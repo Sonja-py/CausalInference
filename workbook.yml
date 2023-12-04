@@ -8,7 +8,7 @@ backingRepositoryRids:
 - "ri.artifacts.repository.artifactory.external-conda-forge"
 - "ri.artifacts.repository.artifactory.external-conda-anaconda"
 outputFolderRid: "ri.compass.main.folder.01d1fd8f-6b93-4d82-90ae-96180ef3b46d"
-comparisonParentFolderRid: "ri.compass.main.folder.78fa9e47-7de0-4e6f-82ef-d49bfb6e3682"
+comparisonParentFolderRid: "ri.compass.main.folder.126c06f0-0b22-425e-ac33-24fc6da5aa18"
 legacyVectorLanguage: null
 autoLayoutPaths: false
 useProjectScope: true
