@@ -1,9 +1,49 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
+from causalml.inference.meta import BaseSLearner
+from causalml.inference.meta import BaseSClassifier
+from causalml.inference.meta import  BaseTClassifier
+
+from sklearn.utils import class_weight
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, precision_recall_curve, auc, roc_auc_score, roc_curve, confusion_matrix
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.4300054b-4092-4e59-b6a5-9418a642e834"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
-def unnamed(final_data):
+def meta_learners(final_data):
+    df = final_data.toPandas()
+    df =  df[df['age_at_covid'].notna()]
+    df = df.reset_index(drop=True)
+
+    X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
+
+    print(X.columns)
+
+    # X['age_at_covid'] = (X['age_at_covid']-X['age_at_covid'].min()) / (X['age_at_covid'].max() - X['age_at_covid'].min())
+    print(X.shape)
+
+    y = df['severity_final']
+    treatment = df['treatment']
+
+    # modelt1 = RandomForestClassifier(n_estimators=100, max_depth=6)
+    # learner_t1 = BaseTClassifier(learner = modelt1)
+    # ate_t1 = learner_t1.estimate_ate(X=X, treatment=treatment, y=y)
+    # print("ATE T-Learner: RandomForest", ate_t1)
+
+    # modelt2 = LogisticRegression(max_iter=10000)
+    # learner_t2 = BaseTClassifier(learner = modelt2)
+    # ate_t2 = learner_t2.estimate_ate(X=X, treatment=treatment, y=y)
+    # print("ATE T-Learner: Logistic Regression", ate_t2)
+
+    models1 = RandomForestClassifier(n_estimators=100, max_depth=6)
+    learner_s1 = BaseSClassifier(learner = models1)
+    ate_s1 = learner_s1.estimate_ate(X=X, treatment=treatment, y=y, return_ci=True)
+    print("ATE S-Learner: RandomForest", ate_s1)
     
 
