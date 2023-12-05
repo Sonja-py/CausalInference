@@ -31,19 +31,24 @@ def meta_learners(final_data):
     y = df['severity_final']
     treatment = df['treatment']
 
-    # modelt1 = RandomForestClassifier(n_estimators=100, max_depth=6)
-    # learner_t1 = BaseTClassifier(learner = modelt1)
-    # ate_t1 = learner_t1.estimate_ate(X=X, treatment=treatment, y=y)
-    # print("ATE T-Learner: RandomForest", ate_t1)
+    modelt1 = RandomForestClassifier(n_estimators=100, max_depth=6)
+    learner_t1 = BaseTClassifier(learner = modelt1)
+    ate_t1 = learner_t1.estimate_ate(X=X, treatment=treatment, y=y)
+    print("ATE T-Learner: RandomForest", ate_t1)
 
-    # modelt2 = LogisticRegression(max_iter=10000)
-    # learner_t2 = BaseTClassifier(learner = modelt2)
-    # ate_t2 = learner_t2.estimate_ate(X=X, treatment=treatment, y=y)
-    # print("ATE T-Learner: Logistic Regression", ate_t2)
+    modelt2 = LogisticRegression(max_iter=10000)
+    learner_t2 = BaseTClassifier(learner = modelt2)
+    ate_t2 = learner_t2.estimate_ate(X=X, treatment=treatment, y=y)
+    print("ATE T-Learner: Logistic Regression", ate_t2)
 
     models1 = RandomForestClassifier(n_estimators=100, max_depth=6)
     learner_s1 = BaseSClassifier(learner = models1)
-    ate_s1 = learner_s1.estimate_ate(X=X, treatment=treatment, y=y, return_ci=True)
+    ate_s1 = learner_s1.estimate_ate(X=X, treatment=treatment, y=y)
     print("ATE S-Learner: RandomForest", ate_s1)
+
+    models2 = LogisticRegression(max_iter=10000)
+    learner_s1 = BaseSClassifier(learner = models2)
+    ate_s2 = learner_s1.estimate_ate(X=X, treatment=treatment, y=y)
+    print("ATE S-Learner: Logistic Regression", ate_s1)
     
 
