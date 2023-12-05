@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 # import matplotlib.pyplot as plt
 
-from causalml.inference.meta import BaseSLearner
+from causalml.inference.meta import BaseSLearner, BaseSClassifier, BaseTClassifier
 from causalml.inference.meta import BaseSClassifier
 from causalml.inference.meta import  BaseTClassifier
 
@@ -23,9 +23,6 @@ def meta_learners(final_data):
 
     X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
 
-    # print(X.columns)
-
-    # X['age_at_covid'] = (X['age_at_covid']-X['age_at_covid'].min()) / (X['age_at_covid'].max() - X['age_at_covid'].min())
     print(X.shape)
 
     y = df['severity_final']
