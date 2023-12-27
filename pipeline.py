@@ -42,22 +42,22 @@ def meta_learners(final_data):
     print('Class weights dict', class_weight_dict)
 
     modelt1 = RandomForestClassifier(n_estimators = 1000, max_depth = 20, class_weight = class_weight_dict)
-    learner_t1 = BaseTClassifier(learner = modelt1).fit(X_train, y_train)
+    learner_t1 = BaseTClassifier(learner = modelt1).fit(X_train, t_train, y_train)
     ate_t1 = learner_t1.estimate_ate(X=X_valid, treatment=t_valid, y=y_valid)
     print("ATE T-Learner: RandomForest", ate_t1)
 
     modelt2 = LogisticRegression(max_iter=100000, class_weight = class_weight_dict)
-    learner_t2 = BaseTClassifier(learner = modelt2).fit(X_train, y_train)
+    learner_t2 = BaseTClassifier(learner = modelt2).fit(X_train, t_train, y_train)
     ate_t2 = learner_t2.estimate_ate(X=X_valid, treatment=t_valid, y=y_valid)
     print("ATE T-Learner: Logistic Regression", ate_t2)
 
     models1 = RandomForestClassifier(n_estimators=1000, max_depth=20, class_weight = class_weight_dict)
-    learner_s1 = BaseSClassifier(learner = models1).fit(X_train, y_train)
+    learner_s1 = BaseSClassifier(learner = models1).fit(X_train, t_train, y_train)
     ate_s1 = learner_s1.estimate_ate(X=X_valid, treatment=t_valid, y=y_valid)
     print("ATE S-Learner: RandomForest", ate_s1)
 
     models2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
-    learner_s2 = BaseSClassifier(learner = models2).fit(X_train, y_train)
+    learner_s2 = BaseSClassifier(learner = models2).fit(X_train, t_train, y_train)
     ate_s2 = learner_s2.estimate_ate(X=X_valid, treatment=t_valid, y=y_valid)
     print("ATE S-Learner: Logistic Regression", ate_s2)
 
