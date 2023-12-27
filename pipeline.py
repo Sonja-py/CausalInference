@@ -44,9 +44,7 @@ def meta_learners(final_data):
     modelt1 = RandomForestClassifier(n_estimators = 500, max_depth = 20, class_weight = class_weight_dict)
     learner_t1 = BaseTClassifier(learner = modelt1)
     ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y)
-    print("ATE T-Learner: RandomForest", ate_t1)
-    cate_t1 = learner_t1.fit_predict(X=X, treatment=t, y=y, return_ci=True, n_bootstraps=10)
-    print('CATE T-Learner: RandomForest', cate_t1)
+    print(f"ATE T-Learner: RandomForest - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}")
 
     modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
     learner_t2 = BaseTClassifier(learner = modelt2)
@@ -74,5 +72,12 @@ def meta_learners(final_data):
     # learner_x2 = BaseXClassifier(outcome_learner = modelx2_c, effect_learner = modelx2_r)
     # ate_x2 = learner_x2.estimate_ate(X=X, treatment=treatment, y=y)
     # print("ATE X-Learner: Logistic Regression", ate_x2)
+    
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.f2cebbba-3c15-4e6c-b89b-d8374a3b91f3"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+def unnamed(final_data):
     
 
