@@ -43,9 +43,9 @@ def meta_learners(final_data):
     print("ATE S-Learner: RandomForest", ate_s1)
 
     models2 = LogisticRegression(max_iter=10000)
-    learner_s2 = BaseTClassifier(learner = models2)
+    learner_s2 = BaseSClassifier(learner = models2)
     ate_s2 = learner_s2.estimate_ate(X=X, treatment=treatment, y=y)
-    print("ATE T-Learner: Logistic Regression", ate_s2)
+    print("ATE S-Learner: Logistic Regression", ate_s2)
 
     modelx1 = RandomForestClassifier(n_estimators=100, max_depth=6)
     learner_x1 = BaseXClassifier(learner = modelx1)
