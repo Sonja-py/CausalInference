@@ -30,7 +30,7 @@ def meta_learners(final_data):
     print('Class weights dict', class_weight_dict)
 
 # n_estimators=800, max_depth=10
-    modelt1 = RandomForestClassifier(n_estimators = 500, max_depth = 10, class_weight = class_weight_dict)
+    modelt1 = RandomForestClassifier(n_estimators = 200, max_depth = 20, class_weight = class_weight_dict)
     learner_t1 = BaseTClassifier(learner = modelt1)
     ate_t1 = learner_t1.estimate_ate(X=X, treatment=treatment, y=y)
     print("ATE T-Learner: RandomForest", ate_t1)
@@ -40,24 +40,24 @@ def meta_learners(final_data):
     ate_t2 = learner_t2.estimate_ate(X=X, treatment=treatment, y=y)
     print("ATE T-Learner: Logistic Regression", ate_t2)
 
-    # models1 = RandomForestClassifier(n_estimators=100, max_depth=6)
+    # models1 = RandomForestClassifier(n_estimators=100, max_depth=6, class_weight = class_weight_dict)
     # learner_s1 = BaseSClassifier(learner = models1)
     # ate_s1 = learner_s1.estimate_ate(X=X, treatment=treatment, y=y)
     # print("ATE S-Learner: RandomForest", ate_s1)
 
-    # models2 = LogisticRegression(max_iter=10000)
+    # models2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
     # learner_s2 = BaseSClassifier(learner = models2)
     # ate_s2 = learner_s2.estimate_ate(X=X, treatment=treatment, y=y)
     # print("ATE S-Learner: Logistic Regression", ate_s2)
 
-    # modelx1_c = RandomForestClassifier(n_estimators=100, max_depth=6)
-    # modelx1_r = RandomForestRegressor(n_estimators=100, max_depth=6)
+    # modelx1_c = RandomForestClassifier(n_estimators=100, max_depth=6, class_weight = class_weight_dict)
+    # modelx1_r = RandomForestRegressor(n_estimators=100, max_depth=6, class_weight = class_weight_dict)
     # learner_x1 = BaseXClassifier(outcome_learner = modelx1_c, effect_learner = modelx1_r)
     # ate_x1 = learner_x1.estimate_ate(X=X, treatment=treatment, y=y)
     # print("ATE X-Learner: RandomForest", ate_x1)
 
-    # modelx2_c = LogisticRegression(max_iter=10000)
-    # modelx2_r = LinearRegression()
+    # modelx2_c = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
+    # modelx2_r = LinearRegression(class_weight = class_weight_dict)
     # learner_x2 = BaseXClassifier(outcome_learner = modelx2_c, effect_learner = modelx2_r)
     # ate_x2 = learner_x2.estimate_ate(X=X, treatment=treatment, y=y)
     # print("ATE X-Learner: Logistic Regression", ate_x2)
