@@ -31,7 +31,9 @@ def meta_learners(final_data):
     X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.7, random_state = 42, stratify = y_test)
 
     t_train = t[X_train.index]
+    print('t_train', t_train)
     t_train = t_train.values.reshape(-1,1)
+    print('t_train', t_train)
     t_test = t[X_test.index]
     t_test = t_test.values.reshape(-1,1)
     t_valid = t[X_valid.index]
@@ -42,7 +44,7 @@ def meta_learners(final_data):
     print('Class weights dict', class_weight_dict)
 
     print('X_train', X_train)
-    print('t_train', t_train)
+    # print('t_train', t_train)
     print('y_train', y_train)
 
     modelt1 = RandomForestClassifier(n_estimators = 1000, max_depth = 20, class_weight = class_weight_dict)
