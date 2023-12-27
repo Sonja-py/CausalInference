@@ -1,10 +1,9 @@
 import numpy as np
 import pandas as pd
-# import matplotlib.pyplot as plt
 
 from causalml.inference.meta import BaseSLearner, BaseSClassifier, BaseTClassifier
-from causalml.inference.meta import BaseSClassifier
-from causalml.inference.meta import  BaseTClassifier
+from causalml.inference.meta import BaseSClassifier, BaseTClassifier, BaseXClassifier
+# from causalml.inference.meta import  BaseTClassifier
 
 from sklearn.utils import class_weight
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, precision_recall_curve, auc, roc_auc_score, roc_curve, confusion_matrix
@@ -44,8 +43,18 @@ def meta_learners(final_data):
     print("ATE S-Learner: RandomForest", ate_s1)
 
     models2 = LogisticRegression(max_iter=10000)
-    learner_s1 = BaseSClassifier(learner = models2)
-    ate_s2 = learner_s1.estimate_ate(X=X, treatment=treatment, y=y)
-    print("ATE S-Learner: Logistic Regression", ate_s1)
+    learner_s2 = BaseTClassifier(learner = models2)
+    ate_s2 = learner_s2.estimate_ate(X=X, treatment=treatment, y=y)
+    print("ATE T-Learner: Logistic Regression", ate_s2)
+
+    modelx1 = RandomForestClassifier(n_estimators=100, max_depth=6)
+    learner_x1 = BaseXClassifier(learner = modelx1)
+    ate_x1 = learner_x1.estimate_ate(X=X, treatment=treatment, y=y)
+    print("ATE X-Learner: RandomForest", ate_x1)
+
+    modelx2 = LogisticRegression(max_iter=10000)
+    learner_x2 = BaseXClassifier(learner = modelx2)
+    ate_x2 = learner_x2.estimate_ate(X=X, treatment=treatment, y=y)
+    print("ATE X-Learner: Logistic Regression", ate_x2)
     
 
