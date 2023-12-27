@@ -31,21 +31,24 @@ def meta_learners(final_data):
     X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.7, random_state = 42, stratify = y_test)
 
     t_train = t[X_train.index]
-    print('t_train', t_train.values)
-    t_train = t_train.values.reshape(-1,1)
-    print('t_train', t_train)
+    # print('t_train', t_train.values)
+    t_train = t_train.values
+    # .reshape(-1,1)
+    # print('t_train', t_train)
     t_test = t[X_test.index]
-    t_test = t_test.values.reshape(-1,1)
+    t_test = t_test.values
+    # .reshape(-1,1)
     t_valid = t[X_valid.index]
-    t_valid = t_valid.values.reshape(-1,1)
+    t_valid = t_valid.values
+    # .reshape(-1,1)
 
     class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
     class_weight_dict = dict(enumerate(class_weights))
     print('Class weights dict', class_weight_dict)
 
-    print('X_train', X_train)
+    # print('X_train', X_train)
     # print('t_train', t_train)
-    print('y_train', y_train)
+    # print('y_train', y_train)
 
     modelt1 = RandomForestClassifier(n_estimators = 1000, max_depth = 20, class_weight = class_weight_dict)
     learner_t1 = BaseTClassifier(learner = modelt1).fit(X_train, t_train, y_train)
