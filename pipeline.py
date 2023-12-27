@@ -30,7 +30,7 @@ def meta_learners(final_data):
     print('Class weights dict', class_weight_dict)
 
 # n_estimators=800, max_depth=10
-    modelt1 = RandomForestClassifier(max_depth = 10, class_weight = class_weight_dict)
+    modelt1 = RandomForestClassifier(n_estimators = 200, max_depth = 10, class_weight = class_weight_dict)
     learner_t1 = BaseTClassifier(learner = modelt1)
     ate_t1 = learner_t1.estimate_ate(X=X, treatment=treatment, y=y)
     print("ATE T-Learner: RandomForest", ate_t1)
