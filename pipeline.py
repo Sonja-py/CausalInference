@@ -31,7 +31,7 @@ def meta_learners(final_data):
     X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.7, random_state = 42, stratify = y_test)
 
     t_train = t[X_train.index]
-    print('t_train', t_train)
+    print('t_train', t_train.values)
     t_train = t_train.values.reshape(-1,1)
     print('t_train', t_train)
     t_test = t[X_test.index]
