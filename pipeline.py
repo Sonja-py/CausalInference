@@ -41,6 +41,10 @@ def meta_learners(final_data):
     class_weight_dict = dict(enumerate(class_weights))
     print('Class weights dict', class_weight_dict)
 
+    print('X_train', X_train)
+    print('t_train', t_train)
+    print('y_train', y_train)
+
     modelt1 = RandomForestClassifier(n_estimators = 1000, max_depth = 20, class_weight = class_weight_dict)
     learner_t1 = BaseTClassifier(learner = modelt1).fit(X_train, t_train, y_train)
     ate_t1 = learner_t1.estimate_ate(X=X_valid, treatment=t_valid, y=y_valid)
