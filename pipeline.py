@@ -22,17 +22,20 @@ def meta_learners(final_data):
 
     X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
 
-    print(X.shape)
-
     y = df['severity_final']
     treatment = df['treatment']
+
+    class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
+    class_weight_dict = dict(enumerate(class_weights))
+    print('Class weights dict', class_weight_dict)
+
 # n_estimators=800, max_depth=10
-    modelt1 = RandomForestClassifier()
+    modelt1 = RandomForestClassifier(class_weight = class_weight_dict)
     learner_t1 = BaseTClassifier(learner = modelt1)
     ate_t1 = learner_t1.estimate_ate(X=X, treatment=treatment, y=y)
     print("ATE T-Learner: RandomForest", ate_t1)
 
-    modelt2 = LogisticRegression(max_iter=10000)
+    modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
     learner_t2 = BaseTClassifier(learner = modelt2)
     ate_t2 = learner_t2.estimate_ate(X=X, treatment=treatment, y=y)
     print("ATE T-Learner: Logistic Regression", ate_t2)
