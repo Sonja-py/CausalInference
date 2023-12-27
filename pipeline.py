@@ -26,48 +26,39 @@ def meta_learners(final_data):
 
     np.random.seed(3)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
 
-    X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.7, random_state = 42, stratify = y_test)
+    # X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.7, random_state = 42, stratify = y_test)
 
-    t_train = t[X_train.index]
-    # print('t_train', t_train.values)
-    t_train = t_train.values
-    # .reshape(-1,1)
-    # print('t_train', t_train)
-    t_test = t[X_test.index]
-    t_test = t_test.values
-    # .reshape(-1,1)
-    t_valid = t[X_valid.index]
-    t_valid = t_valid.values
-    # .reshape(-1,1)
+    # t_train = t[X_train.index]
+    # t_train = t_train.values
+    # t_test = t[X_test.index]
+    # t_test = t_test.values
+    # t_valid = t[X_valid.index]
+    # t_valid = t_valid.values
 
     class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
     class_weight_dict = dict(enumerate(class_weights))
     print('Class weights dict', class_weight_dict)
 
-    # print('X_train', X_train)
-    # print('t_train', t_train)
-    # print('y_train', y_train)
-
     modelt1 = RandomForestClassifier(n_estimators = 1000, max_depth = 20, class_weight = class_weight_dict)
-    learner_t1 = BaseTClassifier(learner = modelt1).fit(X_train, t_train, y_train)
-    ate_t1 = learner_t1.estimate_ate(X=X_valid, treatment=t_valid, y=y_valid)
+    learner_t1 = BaseTClassifier(learner = modelt1)
+    ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y)
     print("ATE T-Learner: RandomForest", ate_t1)
 
     modelt2 = LogisticRegression(max_iter=100000, class_weight = class_weight_dict)
-    learner_t2 = BaseTClassifier(learner = modelt2).fit(X_train, t_train, y_train)
-    ate_t2 = learner_t2.estimate_ate(X=X_valid, treatment=t_valid, y=y_valid)
+    learner_t2 = BaseTClassifier(learner = modelt2)
+    ate_t2 = learner_t2.estimate_ate(X=X, treatment=t, y=y)
     print("ATE T-Learner: Logistic Regression", ate_t2)
 
     models1 = RandomForestClassifier(n_estimators=1000, max_depth=20, class_weight = class_weight_dict)
-    learner_s1 = BaseSClassifier(learner = models1).fit(X_train, t_train, y_train)
-    ate_s1 = learner_s1.estimate_ate(X=X_valid, treatment=t_valid, y=y_valid)
+    learner_s1 = BaseSClassifier(learner = models1)
+    ate_s1 = learner_s1.estimate_ate(X=X, treatment=t, y=y)
     print("ATE S-Learner: RandomForest", ate_s1)
 
     models2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
-    learner_s2 = BaseSClassifier(learner = models2).fit(X_train, t_train, y_train)
-    ate_s2 = learner_s2.estimate_ate(X=X_valid, treatment=t_valid, y=y_valid)
+    learner_s2 = BaseSClassifier(learner = models2)
+    ate_s2 = learner_s2.estimate_ate(X=X, treatment=t, y=y)
     print("ATE S-Learner: Logistic Regression", ate_s2)
 
     # modelx1_c = RandomForestClassifier(n_estimators=100, max_depth=6, class_weight = class_weight_dict)
