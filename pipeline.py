@@ -78,6 +78,41 @@ def meta_learners(final_data):
     Output(rid="ri.vector.main.execute.f2cebbba-3c15-4e6c-b89b-d8374a3b91f3"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
-def unnamed(final_data):
+def meta_learners_bootstrapped(final_data):
+
+    df = final_data.toPandas()
+    df =  df[df['age_at_covid'].notna()]
+    df = df.reset_index(drop=True)
+
+    X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
+
+    y = df['severity_final']
+    t = df['treatment']
+
+    np.random.seed(3)
+
+    class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
+    class_weight_dict = dict(enumerate(class_weights))
+    print('Class weights dict', class_weight_dict)
+
+    model_t1 = RandomForestClassifier(n_estimators = 500, max_depth = 20, class_weight = class_weight_dict)
+    learner_t1 = BaseTClassifier(learner = model_t1)
+    cate_t1 = learner_t1.fit_predict(X=X, treatment=t, y=y, return_ci=True, n_bootstraps=10)
+    print('CATE T-Learner: RandomForest', cate_t1)
+
+    model_t2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
+    learner_t2 = BaseTClassifier(learner = model_t2)
+    cate_t2 = learner_t2.fit_predict(X=X, treatment=t, y=y, return_ci=True, n_bootstraps=10)
+    print('CATE T-Learner: LogisticRegression', cate_t2)
+
+    model_s1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
+    learner_s1 = BaseSClassifier(learner = model_s1)
+    cate_s1 = learner_s1.fit_predict(X=X, treatment=t, y=y, return_ci=True, n_bootstraps=10)
+    print('CATE T-Learner: RandomForest', cate_s1)
+
+    model_s2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
+    learner_s2 = BaseSClassifier(learner = model_s2)
+    cate_s2 = learner_s2.fit_predict(X=X, treatment=t, y=y, return_ci=True, n_bootstraps=10)
+    print('CATE T-Learner: LogisticRegression', cate_s2)
     
 
