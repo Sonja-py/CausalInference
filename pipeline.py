@@ -45,6 +45,8 @@ def meta_learners(final_data):
     learner_t1 = BaseTClassifier(learner = modelt1)
     ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y)
     print("ATE T-Learner: RandomForest", ate_t1)
+    cate_t1 = learner_ti.fit_predict(X=X, treatment=t, y=y, return_ci=True, n_bootstraps=10)
+    print('CATE T-Learner: RandomForest', cate_t1)
 
     modelt2 = LogisticRegression(max_iter=100000, class_weight = class_weight_dict)
     learner_t2 = BaseTClassifier(learner = modelt2)
