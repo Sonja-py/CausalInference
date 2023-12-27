@@ -27,7 +27,7 @@ def meta_learners(final_data):
     y = df['severity_final']
     treatment = df['treatment']
 
-    modelt1 = RandomForestClassifier(n_estimators=100, max_depth=6)
+    modelt1 = RandomForestClassifier(n_estimators=1000, max_depth=6)
     learner_t1 = BaseTClassifier(learner = modelt1)
     ate_t1 = learner_t1.estimate_ate(X=X, treatment=treatment, y=y)
     print("ATE T-Learner: RandomForest", ate_t1)
