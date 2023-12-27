@@ -1,9 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from causalml.inference.meta import BaseSLearner, BaseSClassifier, BaseTClassifier
+# from causalml.inference.meta import BaseSLearner, BaseSClassifier, BaseTClassifier
 from causalml.inference.meta import BaseSClassifier, BaseTClassifier, BaseXClassifier
-# from causalml.inference.meta import  BaseTClassifier
 
 from sklearn.utils import class_weight
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, precision_recall_curve, auc, roc_auc_score, roc_curve, confusion_matrix
@@ -29,13 +28,12 @@ def meta_learners(final_data):
     class_weight_dict = dict(enumerate(class_weights))
     print('Class weights dict', class_weight_dict)
 
-# n_estimators=800, max_depth=10
-    modelt1 = RandomForestClassifier(n_estimators = 500, max_depth = 20, class_weight = class_weight_dict)
+    modelt1 = RandomForestClassifier(n_estimators = 1000, max_depth = 20, class_weight = class_weight_dict)
     learner_t1 = BaseTClassifier(learner = modelt1)
     ate_t1 = learner_t1.estimate_ate(X=X, treatment=treatment, y=y)
     print("ATE T-Learner: RandomForest", ate_t1)
 
-    modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
+    modelt2 = LogisticRegression(max_iter=100000, class_weight = class_weight_dict)
     learner_t2 = BaseTClassifier(learner = modelt2)
     ate_t2 = learner_t2.estimate_ate(X=X, treatment=treatment, y=y)
     print("ATE T-Learner: Logistic Regression", ate_t2)
