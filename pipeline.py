@@ -67,13 +67,13 @@ def meta_learners(final_data):
     modelx1_c = RandomForestClassifier(n_estimators=500, max_depth=6, class_weight = class_weight_dict)
     modelx1_r = RandomForestRegressor(n_estimators=500, max_depth=6)
     learner_x1 = BaseXClassifier(outcome_learner = modelx1_c, effect_learner = modelx1_r)
-    ate_x1 = learner_x1.estimate_ate(X=X, treatment=treatment, y=y)
+    ate_x1 = learner_x1.estimate_ate(X=X, treatment=t, y=y)
     print("ATE X-Learner: RandomForest", ate_x1)
 
     modelx2_c = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
     modelx2_r = LinearRegression(class_weight = class_weight_dict)
     learner_x2 = BaseXClassifier(outcome_learner = modelx2_c, effect_learner = modelx2_r)
-    ate_x2 = learner_x2.estimate_ate(X=X, treatment=treatment, y=y)
+    ate_x2 = learner_x2.estimate_ate(X=X, treatment=t, y=y)
     print("ATE X-Learner: Logistic Regression", ate_x2)
     
 
