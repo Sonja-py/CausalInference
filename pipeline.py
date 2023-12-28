@@ -22,6 +22,7 @@ def cevae(final_data):
     X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
     y = df['severity_final']
     t = df['treatment']
+    print(1)
 
     np.random.seed(3)
 
