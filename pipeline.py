@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-# from causalml.inference.meta import BaseSLearner, BaseSClassifier, BaseTClassifier
 from causalml.inference.meta import BaseSClassifier, BaseTClassifier, BaseXClassifier
+from causalml.inference.nn import CEVAE
 
 from sklearn.utils import class_weight
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, precision_recall_curve, auc, roc_auc_score, roc_curve, confusion_matrix
@@ -117,5 +117,12 @@ def meta_learners_bootstrapped(final_data):
     learner_s2 = BaseSClassifier(learner = model_s2)
     cate_s2 = learner_s2.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
     print('CATE S-Learner: LogisticRegression', cate_s2)
+    
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.70189f47-6260-4ec8-942e-c5e0d4bdbd98"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+def unnamed(final_data):
     
 
