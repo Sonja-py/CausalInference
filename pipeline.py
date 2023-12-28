@@ -101,12 +101,12 @@ def meta_learners_bootstrapped(final_data):
     learner_t1 = BaseTClassifier(learner = model_t1)
     ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
     # cate_t1 = learner_t1.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
-    print('CATE T-Learner: RandomForest', ate_t1)
+    print(f'CATE T-Learner: RandomForest - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}')
 
     model_t2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
     learner_t2 = BaseTClassifier(learner = model_t2)
     cate_t2 = learner_t2.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
-    print('CATE T-Learner: LogisticRegression', cate_t2)
+    print(f'CATE T-Learner: LogisticRegression - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}')
 
     model_s1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
     learner_s1 = BaseSClassifier(learner = model_s1)
