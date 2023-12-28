@@ -65,7 +65,7 @@ def meta_learners(final_data):
 
     # X-Learner
     modelx1_c = RandomForestClassifier(n_estimators=500, max_depth=6, class_weight = class_weight_dict)
-    modelx1_r = RandomForestRegressor(n_estimators=500, max_depth=6, class_weight = class_weight_dict)
+    modelx1_r = RandomForestRegressor(n_estimators=500, max_depth=6)
     learner_x1 = BaseXClassifier(outcome_learner = modelx1_c, effect_learner = modelx1_r)
     ate_x1 = learner_x1.estimate_ate(X=X, treatment=treatment, y=y)
     print("ATE X-Learner: RandomForest", ate_x1)
@@ -110,11 +110,11 @@ def meta_learners_bootstrapped(final_data):
     model_s1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
     learner_s1 = BaseSClassifier(learner = model_s1)
     cate_s1 = learner_s1.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
-    print('CATE T-Learner: RandomForest', cate_s1)
+    print('CATE S-Learner: RandomForest', cate_s1)
 
     model_s2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
     learner_s2 = BaseSClassifier(learner = model_s2)
     cate_s2 = learner_s2.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
-    print('CATE T-Learner: LogisticRegression', cate_s2)
+    print('CATE S-Learner: LogisticRegression', cate_s2)
     
 
