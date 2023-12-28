@@ -41,6 +41,7 @@ def meta_learners(final_data):
     class_weight_dict = dict(enumerate(class_weights))
     print('Class weights dict', class_weight_dict)
 
+    # T-Learner
     modelt1 = RandomForestClassifier(n_estimators = 500, max_depth = 20, class_weight = class_weight_dict)
     learner_t1 = BaseTClassifier(learner = modelt1)
     ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y)
@@ -51,6 +52,7 @@ def meta_learners(final_data):
     ate_t2 = learner_t2.estimate_ate(X=X, treatment=t, y=y)
     print(f"ATE T-Learner: Logistic Regression - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}")
 
+    # S-Learner
     models1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
     learner_s1 = BaseSClassifier(learner = models1)
     ate_s1 = learner_s1.estimate_ate(X=X, treatment=t, y=y)
@@ -61,8 +63,9 @@ def meta_learners(final_data):
     ate_s2 = learner_s2.estimate_ate(X=X, treatment=t, y=y)
     print("ATE S-Learner: Logistic Regression", ate_s2)
 
-    modelx1_c = RandomForestClassifier(n_estimators=100, max_depth=6, class_weight = class_weight_dict)
-    modelx1_r = RandomForestRegressor(n_estimators=100, max_depth=6, class_weight = class_weight_dict)
+    # X-Learner
+    modelx1_c = RandomForestClassifier(n_estimators=500, max_depth=6, class_weight = class_weight_dict)
+    modelx1_r = RandomForestRegressor(n_estimators=500, max_depth=6, class_weight = class_weight_dict)
     learner_x1 = BaseXClassifier(outcome_learner = modelx1_c, effect_learner = modelx1_r)
     ate_x1 = learner_x1.estimate_ate(X=X, treatment=treatment, y=y)
     print("ATE X-Learner: RandomForest", ate_x1)
