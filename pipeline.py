@@ -11,6 +11,29 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.model_selection import train_test_split
 
 @transform_pandas(
+    Output(rid="ri.vector.main.execute.70189f47-6260-4ec8-942e-c5e0d4bdbd98"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+def cevae(final_data):
+    df = final_data.toPandas()
+    df =  df[df['age_at_covid'].notna()]
+    df = df.reset_index(drop=True)
+
+    X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
+    y = df['severity_final']
+    t = df['treatment']
+
+    np.random.seed(3)
+
+    class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
+    class_weight_dict = dict(enumerate(class_weights))
+    print('Class weights dict', class_weight_dict)
+
+    cevae_model = CEVAE()
+    ite = cevae_model.fit_predict(X=X, treatment=t, y=y)
+    print(f'ITE: CEVAE - {ite}')
+
+@transform_pandas(
     Output(rid="ri.vector.main.execute.4300054b-4092-4e59-b6a5-9418a642e834"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
@@ -117,12 +140,5 @@ def meta_learners_bootstrapped(final_data):
     learner_s2 = BaseSClassifier(learner = model_s2)
     cate_s2 = learner_s2.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
     print('CATE S-Learner: LogisticRegression', cate_s2)
-    
-
-@transform_pandas(
-    Output(rid="ri.vector.main.execute.70189f47-6260-4ec8-942e-c5e0d4bdbd98"),
-    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
-)
-def unnamed(final_data):
     
 
