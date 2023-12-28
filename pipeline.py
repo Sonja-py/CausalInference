@@ -99,22 +99,23 @@ def meta_learners_bootstrapped(final_data):
 
     model_t1 = RandomForestClassifier(n_estimators = 500, max_depth = 20, class_weight = class_weight_dict)
     learner_t1 = BaseTClassifier(learner = model_t1)
-    cate_t1 = learner_t1.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
-    print('CATE T-Learner: RandomForest', cate_t1)
+    ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
+    # cate_t1 = learner_t1.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
+    print('CATE T-Learner: RandomForest', ate_t1)
 
     model_t2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
     learner_t2 = BaseTClassifier(learner = model_t2)
-    cate_t2 = learner_t2.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
+    cate_t2 = learner_t2.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
     print('CATE T-Learner: LogisticRegression', cate_t2)
 
     model_s1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
     learner_s1 = BaseSClassifier(learner = model_s1)
-    cate_s1 = learner_s1.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
+    cate_s1 = learner_s1.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
     print('CATE S-Learner: RandomForest', cate_s1)
 
     model_s2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
     learner_s2 = BaseSClassifier(learner = model_s2)
-    cate_s2 = learner_s2.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
+    cate_s2 = learner_s2.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
     print('CATE S-Learner: LogisticRegression', cate_s2)
     
 
