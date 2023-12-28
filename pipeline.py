@@ -49,7 +49,7 @@ def meta_learners(final_data):
     modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
     learner_t2 = BaseTClassifier(learner = modelt2)
     ate_t2 = learner_t2.estimate_ate(X=X, treatment=t, y=y)
-    print("ATE T-Learner: Logistic Regression", ate_t2)
+    print(f"ATE T-Learner: Logistic Regression - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}")
 
     models1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
     learner_s1 = BaseSClassifier(learner = models1)
@@ -85,7 +85,6 @@ def meta_learners_bootstrapped(final_data):
     df = df.reset_index(drop=True)
 
     X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
-
     y = df['severity_final']
     t = df['treatment']
 
@@ -97,22 +96,22 @@ def meta_learners_bootstrapped(final_data):
 
     model_t1 = RandomForestClassifier(n_estimators = 500, max_depth = 20, class_weight = class_weight_dict)
     learner_t1 = BaseTClassifier(learner = model_t1)
-    cate_t1 = learner_t1.fit_predict(X=X, treatment=t, y=y, return_ci=True, n_bootstraps=10)
+    cate_t1 = learner_t1.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
     print('CATE T-Learner: RandomForest', cate_t1)
 
     model_t2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
     learner_t2 = BaseTClassifier(learner = model_t2)
-    cate_t2 = learner_t2.fit_predict(X=X, treatment=t, y=y, return_ci=True, n_bootstraps=10)
+    cate_t2 = learner_t2.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
     print('CATE T-Learner: LogisticRegression', cate_t2)
 
     model_s1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
     learner_s1 = BaseSClassifier(learner = model_s1)
-    cate_s1 = learner_s1.fit_predict(X=X, treatment=t, y=y, return_ci=True, n_bootstraps=10)
+    cate_s1 = learner_s1.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
     print('CATE T-Learner: RandomForest', cate_s1)
 
     model_s2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
     learner_s2 = BaseSClassifier(learner = model_s2)
-    cate_s2 = learner_s2.fit_predict(X=X, treatment=t, y=y, return_ci=True, n_bootstraps=10)
+    cate_s2 = learner_s2.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
     print('CATE T-Learner: LogisticRegression', cate_s2)
     
 
