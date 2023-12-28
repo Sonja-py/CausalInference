@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from causalml.inference.meta import BaseSClassifier, BaseTClassifier, BaseXClassifier
-from causalml.inference.nn import CEVAE
+# from causalml.inference.nn import CEVAE
 
 from sklearn.utils import class_weight
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, precision_recall_curve, auc, roc_auc_score, roc_curve, confusion_matrix
