@@ -95,7 +95,7 @@ def meta_learners(final_data):
     print("ATE X-Learner: RandomForest", ate_x1)
 
     modelx2_c = LogisticRegression(max_iter=1000000, class_weight = class_weight_dict)
-    modelx2_r = LinearRegression(class_weight = class_weight_dict)
+    modelx2_r = LinearRegression()
     learner_x2 = BaseXClassifier(outcome_learner = modelx2_c, effect_learner = modelx2_r)
     ate_x2 = learner_x2.estimate_ate(X=X, treatment=t, y=y)
     print("ATE X-Learner: Logistic Regression", ate_x2)
