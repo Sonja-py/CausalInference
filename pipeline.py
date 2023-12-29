@@ -26,7 +26,7 @@ def cevae(final_data):
     np.random.seed(3)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
-    X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.3, random_state = 42, stratify = y_test)
+    X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.2, random_state = 42, stratify = y_test)
 
     t_train = t[X_train.index]
     t_test = t[X_test.index]
@@ -42,6 +42,7 @@ def cevae(final_data):
     cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
     ite = cevae_model.predict(X_valid.to_numpy())
     print(f'ITE: CEVAE - {ite}')
+    print('ATE: CEVAE:',ite.mean())
     print('Shape of ITE:',ite.shape)
     
 
