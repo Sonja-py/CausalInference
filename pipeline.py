@@ -22,17 +22,25 @@ def cevae(final_data):
     X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
     y = df['severity_final']
     t = df['treatment']
-    print(1)
 
     np.random.seed(3)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
+    X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.3, random_state = 42, stratify = y_test)
+
+    t_train = t[X_train.index]
+    t_test = t[X_test.index]
+    t_valid = t[Xvalidn.index]
 
     class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
     class_weight_dict = dict(enumerate(class_weights))
     print('Class weights dict', class_weight_dict)
 
     cevae_model = CEVAE()
-    ite = cevae_model.fit_predict(X=X, treatment=t, y=y)
+    cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
+    ite = cevae_model.predict(X_valid)
     print(f'ITE: CEVAE - {ite}')
+    
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.4300054b-4092-4e59-b6a5-9418a642e834"),
