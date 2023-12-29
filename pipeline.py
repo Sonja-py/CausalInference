@@ -36,7 +36,7 @@ def cevae(final_data):
     class_weight_dict = dict(enumerate(class_weights))
     print('Class weights dict', class_weight_dict)
 
-    cevae_model = CEVAE()
+    cevae_model = CEVAE(num_epochs = 10, batch_size = 32, learning_rate = 1e-2, num_samples = 100)
     cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
     ite = cevae_model.predict(X_valid)
     print(f'ITE: CEVAE - {ite}')
