@@ -30,7 +30,7 @@ def cevae(final_data):
 
     t_train = t[X_train.index]
     t_test = t[X_test.index]
-    t_valid = t[Xvalidn.index]
+    t_valid = t[X_valid.index]
 
     class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
     class_weight_dict = dict(enumerate(class_weights))
