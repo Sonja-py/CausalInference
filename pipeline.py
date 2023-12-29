@@ -31,8 +31,8 @@ def cevae(final_data):
     t_train = t[X_train.index]
     t_test = t[X_test.index]
     t_valid = t[X_valid.index]
-    print('Type of X_valid', type(X_valid))
-    print('Shape of X_valid', X_valid.shape)
+    
+    print(f'Shape of train: {X_train.shape}, test: {X_test.shape}, valid:{X_valid.shape}')
 
     class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
     class_weight_dict = dict(enumerate(class_weights))
@@ -42,6 +42,7 @@ def cevae(final_data):
     cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
     ite = cevae_model.predict(X_valid.to_numpy())
     print(f'ITE: CEVAE - {ite}')
+    print('Shape of ITE:',ite.shape)
     
 
 @transform_pandas(
