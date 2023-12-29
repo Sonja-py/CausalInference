@@ -40,7 +40,7 @@ def cevae(final_data):
 
     cevae_model = CEVAE(num_epochs = 10, batch_size = 32, learning_rate = 1e-2, num_samples = 100)
     cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
-    ite = cevae_model.predict(X_valid)
+    ite = cevae_model.predict(X_valid.to_numpy())
     print(f'ITE: CEVAE - {ite}')
     
 
