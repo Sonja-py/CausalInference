@@ -79,7 +79,7 @@ def meta_learners(final_data):
 
     # T-Learner
     modelt1 = RandomForestClassifier(n_estimators = 500, max_depth = 20, class_weight = class_weight_dict)
-    modelt1.fit(X_train, np.concatenate([y_train, t_train], 1))
+    modelt1.fit(X=X_train, y=np.concatenate([y_train, t_train], 1))
     modelt1_preds = modelt1.predict_proba(X_valid)
     y0_pred = modelt1_preds[:, 0]
     y1_pred = modelt1_preds[:, 1]
