@@ -55,23 +55,22 @@ def meta_learners(final_data):
     df = df.reset_index(drop=True)
 
     X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
-
     y = df['severity_final']
     t = df['treatment']
 
     np.random.seed(3)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
 
-    X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.7, random_state = 42, stratify = y_test)
+    # X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.7, random_state = 42, stratify = y_test)
 
-    y_train, y_valid, y_test = y_train.values.reshape(-1,1), y_valid.values.reshape(-1,1), y_test.values.reshape(-1,1)
-    t_train = t[X_train.index]
-    t_train = t_train.values.reshape(-1,1)
-    t_test = t[X_test.index]
-    t_test = t_test.values.reshape(-1,1)
-    t_valid = t[X_valid.index]
-    t_valid = t_valid.values.reshape(-1,1)
+    # y_train, y_valid, y_test = y_train.values.reshape(-1,1), y_valid.values.reshape(-1,1), y_test.values.reshape(-1,1)
+    # t_train = t[X_train.index]
+    # t_train = t_train.values.reshape(-1,1)
+    # t_test = t[X_test.index]
+    # t_test = t_test.values.reshape(-1,1)
+    # t_valid = t[X_valid.index]
+    # t_valid = t_valid.values.reshape(-1,1)
 
     class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
     class_weight_dict = dict(enumerate(class_weights))
@@ -79,25 +78,25 @@ def meta_learners(final_data):
 
     # T-Learner
     modelt1 = RandomForestClassifier(n_estimators = 500, max_depth = 20, class_weight = class_weight_dict)
-    modelt1.fit(X=X_train, y=np.concatenate([y_train, t_train], 1))
-    modelt1_preds = modelt1.predict_proba(X_valid)
-    y0_pred = modelt1_preds[:, 0]
-    y1_pred = modelt1_preds[:, 1]
+    # modelt1.fit(X=X_train, y=np.concatenate([y_train, t_train], 1))
+    # modelt1_preds = modelt1.predict_proba(X_valid)
+    # y0_pred = modelt1_preds[:, 0]
+    # y1_pred = modelt1_preds[:, 1]
 
-    print('y0_pred',y0_pred)
-    print('y1_pred',y1_pred)
-    print('t_valid',t_valid)
-    preds = (1. - t_valid) * y0_pred + t_valid * y1_pred
-    print('preds',preds)
-    print('modelt1_preds',modelt1_preds)
+    # print('y0_pred',y0_pred)
+    # print('y1_pred',y1_pred)
+    # print('t_valid',t_valid)
+    # preds = (1. - t_valid) * y0_pred + t_valid * y1_pred
+    # print('preds',preds)
+    # print('modelt1_preds',modelt1_preds)
     learner_t1 = BaseTClassifier(learner = modelt1)
     ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y)
     print(f"ATE T-Learner: RandomForest - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}")
 
-    # modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
-    # learner_t2 = BaseTClassifier(learner = modelt2)
-    # ate_t2 = learner_t2.estimate_ate(X=X, treatment=t, y=y)
-    # print(f"ATE T-Learner: Logistic Regression - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}")
+    modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
+    learner_t2 = BaseTClassifier(learner = modelt2)
+    ate_t2 = learner_t2.estimate_ate(X=X, treatment=t, y=y)
+    print(f"ATE T-Learner: Logistic Regression - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}")
 
     # S-Learner
     # models1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
