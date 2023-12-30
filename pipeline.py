@@ -83,6 +83,7 @@ def meta_learners(final_data):
     y1_pred = modelt1_preds[:, 1].reshape(-1, 1)
 
     print('y0_pred',y0_pred)
+    print('y1_pred',y1_pred)
     print('t_valid',t_valid)
     preds = (1. - t_valid) * y0_pred + t_valid * y1_pred
     print('preds',preds)
