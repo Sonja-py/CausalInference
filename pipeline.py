@@ -96,7 +96,7 @@ def meta_learners(final_data):
     modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
     learner_t2 = BaseTClassifier(learner = modelt2)
     ate_t2 = learner_t2.estimate_ate(X=X, treatment=t, y=y)
-    print(f"ATE T-Learner: Logistic Regression - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}")
+    print(f"ATE T-Learner: Logistic Regression - Mean {ate_t2[0]}, LB {ate_t2[1]}, UB {ate_t2[2]}")
 
     # S-Learner
     # models1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
