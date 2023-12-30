@@ -82,7 +82,9 @@ def meta_learners(final_data):
     y0_pred = modelt1_preds[:, 0].reshape(-1, 1)
     y1_pred = modelt1_preds[:, 1].reshape(-1, 1)
 
-    preds = ((1. - t_valid) * y0_pred) + (t_valid * y1_pred)
+    print('y0_pred',y0_pred)
+    print('t_valid',t_valid)
+    preds = (1. - t_valid) * y0_pred + t_valid * y1_pred
     print('preds',preds)
     print('modelt1_preds',modelt1_preds)
     learner_t1 = BaseTClassifier(learner = modelt1)
