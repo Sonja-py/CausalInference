@@ -42,7 +42,7 @@ def cevae(final_data):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    ingredient_list = main_df.ingredient_concept_id.unique()[:3]
+    ingredient_list = main_df.ingredient_concept_id.unique()[:1]
     ingredient_pairs = list(combinations(ingredient_list, 2))
     # rocs = []
     ates = []
@@ -72,12 +72,12 @@ def cevae(final_data):
 
         cevae_model = CEVAE(num_epochs = 10, batch_size = 128, learning_rate = 1e-2, num_samples = 100)
         loss = cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
-
-        plt.plot(loss)
-        plt.title(f'CEVAE loss for combo {combination}')
-        plt.xlabel('Epoch')
-        plt.ylabel('Training Loss')
-        plt.show()
+        print('Loss:',loss)
+        # plt.plot(loss)
+        # plt.title(f'CEVAE loss for combo {combination}')
+        # plt.xlabel('Epoch')
+        # plt.ylabel('Training Loss')
+        # plt.show()
 
         ite = cevae_model.predict(X_valid.to_numpy())
         ate = ite.mean()
