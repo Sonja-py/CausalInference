@@ -77,6 +77,7 @@ def cevae(final_data):
         plt.title(f'CEVAE loss for combo {combination}')
         plt.xlabel('Epoch')
         plt.ylabel('Training Loss')
+        plt.show()
 
         ite = cevae_model.predict(X_valid.to_numpy())
         ate = ite.mean()
