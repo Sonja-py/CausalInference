@@ -95,7 +95,7 @@ def meta_learners(final_data):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    ingredient_list = main_df.ingredient_concept_id.unique()[:2]
+    ingredient_list = main_df.ingredient_concept_id.unique()[:3]
     ingredient_pairs = list(combinations(ingredient_list, 2))
     # rocs = []
     ates = []
@@ -129,7 +129,7 @@ def meta_learners(final_data):
         print('Class weights dict', class_weight_dict)
 
         # T-Learner
-        modelt1 = RandomForestClassifier(n_estimators = 500, max_depth = 20, class_weight = class_weight_dict)
+        modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 15, class_weight = class_weight_dict)
         # modelt1.fit(X=X_train, y=np.concatenate([y_train, t_train], 1))
         # modelt1_preds = modelt1.predict_proba(X_valid)
         # y0_pred = modelt1_preds[:, 0]
@@ -142,8 +142,8 @@ def meta_learners(final_data):
         # print('preds',preds)
         # print('modelt1_preds',modelt1_preds)
         learner_t1 = BaseTClassifier(learner = modelt1)
-        pred_t1 = learner_t1.fit_predict(X=X, treatment=t, y=y, verbose=True)
-        print('pred_t1:',pred_t1)
+        # pred_t1 = learner_t1.fit_predict(X=X, treatment=t, y=y, verbose=True)
+        # print('pred_t1:',pred_t1)
         ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y)
         print(f"ATE T-Learner: RandomForest - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}")
 
