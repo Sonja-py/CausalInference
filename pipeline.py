@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from datetime import datetime
 from itertools import combinations
 
@@ -70,7 +71,13 @@ def cevae(final_data):
         print('Class weights dict', class_weight_dict)
 
         cevae_model = CEVAE(num_epochs = 10, batch_size = 128, learning_rate = 1e-2, num_samples = 100)
-        cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
+        loss = cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
+
+        plt.plot(loss)
+        plt.title(f'CEVAE loss for combo {combination}')
+        plt.xlabel('Epoch')
+        plt.ylabel('Training Loss')
+
         ite = cevae_model.predict(X_valid.to_numpy())
         ate = ite.mean()
         print('ATE:',ate)
