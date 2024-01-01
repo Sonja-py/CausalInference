@@ -10,40 +10,73 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.model_selection import train_test_split
 
+# Save error metrics
+def write_text_file(data, metric):
+    output = Transforms.get_output()
+    output_fs = output.filesystem()
+    
+    if metric == 'roc':
+        filename = 'roc.txt'
+    else:
+        filename = 'ate.txt'
+    with output_fs.open(filename, 'w') as f: 
+        f.write(str(data))
+    
+
+# Save model
+def save_model(model, output_filename):
+    output = Transforms.get_output()
+    output_fs = output.filesystem()
+    
+    with output_fs.open(output_filename + ".h5", 'w') as f:
+        model.save(str(output_filename)+'.h5')
+
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.70189f47-6260-4ec8-942e-c5e0d4bdbd98"),
+    Output(rid="ri.foundry.main.dataset.aa8fcdda-8570-4c04-b0d5-3b1afa7d04e6"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
 def cevae(final_data):
-    df = final_data.toPandas()
-    df =  df[df['age_at_covid'].notna()]
-    df = df.reset_index(drop=True)
 
-    X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
-    y = df['severity_final']
-    t = df['treatment']
+    # Create and get the data for pair of different antidepressants
+    main_df = final_data.toPandas()
+    ingredient_list = main_df.ingredient_concept_id.unique()[:3]
+    ingredient_pairs = list(combinations(ingredient_list, 2))
+    # rocs = []
+    ates = []
 
-    np.random.seed(3)
+    for idx, combination in enumerate(ingredient_pairs):
+        start_time = datetime.now()
+        print(f'-----------Running S-Learner for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
+        df = main_df[main_df.ingredient_concept_id.isin(list(combination))]
+        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
-    X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.2, random_state = 42, stratify = y_test)
+        X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
+        y = df['severity_final']
+        t = df['treatment']
 
-    t_train = t[X_train.index]
-    t_test = t[X_test.index]
-    t_valid = t[X_valid.index]
-    
-    print(f'Shape of train: {X_train.shape}, test: {X_test.shape}, valid:{X_valid.shape}')
+        np.random.seed(3)
 
-    class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
-    class_weight_dict = dict(enumerate(class_weights))
-    print('Class weights dict', class_weight_dict)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
+        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.2, random_state = 42, stratify = y_test)
 
-    cevae_model = CEVAE(num_epochs = 10, batch_size = 32, learning_rate = 1e-2, num_samples = 100)
-    cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
-    ite = cevae_model.predict(X_valid.to_numpy())
-    print(f'ITE: CEVAE - {ite}')
-    print('ATE: CEVAE:',ite.mean())
-    
+        t_train = t[X_train.index]
+        t_test = t[X_test.index]
+        t_valid = t[X_valid.index]
+
+        class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
+        class_weight_dict = dict(enumerate(class_weights))
+        print('Class weights dict', class_weight_dict)
+
+        cevae_model = CEVAE(num_epochs = 10, batch_size = 32, learning_rate = 1e-2, num_samples = 100)
+        cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
+        ite = cevae_model.predict(X_valid.to_numpy())
+        ate = ite.mean()
+        # print(f'ITE: CEVAE - {ite}')
+        print('ATE:',ate)
+        ates.append(ate)
+        save_model(cevae_model, str(combination[0]) + '_' + str(combination[1]))
+        print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
+        
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.4300054b-4092-4e59-b6a5-9418a642e834"),
