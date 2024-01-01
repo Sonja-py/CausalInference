@@ -42,7 +42,7 @@ def cevae(final_data):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    ingredient_list = main_df.ingredient_concept_id.unique()[:1]
+    ingredient_list = main_df.ingredient_concept_id.unique()[:2]
     ingredient_pairs = list(combinations(ingredient_list, 2))
     # rocs = []
     ates = []
