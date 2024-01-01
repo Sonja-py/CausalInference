@@ -102,13 +102,13 @@ def meta_learners(final_data):
 
     for idx, combination in enumerate(ingredient_pairs):
         start_time = datetime.now()
-        print(f'-----------Running CEVAE for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
+        print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
         df = main_df[main_df.ingredient_concept_id.isin(list(combination))]
         df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
 
         X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
-        y = df['severity_final']
-        t = df['treatment']
+        y = df['severity_final'].values
+        t = df['treatment'].values
 
         np.random.seed(0)
 
