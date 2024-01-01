@@ -69,14 +69,13 @@ def cevae(final_data):
         class_weight_dict = dict(enumerate(class_weights))
         print('Class weights dict', class_weight_dict)
 
-        cevae_model = CEVAE(num_epochs = 10, batch_size = 32, learning_rate = 1e-2, num_samples = 100)
+        cevae_model = CEVAE(num_epochs = 10, batch_size = 128, learning_rate = 1e-2, num_samples = 100)
         cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
         ite = cevae_model.predict(X_valid.to_numpy())
         ate = ite.mean()
-        # print(f'ITE: CEVAE - {ite}')
         print('ATE:',ate)
         ates.append(ate)
-        save_model(cevae_model, str(combination[0]) + '_' + str(combination[1]))
+        # save_model(cevae_model, str(combination[0]) + '_' + str(combination[1]))
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
         
 
