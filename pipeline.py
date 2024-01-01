@@ -142,7 +142,7 @@ def meta_learners(final_data):
         # print('preds',preds)
         # print('modelt1_preds',modelt1_preds)
         learner_t1 = BaseTClassifier(learner = modelt1)
-        pred_t1 = learner_t1.predict(X=X, treatment=t, y=y, verbose=True)
+        pred_t1 = learner_t1.fit_predict(X=X, treatment=t, y=y, verbose=True)
         print('pred_t1:',pred_t1)
         ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y)
         print(f"ATE T-Learner: RandomForest - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}")
