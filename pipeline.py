@@ -161,6 +161,8 @@ def meta_learners(final_data):
         ate_s2 = learner_s2.estimate_ate(X=X, treatment=t, y=y)
         print("ATE S-Learner: Logistic Regression", ate_s2)
 
+        print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
+
         # # X-Learner
         # modelx1_c = RandomForestClassifier(n_estimators=500, max_depth=6, class_weight = class_weight_dict)
         # modelx1_r = RandomForestRegressor(n_estimators=500, max_depth=6)
