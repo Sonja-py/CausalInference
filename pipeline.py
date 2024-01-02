@@ -140,8 +140,8 @@ def meta_learner_s(final_data):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
         preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
         roc_score = roc_auc_score(y_valid, preds)
-        print('S Learner - LogisticRegression ATE:',ite.mean())
-        print('S Learner - LogisticRegression ROC score:', roc_score)
+        print('S Learner - RandomForest ATE:',ite.mean())
+        print('S Learner - RandomForest ROC score:', roc_score)
         rocs_s.append(roc_score)
         ates_s.append(ite.mean())
 
@@ -215,9 +215,7 @@ def meta_learners_t(final_data):
     main_df = final_data.toPandas()
     ingredient_list = main_df.ingredient_concept_id.unique()[:10]
     ingredient_pairs = list(combinations(ingredient_list, 2))
-    rocs_s = []
     rocs_t = []
-    ates_s = []
     ates_t = []
 
     for idx, combination in enumerate(ingredient_pairs):
@@ -232,7 +230,7 @@ def meta_learners_t(final_data):
 
         np.random.seed(3)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
-        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.8, random_state = 42, stratify = y_test)
+        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 42, stratify = y_test)
         y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
         
         t_train = t[X_train.index]
