@@ -162,11 +162,12 @@ def meta_learner_s(final_data):
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
-    # print(f'Median {np.array(rocs_s).median()}, Mean {np.array(rocs_s).mean()}')
     print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}')
     print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}')
-    write_text_file(rocs_s, 'rocs_s')
-    write_text_file(ates_s, 'ates_s')
+    write_text_file(rocs_r, 'rocs_r')
+    write_text_file(rocs_l, 'rocs_l')
+    write_text_file(ates_r, 'ates_r')
+    write_text_file(ates_l, 'ates_l')
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.f2cebbba-3c15-4e6c-b89b-d8374a3b91f3"),
@@ -281,8 +282,10 @@ def meta_learners_t(final_data):
     # print(f'Median {np.array(rocs_t).median()}, Mean {np.array(rocs_t).mean()}')
     print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}')
     print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}')
-    write_text_file(rocs_t, 'rocs_t')
-    write_text_file(ates_t, 'ates_t')
+    write_text_file(rocs_r, 'rocs_r')
+    write_text_file(rocs_l, 'rocs_l')
+    write_text_file(ates_r, 'ates_r')
+    write_text_file(ates_l, 'ates_l')
         
 
 @transform_pandas(
