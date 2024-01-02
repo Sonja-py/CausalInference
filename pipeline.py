@@ -229,9 +229,9 @@ def meta_learners_t(final_data):
         y = df['severity_final']
         t = df['treatment']
 
-        np.random.seed(0)
+        np.random.seed(3)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
-        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.7, random_state = 42, stratify = y_test)
+        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.8, random_state = 42, stratify = y_test)
         y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
         
         t_train = t[X_train.index]
