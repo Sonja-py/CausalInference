@@ -246,6 +246,17 @@ def testing(final_data):
         t = df['treatment'].values
 
         np.random.seed(0)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
+
+        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.7, random_state = 42, stratify = y_test)
+
+        y_train, y_valid, y_test = y_train.values.reshape(-1,1), y_valid.values.reshape(-1,1), y_test.values.reshape(-1,1)
+        t_train = t[X_train.index]
+        t_train = t_train.values.reshape(-1,1)
+        t_test = t[X_test.index]
+        t_test = t_test.values.reshape(-1,1)
+        t_valid = t[X_valid.index]
+        t_valid = t_valid.values.reshape(-1,1)
 
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
@@ -253,7 +264,7 @@ def testing(final_data):
 
         modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 15, class_weight = class_weight_dict)
         learner_t1 = BaseTClassifier(learner = modelt1)
-        learner_t1.fit(X=X, treatment=t, y=y)
-        ite = learner_t1.predict(X=X, treatment=t, y=y, return_components=False, verbose=True)
+        learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
+        ite = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=False, verbose=True)
         print('ITE:',ite.mean())
 
