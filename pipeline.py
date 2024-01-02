@@ -220,8 +220,10 @@ def meta_learners_t(final_data):
     main_df = final_data.toPandas()
     ingredient_list = main_df.ingredient_concept_id.unique()[:10]
     ingredient_pairs = list(combinations(ingredient_list, 2))
-    rocs_t = []
-    ates_t = []
+    rocs_r = []
+    rocs_l = []
+    ates_r = []
+    ates_l = []
 
     for idx, combination in enumerate(ingredient_pairs):
         start_time = datetime.now()
@@ -250,7 +252,7 @@ def meta_learners_t(final_data):
         print('Class weights dict', class_weight_dict)
 
         # T-Learner
-        modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 15, class_weight = class_weight_dict)
+        modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 10, class_weight = class_weight_dict)
         learner_t1 = BaseTClassifier(learner = modelt1)
         learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
@@ -259,8 +261,8 @@ def meta_learners_t(final_data):
         roc_score = roc_auc_score(y_valid, preds)
         print('T Learner - RandomForest ATE:',ite.mean())
         print('T Learner - RandomForest ROC score:', roc_score)
-        rocs_t.append(roc_score)
-        ates_t.append(ite.mean())
+        rocs_r.append(roc_score)
+        ates_r.append(ite.mean())
 
         modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
         learner_t2 = BaseTClassifier(learner = modelt2)
@@ -271,13 +273,14 @@ def meta_learners_t(final_data):
         roc_score = roc_auc_score(y_valid, preds)
         print('T Learner - LogisticRegression ATE:',ite.mean())
         print('T Learner - LogisticRegression ROC score:', roc_score)
-        rocs_t.append(roc_score)
-        ates_t.append(ite.mean())
+        rocs_l.append(roc_score)
+        ates_l.append(ite.mean())
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
     # print(f'Median {np.array(rocs_t).median()}, Mean {np.array(rocs_t).mean()}')
-    print(f'Median {median(rocs_t)}, Mean {mean(rocs_t)}')
+    print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}')
+    print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}')
     write_text_file(rocs_t, 'rocs_t')
     write_text_file(ates_t, 'ates_t')
         
