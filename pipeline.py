@@ -247,10 +247,9 @@ def testing(final_data):
 
         np.random.seed(0)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
-
         X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.7, random_state = 42, stratify = y_test)
 
-        y_train, y_valid, y_test = y_train.values.reshape(-1,1), y_valid.values.reshape(-1,1), y_test.values.reshape(-1,1)
+        y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
         t_train = t[X_train.index]
         t_train = t_train.values.reshape(-1,1)
         t_test = t[X_test.index]
