@@ -242,8 +242,8 @@ def testing(final_data):
         df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
 
         X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
-        y = df['severity_final'].values
-        t = df['treatment'].values
+        y = df['severity_final']
+        t = df['treatment']
 
         np.random.seed(0)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
