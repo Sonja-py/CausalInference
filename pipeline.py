@@ -159,6 +159,7 @@ def meta_learner_s(final_data):
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
+    print(f'Median {np.array(roc_s).median()}, Mean {np.array(roc_s).mean()}')
     write_text_file(rocs_s, 'roc_s')
     write_text_file(ates_s, 'ate_s')
 
