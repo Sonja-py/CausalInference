@@ -330,9 +330,9 @@ def testing(final_data):
         ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
         print('ATE:',ite.mean())
 
-        yhat_cs, yhat_ts = np.array(yhat_cs.values()), np.array(yhat_ts.values())
+        yhat_cs, yhat_ts = list(yhat_cs.values()), list(yhat_ts.values())
         print('yhat_cs:',yhat_cs)
-        print('yhat_cs shape:',yhat_cs.shape)
+        print('yhat_cs shape:',len(yhat_cs))
         print('yhat_ts:',yhat_ts)
-        print('yhat_ts keys:',yhat_ts.shape)
+        print('yhat_ts keys:',len(yhat_ts))
 
