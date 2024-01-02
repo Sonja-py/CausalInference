@@ -330,9 +330,12 @@ def testing(final_data):
         ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
         print('ATE:',ite.mean())
 
-        yhat_cs, yhat_ts = list(yhat_cs.values())[0], list(yhat_ts.values())[0]
+        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
+        roc_score = roc_auc_score(y_valid, preds)
+
         print('yhat_cs:',yhat_cs)
-        print('yhat_cs shape:',len(yhat_cs))
         print('yhat_ts:',yhat_ts)
-        print('yhat_ts keys:',len(yhat_ts))
+        print('ROC score:', roc_score)
+        
 
