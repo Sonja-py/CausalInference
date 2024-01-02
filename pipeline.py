@@ -318,6 +318,7 @@ def testing(final_data):
         t_test = t_test.values
         t_valid = t[X_valid.index]
         t_valid = t_valid.values
+        print('shape of valid data:',t_valid.shape)
 
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
@@ -329,8 +330,9 @@ def testing(final_data):
         ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
         print('ATE:',ite.mean())
 
+        yhat_cs, yhat_ts = yhat_cs.values(), yhat_ts.values()
         print('yhat_cs:',yhat_cs)
-        print('yhat_cs keys:',yhat_cs.keys())
+        print('yhat_cs shape:',yhat_cs.shape)
         print('yhat_ts:',yhat_ts)
-        print('yhat_ts keys:',yhat_ts.keys())
+        print('yhat_ts keys:',yhat_ts.shape)
 
