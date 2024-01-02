@@ -159,31 +159,6 @@ def meta_learners(final_data):
         rocs_t.append(roc_score)
         ates_t.append(ite.mean())
 
-        # S-Learner
-        models1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
-        learner_s1 = BaseSClassifier(learner = models1)
-        learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
-        ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
-        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
-        roc_score = roc_auc_score(y_valid, preds)
-        print('S Learner - LogisticRegression ATE:',ite.mean())
-        print('S Learner - LogisticRegression ROC score:', roc_score)
-        rocs_s.append(roc_score)
-        ates_s.append(ite.mean())
-
-        models2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
-        learner_s2 = BaseSClassifier(learner = models2)
-        learner_s2.fit(X=X_train, treatment=t_train, y=y_train)
-        ite, yhat_cs, yhat_ts = learner_s2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
-        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
-        roc_score = roc_auc_score(y_valid, preds)
-        print('S Learner - LogisticRegression ATE:',ite.mean())
-        print('S Learner - LogisticRegression ROC score:', roc_score)
-        rocs_s.append(roc_score)
-        ates_s.append(ite.mean())
-
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
         # # X-Learner
@@ -366,4 +341,11 @@ def testing(final_data):
         print('ATE:',ite.mean())
         print('ROC score:', roc_score)
         
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.e958ac6b-e0d4-4479-9736-b4191a511014"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+def unnamed(final_data):
+    
 
