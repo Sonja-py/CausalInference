@@ -284,9 +284,9 @@ def meta_learners_t(final_data):
         # ate_x2 = learner_x2.estimate_ate(X=X, treatment=t, y=y)
         # print("ATE X-Learner: Logistic Regression", ate_x2)
 
-    print(f'Median {np.array(roc_t).median()}, Mean {np.array(roc_t).mean()}')
-    write_text_file(rocs_t, 'roc_t')
-    write_text_file(ates_t, 'ate_t')
+    print(f'Median {np.array(rocs_t).median()}, Mean {np.array(rocs_t).mean()}')
+    write_text_file(rocs_t, 'rocs_t')
+    write_text_file(ates_t, 'ates_t')
         
 
 @transform_pandas(
