@@ -254,6 +254,6 @@ def testing(final_data):
         modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 15, class_weight = class_weight_dict)
         learner_t1 = BaseTClassifier(learner = modelt1)
         learner_t1.fit(X=X, treatment=t, y=y)
-        ite = learner_t1.predict(X=X, treatment=t, y=y, return_components=False, verbose=True).values
+        ite = learner_t1.predict(X=X, treatment=t, y=y, return_components=False, verbose=True)
         print('ITE:',ite.mean())
 
