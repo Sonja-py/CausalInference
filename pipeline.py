@@ -104,8 +104,10 @@ def meta_learner_s(final_data):
     main_df = final_data.toPandas()
     ingredient_list = main_df.ingredient_concept_id.unique()[:10]
     ingredient_pairs = list(combinations(ingredient_list, 2))
-    rocs_s = []
-    ates_s = []
+    rocs_l = []
+    rocs_r = []
+    ates_r = []
+    ates_l = []
 
     for idx, combination in enumerate(ingredient_pairs):
         start_time = datetime.now()
@@ -134,7 +136,7 @@ def meta_learner_s(final_data):
         print('Class weights dict', class_weight_dict)
     
         # S-Learner
-        models1 = RandomForestClassifier(n_estimators=100, max_depth=15, class_weight = class_weight_dict)
+        models1 = RandomForestClassifier(n_estimators=100, max_depth=10, class_weight = class_weight_dict)
         learner_s1 = BaseSClassifier(learner = models1)
         learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
@@ -143,8 +145,8 @@ def meta_learner_s(final_data):
         roc_score = roc_auc_score(y_valid, preds)
         print('S Learner - RandomForest ATE:',ite.mean())
         print('S Learner - RandomForest ROC score:', roc_score)
-        rocs_s.append(roc_score)
-        ates_s.append(ite.mean())
+        rocs_r.append(roc_score)
+        ates_r.append(ite.mean())
 
         models2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
         learner_s2 = BaseSClassifier(learner = models2)
@@ -155,13 +157,14 @@ def meta_learner_s(final_data):
         roc_score = roc_auc_score(y_valid, preds)
         print('S Learner - LogisticRegression ATE:',ite.mean())
         print('S Learner - LogisticRegression ROC score:', roc_score)
-        rocs_s.append(roc_score)
-        ates_s.append(ite.mean())
+        rocs_l.append(roc_score)
+        ates_l.append(ite.mean())
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
     # print(f'Median {np.array(rocs_s).median()}, Mean {np.array(rocs_s).mean()}')
-    print(f'Median {median(rocs_s)}, Mean {mean(rocs_s)}')
+    print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}')
+    print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}')
     write_text_file(rocs_s, 'rocs_s')
     write_text_file(ates_s, 'ates_s')
 
@@ -216,7 +219,6 @@ def meta_learners_t(final_data):
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     ingredient_list = main_df.ingredient_concept_id.unique()[:10]
-    print(median(ingredient_list))
     ingredient_pairs = list(combinations(ingredient_list, 2))
     rocs_t = []
     ates_t = []
