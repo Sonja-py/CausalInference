@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 from itertools import combinations
+from copy import deepcopy
 
 from causalml.inference.meta import BaseSClassifier, BaseTClassifier, BaseXClassifier
 from causalml.inference.nn import CEVAE
@@ -107,22 +108,21 @@ def meta_learners(final_data):
         df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
 
         X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
-        y = df['severity_final'].values
-        t = df['treatment'].values
+        y = df['severity_final']
+        t = df['treatment']
 
         np.random.seed(0)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
 
-        # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
+        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.7, random_state = 42, stratify = y_test)
 
-        # X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.7, random_state = 42, stratify = y_test)
-
-        # y_train, y_valid, y_test = y_train.values.reshape(-1,1), y_valid.values.reshape(-1,1), y_test.values.reshape(-1,1)
-        # t_train = t[X_train.index]
-        # t_train = t_train.values.reshape(-1,1)
-        # t_test = t[X_test.index]
-        # t_test = t_test.values.reshape(-1,1)
-        # t_valid = t[X_valid.index]
-        # t_valid = t_valid.values.reshape(-1,1)
+        y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
+        t_train = t[X_train.index]
+        t_train = t_train.values
+        t_test = t[X_test.index]
+        t_test = t_test.values
+        t_valid = t[X_valid.index]
+        t_valid = t_valid.values
 
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
@@ -130,25 +130,18 @@ def meta_learners(final_data):
 
         # T-Learner
         modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 15, class_weight = class_weight_dict)
-        # modelt1.fit(X=X_train, y=np.concatenate([y_train, t_train], 1))
-        # modelt1_preds = modelt1.predict_proba(X_valid)
-        # y0_pred = modelt1_preds[:, 0]
-        # y1_pred = modelt1_preds[:, 1]
-
-        # print('y0_pred',y0_pred)
-        # print('y1_pred',y1_pred)
-        # print('t_valid',t_valid)
-        # preds = (1. - t_valid) * y0_pred + t_valid * y1_pred
-        # print('preds',preds)
-        # print('modelt1_preds',modelt1_preds)
         learner_t1 = BaseTClassifier(learner = modelt1)
-        # pred_t1 = learner_t1.fit_predict(X=X, treatment=t, y=y, verbose=True)
-        # print('pred_t1:',pred_t1)
-        ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y)
+        learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
+        ite, y_hat_cs, y_hat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        # ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y)
+        ate_t1 = ite.mean()
         print(f"ATE T-Learner: RandomForest - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}")
 
         modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
         learner_t2 = BaseTClassifier(learner = modelt2)
+        learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
+        ite = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        ate_t2 = ite.mean()
         ate_t2 = learner_t2.estimate_ate(X=X, treatment=t, y=y)
         print(f"ATE T-Learner: Logistic Regression - Mean {ate_t2[0]}, LB {ate_t2[1]}, UB {ate_t2[2]}")
 
@@ -228,6 +221,75 @@ def meta_learners_bootstrapped(final_data):
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
 def testing(final_data):
+
+    # def fit(X, treatment, y, learner, p=None):
+    #     """Fit the inference model
+
+    #     Args:
+    #         X (np.matrix or np.array or pd.Dataframe): a feature matrix
+    #         treatment (np.array or pd.Series): a treatment vector
+    #         y (np.array or pd.Series): an outcome vector
+    #     """
+    #     model_c = deepcopy(learner)
+    #     model_t = deepcopy(learner)
+    #     control_name = 0
+    #     X, treatment, y = convert_pd_to_np(X, treatment, y)
+    #     check_treatment_vector(treatment, control_name)
+    #     t_groups = np.unique(treatment[treatment != control_name])
+    #     t_groups.sort()
+    #     _classes = {group: i for i, group in enumerate(t_groups)}
+    #     models_c = {group: deepcopy(model_c) for group in t_groups}
+    #     models_t = {group: deepcopy(model_t) for group in t_groups}
+
+    #     for group in t_groups:
+    #         mask = (treatment == group) | (treatment == control_name)
+    #         treatment_filt = treatment[mask]
+    #         X_filt = X[mask]
+    #         y_filt = y[mask]
+    #         w = (treatment_filt == group).astype(int)
+
+    #         models_c[group].fit(X_filt[w == 0], y_filt[w == 0])
+    #         models_t[group].fit(X_filt[w == 1], y_filt[w == 1])
+
+    # def predict(
+    #     X, treatment=None, y=None, p=None, return_components=False, verbose=True
+    # ):
+    #     """Predict treatment effects.
+
+    #     Args:
+    #         X (np.matrix or np.array or pd.Dataframe): a feature matrix
+    #         treatment (np.array or pd.Series, optional): a treatment vector
+    #         y (np.array or pd.Series, optional): an outcome vector
+    #         verbose (bool, optional): whether to output progress logs
+    #     Returns:
+    #         (numpy.ndarray): Predictions of treatment effects.
+    #     """
+    #     yhat_cs = {}
+    #     yhat_ts = {}
+
+    #     for group in t_groups:
+    #         model_c = models_c[group]
+    #         model_t = models_t[group]
+    #         yhat_cs[group] = model_c.predict_proba(X)[:, 1]
+    #         yhat_ts[group] = model_t.predict_proba(X)[:, 1]
+
+    #         if (y is not None) and (treatment is not None) and verbose:
+    #             mask = (treatment == group) | (treatment == control_name)
+    #             treatment_filt = treatment[mask]
+    #             y_filt = y[mask]
+    #             w = (treatment_filt == group).astype(int)
+
+    #             yhat = np.zeros_like(y_filt, dtype=float)
+    #             yhat[w == 0] = yhat_cs[group][mask][w == 0]
+    #             yhat[w == 1] = yhat_ts[group][mask][w == 1]
+
+    #             logger.info("Error metrics for group {}".format(group))
+    #             classification_metrics(y_filt, yhat, w)
+
+    #     te = np.zeros((X.shape[0], t_groups.shape[0]))
+    #     for i, group in enumerate(t_groups):
+    #         te[:, i] = yhat_ts[group] - yhat_cs[group]
+
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     ingredient_list = main_df.ingredient_concept_id.unique()[:2]
@@ -264,6 +326,9 @@ def testing(final_data):
         modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 15, class_weight = class_weight_dict)
         learner_t1 = BaseTClassifier(learner = modelt1)
         learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
-        ite = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=False, verbose=True)
-        print('ITE:',ite.mean())
+        ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        print('ATE:',ite.mean())
+
+        print('yhat_cs:',yhat_cs)
+        print('yhat_ts:',yhat_ts)
 
