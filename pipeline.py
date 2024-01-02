@@ -133,7 +133,7 @@ def meta_learner_s(final_data):
         print('Class weights dict', class_weight_dict)
     
         # S-Learner
-        models1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
+        models1 = RandomForestClassifier(n_estimators=100, max_depth=15, class_weight = class_weight_dict)
         learner_s1 = BaseSClassifier(learner = models1)
         learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
@@ -159,9 +159,9 @@ def meta_learner_s(final_data):
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
-    print(f'Median {np.array(roc_s).median()}, Mean {np.array(roc_s).mean()}')
-    write_text_file(rocs_s, 'roc_s')
-    write_text_file(ates_s, 'ate_s')
+    print(f'Median {np.array(rocs_s).median()}, Mean {np.array(rocs_s).mean()}')
+    write_text_file(rocs_s, 'rocs_s')
+    write_text_file(ates_s, 'ates_s')
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.f2cebbba-3c15-4e6c-b89b-d8374a3b91f3"),
