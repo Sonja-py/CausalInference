@@ -18,11 +18,16 @@ from sklearn.model_selection import train_test_split
 def write_text_file(data, metric):
     output = Transforms.get_output()
     output_fs = output.filesystem()
+    metric, learner = metric.split('_')
     
-    if metric == 'roc':
-        filename = 'roc.txt'
+    if metric == 'roc' and learner == 's':
+        filename = 'roc_s.txt'
+    elif metric == 'roc' and learner == 't':
+        filename = 'roc_t.txt'
+    elif metric == 'ate' and learner == 's':
+        filename = 'ate_s.txt'
     else:
-        filename = 'ate.txt'
+        filename = 'ate_t.txt'
     with output_fs.open(filename, 'w') as f: 
         f.write(str(data))
     
@@ -89,17 +94,19 @@ def cevae(final_data):
         
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.4300054b-4092-4e59-b6a5-9418a642e834"),
+    Output(rid="ri.foundry.main.dataset.3cbc3c8c-65b6-4f67-8c4e-40bc4da8bbe8"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
 def meta_learners(final_data):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    ingredient_list = main_df.ingredient_concept_id.unique()[:5]
+    ingredient_list = main_df.ingredient_concept_id.unique()
     ingredient_pairs = list(combinations(ingredient_list, 2))
-    # rocs = []
-    ates = []
+    rocs_s = []
+    rocs_t = []
+    ates_s = []
+    ates_t = []
 
     for idx, combination in enumerate(ingredient_pairs):
         start_time = datetime.now()
@@ -135,9 +142,10 @@ def meta_learners(final_data):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
         preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
         roc_score = roc_auc_score(y_valid, preds)
-        print('RandomForest')
-        print('ATE:',ite.mean())
-        print('ROC score:', roc_score)
+        print('T Learner - RandomForest ATE:',ite.mean())
+        print('T Learner - RandomForest ROC score:', roc_score)
+        rocs_t.append(roc_score)
+        ates_t.append(ite.mean())
 
         modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
         learner_t2 = BaseTClassifier(learner = modelt2)
@@ -146,20 +154,35 @@ def meta_learners(final_data):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
         preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
         roc_score = roc_auc_score(y_valid, preds)
-        print('LogisticRegression')
-        print('ATE:',ite.mean())
-        print('ROC score:', roc_score)
+        print('T Learner - LogisticRegression ATE:',ite.mean())
+        print('T Learner - LogisticRegression ROC score:', roc_score)
+        rocs_t.append(roc_score)
+        ates_t.append(ite.mean())
 
         # S-Learner
-        # models1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
-        # learner_s1 = BaseSClassifier(learner = models1)
-        # ate_s1 = learner_s1.estimate_ate(X=X, treatment=t, y=y)
-        # print("ATE S-Learner: RandomForest", ate_s1)
+        models1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
+        learner_s1 = BaseSClassifier(learner = models1)
+        learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
+        ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
+        roc_score = roc_auc_score(y_valid, preds)
+        print('S Learner - LogisticRegression ATE:',ite.mean())
+        print('S Learner - LogisticRegression ROC score:', roc_score)
+        rocs_s.append(roc_score)
+        ates_s.append(ite.mean())
 
-        # models2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
-        # learner_s2 = BaseSClassifier(learner = models2)
-        # ate_s2 = learner_s2.estimate_ate(X=X, treatment=t, y=y)
-        # print("ATE S-Learner: Logistic Regression", ate_s2)
+        models2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
+        learner_s2 = BaseSClassifier(learner = models2)
+        learner_s2.fit(X=X_train, treatment=t_train, y=y_train)
+        ite, yhat_cs, yhat_ts = learner_s2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
+        roc_score = roc_auc_score(y_valid, preds)
+        print('S Learner - LogisticRegression ATE:',ite.mean())
+        print('S Learner - LogisticRegression ROC score:', roc_score)
+        rocs_s.append(roc_score)
+        ates_s.append(ite.mean())
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
@@ -176,7 +199,10 @@ def meta_learners(final_data):
         # ate_x2 = learner_x2.estimate_ate(X=X, treatment=t, y=y)
         # print("ATE X-Learner: Logistic Regression", ate_x2)
 
-        
+    write_text_file(rocs_s, 'roc_s')
+    write_text_file(rocs_t, 'roc_t')
+    write_text_file(ates_s, 'ate_s')
+    write_text_file(ates_t, 'ate_t')
         
 
 @transform_pandas(
