@@ -101,7 +101,7 @@ def meta_learner_s(final_data):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    ingredient_list = main_df.ingredient_concept_id.unique()[:5]
+    ingredient_list = main_df.ingredient_concept_id.unique()[:10]
     ingredient_pairs = list(combinations(ingredient_list, 2))
     rocs_s = []
     ates_s = []
@@ -116,9 +116,9 @@ def meta_learner_s(final_data):
         y = df['severity_final']
         t = df['treatment']
 
-        np.random.seed(0)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
-        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 42, stratify = y_test)
+        # np.random.seed(0)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.6, random_state = 2, stratify = y)
+        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 2, stratify = y_test)
         y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
         
         t_train = t[X_train.index]
