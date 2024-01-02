@@ -227,6 +227,33 @@ def meta_learners_bootstrapped(final_data):
     Output(rid="ri.vector.main.execute.3cc31dfe-610e-492d-924d-c5f6421324d1"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
-def unnamed(final_data):
-    
+def testing(final_data):
+    # Create and get the data for pair of different antidepressants
+    main_df = final_data.toPandas()
+    ingredient_list = main_df.ingredient_concept_id.unique()[:2]
+    ingredient_pairs = list(combinations(ingredient_list, 2))
+    # rocs = []
+    ates = []
+
+    for idx, combination in enumerate(ingredient_pairs):
+        start_time = datetime.now()
+        print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
+        df = main_df[main_df.ingredient_concept_id.isin(list(combination))]
+        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
+
+        X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
+        y = df['severity_final'].values
+        t = df['treatment'].values
+
+        np.random.seed(0)
+
+        class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
+        class_weight_dict = dict(enumerate(class_weights))
+        print('Class weights dict', class_weight_dict)
+
+        modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 15, class_weight = class_weight_dict)
+        learner_t1 = BaseTClassifier(learner = modelt1)
+        learner_t1.fit(X=X, treatment=t, y=y)
+        ate = learner_t1.predict(X=X, treatment=t, y=y, return_components=False, verbose=True)
+        print('ITE:',ate)
 
