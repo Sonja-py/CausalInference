@@ -96,7 +96,7 @@ def meta_learners(final_data):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    ingredient_list = main_df.ingredient_concept_id.unique()[:2]
+    ingredient_list = main_df.ingredient_concept_id.unique()[:5]
     ingredient_pairs = list(combinations(ingredient_list, 2))
     # rocs = []
     ates = []
@@ -132,29 +132,33 @@ def meta_learners(final_data):
         modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 15, class_weight = class_weight_dict)
         learner_t1 = BaseTClassifier(learner = modelt1)
         learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
-        ite, y_hat_cs, y_hat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        # ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y)
-        ate_t1 = ite.mean()
-        print(f"ATE T-Learner: RandomForest - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}")
+        ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
+        roc_score = roc_auc_score(y_valid, preds)
+        print('ATE:',ite.mean())
+        print('ROC score:', roc_score)
 
         modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
         learner_t2 = BaseTClassifier(learner = modelt2)
         learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
-        ite = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        ate_t2 = ite.mean()
-        ate_t2 = learner_t2.estimate_ate(X=X, treatment=t, y=y)
-        print(f"ATE T-Learner: Logistic Regression - Mean {ate_t2[0]}, LB {ate_t2[1]}, UB {ate_t2[2]}")
+        ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
+        roc_score = roc_auc_score(y_valid, preds)
+        print('ATE:',ite.mean())
+        print('ROC score:', roc_score)
 
         # S-Learner
-        models1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
-        learner_s1 = BaseSClassifier(learner = models1)
-        ate_s1 = learner_s1.estimate_ate(X=X, treatment=t, y=y)
-        print("ATE S-Learner: RandomForest", ate_s1)
+        # models1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
+        # learner_s1 = BaseSClassifier(learner = models1)
+        # ate_s1 = learner_s1.estimate_ate(X=X, treatment=t, y=y)
+        # print("ATE S-Learner: RandomForest", ate_s1)
 
-        models2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
-        learner_s2 = BaseSClassifier(learner = models2)
-        ate_s2 = learner_s2.estimate_ate(X=X, treatment=t, y=y)
-        print("ATE S-Learner: Logistic Regression", ate_s2)
+        # models2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
+        # learner_s2 = BaseSClassifier(learner = models2)
+        # ate_s2 = learner_s2.estimate_ate(X=X, treatment=t, y=y)
+        # print("ATE S-Learner: Logistic Regression", ate_s2)
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
@@ -328,14 +332,11 @@ def testing(final_data):
         learner_t1 = BaseTClassifier(learner = modelt1)
         learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        print('ATE:',ite.mean())
 
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
         preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
         roc_score = roc_auc_score(y_valid, preds)
-
-        print('yhat_cs:',yhat_cs)
-        print('yhat_ts:',yhat_ts)
+        print('ATE:',ite.mean())
         print('ROC score:', roc_score)
         
 
