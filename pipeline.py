@@ -157,6 +157,8 @@ def meta_learner_s(final_data):
         rocs_s.append(roc_score)
         ates_s.append(ite.mean())
 
+        print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
+
     write_text_file(rocs_s, 'roc_s')
     write_text_file(ates_s, 'ate_s')
 
