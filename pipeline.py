@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from itertools import combinations
 from copy import deepcopy
+from statistics import median, mean
 
 from causalml.inference.meta import BaseSClassifier, BaseTClassifier, BaseXClassifier
 from causalml.inference.nn import CEVAE
@@ -214,6 +215,7 @@ def meta_learners_t(final_data):
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     ingredient_list = main_df.ingredient_concept_id.unique()[:10]
+    print(median(ingredient_list))
     ingredient_pairs = list(combinations(ingredient_list, 2))
     rocs_t = []
     ates_t = []
@@ -271,20 +273,8 @@ def meta_learners_t(final_data):
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
-        # # X-Learner
-        # modelx1_c = RandomForestClassifier(n_estimators=500, max_depth=6, class_weight = class_weight_dict)
-        # modelx1_r = RandomForestRegressor(n_estimators=500, max_depth=6)
-        # learner_x1 = BaseXClassifier(outcome_learner = modelx1_c, effect_learner = modelx1_r)
-        # ate_x1 = learner_x1.estimate_ate(X=X, treatment=t, y=y)
-        # print("ATE X-Learner: RandomForest", ate_x1)
-
-        # modelx2_c = LogisticRegression(max_iter=1000000, class_weight = class_weight_dict)
-        # modelx2_r = LinearRegression()
-        # learner_x2 = BaseXClassifier(outcome_learner = modelx2_c, effect_learner = modelx2_r)
-        # ate_x2 = learner_x2.estimate_ate(X=X, treatment=t, y=y)
-        # print("ATE X-Learner: Logistic Regression", ate_x2)
-
-    print(f'Median {np.array(rocs_t).median()}, Mean {np.array(rocs_t).mean()}')
+    # print(f'Median {np.array(rocs_t).median()}, Mean {np.array(rocs_t).mean()}')
+    print(f'Median {median(rocs_t)}, Mean {mean(rocs_t)}')
     write_text_file(rocs_t, 'rocs_t')
     write_text_file(ates_t, 'ates_t')
         
