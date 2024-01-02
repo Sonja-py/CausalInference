@@ -95,7 +95,7 @@ def meta_learners(final_data):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    ingredient_list = main_df.ingredient_concept_id.unique()
+    ingredient_list = main_df.ingredient_concept_id.unique()[:2]
     ingredient_pairs = list(combinations(ingredient_list, 2))
     # rocs = []
     ates = []
@@ -221,5 +221,12 @@ def meta_learners_bootstrapped(final_data):
     learner_s2 = BaseSClassifier(learner = model_s2)
     cate_s2 = learner_s2.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
     print('CATE S-Learner: LogisticRegression', cate_s2)
+    
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.3cc31dfe-610e-492d-924d-c5f6421324d1"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+def unnamed(final_data):
     
 
