@@ -330,5 +330,7 @@ def testing(final_data):
         print('ATE:',ite.mean())
 
         print('yhat_cs:',yhat_cs)
+        print('yhat_cs keys:',yhat_cs.keys())
         print('yhat_ts:',yhat_ts)
+        print('yhat_ts keys:',yhat_ts.keys())
 
