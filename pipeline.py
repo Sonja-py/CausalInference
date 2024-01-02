@@ -94,10 +94,119 @@ def cevae(final_data):
         
 
 @transform_pandas(
+    Output(rid="ri.vector.main.execute.e958ac6b-e0d4-4479-9736-b4191a511014"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+def meta_learner_s(final_data):
+
+    # Create and get the data for pair of different antidepressants
+    main_df = final_data.toPandas()
+    ingredient_list = main_df.ingredient_concept_id.unique()
+    ingredient_pairs = list(combinations(ingredient_list, 2))
+    rocs_s = []
+    ates_s = []
+
+    for idx, combination in enumerate(ingredient_pairs):
+        start_time = datetime.now()
+        print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
+        df = main_df[main_df.ingredient_concept_id.isin(list(combination))]
+        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
+
+        X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
+        y = df['severity_final']
+        t = df['treatment']
+
+        np.random.seed(0)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
+        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.7, random_state = 42, stratify = y_test)
+        y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
+        
+        t_train = t[X_train.index]
+        t_train = t_train.values
+        t_test = t[X_test.index]
+        t_test = t_test.values
+        t_valid = t[X_valid.index]
+        t_valid = t_valid.values
+
+        class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
+        class_weight_dict = dict(enumerate(class_weights))
+        print('Class weights dict', class_weight_dict)
+    
+        # S-Learner
+        models1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
+        learner_s1 = BaseSClassifier(learner = models1)
+        learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
+        ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
+        roc_score = roc_auc_score(y_valid, preds)
+        print('S Learner - LogisticRegression ATE:',ite.mean())
+        print('S Learner - LogisticRegression ROC score:', roc_score)
+        rocs_s.append(roc_score)
+        ates_s.append(ite.mean())
+
+        models2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
+        learner_s2 = BaseSClassifier(learner = models2)
+        learner_s2.fit(X=X_train, treatment=t_train, y=y_train)
+        ite, yhat_cs, yhat_ts = learner_s2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
+        roc_score = roc_auc_score(y_valid, preds)
+        print('S Learner - LogisticRegression ATE:',ite.mean())
+        print('S Learner - LogisticRegression ROC score:', roc_score)
+        rocs_s.append(roc_score)
+        ates_s.append(ite.mean())
+
+    write_text_file(rocs_s, 'roc_s')
+    write_text_file(ates_s, 'ate_s')
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.f2cebbba-3c15-4e6c-b89b-d8374a3b91f3"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+def meta_learners_bootstrapped(final_data):
+
+    df = final_data.toPandas()
+    df =  df[df['age_at_covid'].notna()]
+    df = df.reset_index(drop=True)
+
+    X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
+    y = df['severity_final']
+    t = df['treatment']
+
+    np.random.seed(3)
+
+    class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
+    class_weight_dict = dict(enumerate(class_weights))
+    print('Class weights dict', class_weight_dict)
+
+    model_t1 = RandomForestClassifier(n_estimators = 500, max_depth = 20, class_weight = class_weight_dict)
+    learner_t1 = BaseTClassifier(learner = model_t1)
+    ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
+    # cate_t1 = learner_t1.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
+    print(f'CATE T-Learner: RandomForest - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}')
+
+    model_t2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
+    learner_t2 = BaseTClassifier(learner = model_t2)
+    cate_t2 = learner_t2.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
+    print(f'CATE T-Learner: LogisticRegression - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}')
+
+    model_s1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
+    learner_s1 = BaseSClassifier(learner = model_s1)
+    cate_s1 = learner_s1.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
+    print('CATE S-Learner: RandomForest', cate_s1)
+
+    model_s2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
+    learner_s2 = BaseSClassifier(learner = model_s2)
+    cate_s2 = learner_s2.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
+    print('CATE S-Learner: LogisticRegression', cate_s2)
+    
+
+@transform_pandas(
     Output(rid="ri.foundry.main.dataset.3cbc3c8c-65b6-4f67-8c4e-40bc4da8bbe8"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
-def meta_learners(final_data):
+def meta_learners_t(final_data):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
@@ -174,53 +283,9 @@ def meta_learners(final_data):
         # ate_x2 = learner_x2.estimate_ate(X=X, treatment=t, y=y)
         # print("ATE X-Learner: Logistic Regression", ate_x2)
 
-    write_text_file(rocs_s, 'roc_s')
     write_text_file(rocs_t, 'roc_t')
-    write_text_file(ates_s, 'ate_s')
     write_text_file(ates_t, 'ate_t')
         
-
-@transform_pandas(
-    Output(rid="ri.vector.main.execute.f2cebbba-3c15-4e6c-b89b-d8374a3b91f3"),
-    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
-)
-def meta_learners_bootstrapped(final_data):
-
-    df = final_data.toPandas()
-    df =  df[df['age_at_covid'].notna()]
-    df = df.reset_index(drop=True)
-
-    X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
-    y = df['severity_final']
-    t = df['treatment']
-
-    np.random.seed(3)
-
-    class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
-    class_weight_dict = dict(enumerate(class_weights))
-    print('Class weights dict', class_weight_dict)
-
-    model_t1 = RandomForestClassifier(n_estimators = 500, max_depth = 20, class_weight = class_weight_dict)
-    learner_t1 = BaseTClassifier(learner = model_t1)
-    ate_t1 = learner_t1.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
-    # cate_t1 = learner_t1.fit_predict(X=X, treatment=t, y=y, n_bootstraps=10)
-    print(f'CATE T-Learner: RandomForest - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}')
-
-    model_t2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
-    learner_t2 = BaseTClassifier(learner = model_t2)
-    cate_t2 = learner_t2.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
-    print(f'CATE T-Learner: LogisticRegression - Mean {ate_t1[0]}, LB {ate_t1[1]}, UB {ate_t1[2]}')
-
-    model_s1 = RandomForestClassifier(n_estimators=500, max_depth=20, class_weight = class_weight_dict)
-    learner_s1 = BaseSClassifier(learner = model_s1)
-    cate_s1 = learner_s1.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
-    print('CATE S-Learner: RandomForest', cate_s1)
-
-    model_s2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
-    learner_s2 = BaseSClassifier(learner = model_s2)
-    cate_s2 = learner_s2.estimate_ate(X=X, treatment=t, y=y, n_bootstraps=10)
-    print('CATE S-Learner: LogisticRegression', cate_s2)
-    
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.3cc31dfe-610e-492d-924d-c5f6421324d1"),
@@ -341,11 +406,4 @@ def testing(final_data):
         print('ATE:',ite.mean())
         print('ROC score:', roc_score)
         
-
-@transform_pandas(
-    Output(rid="ri.vector.main.execute.e958ac6b-e0d4-4479-9736-b4191a511014"),
-    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
-)
-def unnamed(final_data):
-    
 
