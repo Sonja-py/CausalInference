@@ -135,6 +135,7 @@ def meta_learners(final_data):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
         preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
         roc_score = roc_auc_score(y_valid, preds)
+        print('RandomForest')
         print('ATE:',ite.mean())
         print('ROC score:', roc_score)
 
@@ -145,6 +146,7 @@ def meta_learners(final_data):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
         preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
         roc_score = roc_auc_score(y_valid, preds)
+        print('LogisticRegression')
         print('ATE:',ite.mean())
         print('ROC score:', roc_score)
 
