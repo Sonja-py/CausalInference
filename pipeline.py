@@ -235,6 +235,7 @@ def meta_learners_t(final_data):
     main_df = final_data.toPandas()
     ingredient_list = main_df.ingredient_concept_id.unique()[:10]
     ingredient_pairs = list(combinations(ingredient_list, 2))
+    initial_time = datetime.now()
     # ingredient_pairs = [(739138, 703547)]
     threshold = 0.4
     rocs_r = []
@@ -288,6 +289,7 @@ def meta_learners_t(final_data):
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
+    print('Total time taken:',datetime.now() - initial_time)
     print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}')
     print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}')
     print(f'RandomForest: Median {median(ates_r)}, Mean {mean(ates_r)}, Max {max(ates_r)}, Min {min(ates_r)}')
