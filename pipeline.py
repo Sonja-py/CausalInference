@@ -225,8 +225,8 @@ def meta_learners_t(final_data):
         # preds[preds>threshold] = 1
         # preds[preds<=threshold] = 0
         # print('Accuracy:', accuracy_score(y_valid, preds))
-        print(f'S Learner - {model} ATE: {ate}')
-        print(f'S Learner - {model} ROC score: {roc}')
+        print(f'T Learner - {model} ATE: {ate}')
+        print(f'T Learner - {model} ROC score: {roc}')
         return roc, ate
 
     # Create and get the data for pair of different antidepressants
@@ -272,7 +272,7 @@ def meta_learners_t(final_data):
         learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
         roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForestClassifier')
-        rocs_r.append(roc_score)
+        rocs_r.append(roc)
         ates_r.append(ate)
 
         modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 5, class_weight = class_weight_dict)
@@ -280,7 +280,7 @@ def meta_learners_t(final_data):
         learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
         roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForestClassifier')
-        rocs_r.append(roc_score)
+        rocs_r.append(roc)
         ates_r.append(ate)
 
         modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 7, class_weight = class_weight_dict)
@@ -288,7 +288,7 @@ def meta_learners_t(final_data):
         learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
         roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForestClassifier')
-        rocs_r.append(roc_score)
+        rocs_r.append(roc)
         ates_r.append(ate)
 
         # modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
@@ -296,7 +296,7 @@ def meta_learners_t(final_data):
         # learner_t2.fit(X=X_train, treatment=t_train, y=y_train)
         # ite, yhat_cs, yhat_ts = learner_t2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
         # roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'LogisticRegression')
-        # rocs_l.append(roc_score)
+        # rocs_l.append(roc)
         # ates_l.append(ate)
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
