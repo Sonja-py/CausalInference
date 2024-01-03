@@ -234,6 +234,7 @@ def meta_learners_t(final_data):
     # ingredient_list = main_df.ingredient_concept_id.unique()[:10]
     # ingredient_pairs = list(combinations(ingredient_list, 2))
     ingredient_pairs = [(739138, 703547)]
+    threshold = 0.4
     rocs_r = []
     rocs_l = []
     ates_r = []
