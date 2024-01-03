@@ -99,6 +99,7 @@ def meta_learner_s(final_data):
     # ingredient_list = main_df.ingredient_concept_id.unique()[:10]
     # ingredient_pairs = list(combinations(ingredient_list, 2))
     ingredient_pairs = [(739138, 703547)]
+    threshold = 0.4
     rocs_l = []
     rocs_r = []
     ates_r = []
@@ -131,15 +132,15 @@ def meta_learner_s(final_data):
         print('Class weights dict', class_weight_dict)
     
         # S-Learner
-        models1 = RandomForestClassifier(n_estimators=100, max_depth=5, class_weight = class_weight_dict)
+        models1 = RandomForestClassifier(n_estimators=200, max_depth=5, class_weight = class_weight_dict)
         learner_s1 = BaseSClassifier(learner = models1)
         learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
         preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
         roc_score = roc_auc_score(y_valid, preds)
-        preds[preds>0.3] = 1
-        preds[preds<=0.3] = 0
+        preds[preds>threshold] = 1
+        preds[preds<=threshold] = 0
         print('Accuracy:', accuracy_score(y_valid, preds))
         print('S Learner - RandomForest ATE:',ite.mean())
         print('S Learner - RandomForest ROC score:', roc_score)
@@ -153,8 +154,8 @@ def meta_learner_s(final_data):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
         preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
         roc_score = roc_auc_score(y_valid, preds)
-        preds[preds>0.3] = 1
-        preds[preds<=0.3] = 0
+        preds[preds>threshold] = 1
+        preds[preds<=threshold] = 0
         print('Accuracy:', accuracy_score(y_valid, preds))
         print('S Learner - LogisticRegression ATE:',ite.mean())
         print('S Learner - LogisticRegression ROC score:', roc_score)
