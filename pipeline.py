@@ -166,6 +166,8 @@ def meta_learner_s(final_data):
     print('Total time taken:',datetime.now() - initial_time)
     print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}')
     print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}')
+    print(f'RandomForest: Median {median(ates_r)}, Mean {mean(ates_r)}, Max {max(ates_r)}, Min {min(ates_r)}')
+    print(f'LogisticRegression: Median {median(ates_l)}, Mean {mean(ates_l)}, Max {max(ates_l)}, Min {min(ates_l)}')
     write_text_file(rocs_r, 'rocs_r')
     write_text_file(rocs_l, 'rocs_l')
     write_text_file(ates_r, 'ates_r')
