@@ -273,7 +273,8 @@ def meta_learners_t(final_data):
 
         # T-Learner
 
-        modelt1 = RandomForestClassifier(n_estimators = 400, max_depth = 7, class_weight = class_weight_dict)
+        # modelt1 = RandomForestClassifier(n_estimators = 400, max_depth = 7, class_weight = class_weight_dict)
+        modelt1 = RandomForestClassifier(class_weight=class_weight_dict)
         learner_t1 = BaseTClassifier(learner = modelt1)
         learner_t1.fit(X=X, treatment=t, y=y)
         ite, yhat_cs, yhat_ts = learner_t1.predict(X=X, treatment=t, y=y, return_components=True, verbose=True)
@@ -281,7 +282,7 @@ def meta_learners_t(final_data):
         rocs_r.append(roc)
         ates_r.append(ate)
 
-        modelt2 = LogisticRegression(max_iter=1000, class_weight = class_weight_dict)
+        modelt2 = LogisticRegression(class_weight = class_weight_dict)
         learner_t2 = BaseTClassifier(learner = modelt2)
         learner_t2.fit(X=X, treatment=t, y=y)
         ite, yhat_cs, yhat_ts = learner_t2.predict(X=X, treatment=t, y=y, return_components=True, verbose=True)
