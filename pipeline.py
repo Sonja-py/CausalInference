@@ -284,7 +284,7 @@ def meta_learners_t(final_data):
         rocs_l.append(roc)
         ates_l.append(ate)
 
-        modelt2 = LogisticRegression(max_iter=1000, C=1e10, class_weight = class_weight_dict)
+        modelt2 = LogisticRegression(max_iter=1000, C=1.0, class_weight = class_weight_dict)
         learner_t2 = BaseTClassifier(learner = modelt2)
         learner_t2.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_t2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
