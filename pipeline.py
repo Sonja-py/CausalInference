@@ -250,7 +250,7 @@ def meta_learners_t(final_data):
         t = df['treatment']
 
         # np.random.seed(0)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.4, random_state = 2, stratify = y)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
         X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 2, stratify = y_test)
         y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
         
@@ -266,35 +266,40 @@ def meta_learners_t(final_data):
         print('Class weights dict', class_weight_dict)
 
         # T-Learner
+        modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 3, class_weight = class_weight_dict)
+        learner_t1 = BaseTClassifier(learner = modelt1)
+        learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
+        ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForestClassifier')
+        rocs_r.append(roc_score)
+        ates_r.append(ate)
+
         modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 5, class_weight = class_weight_dict)
         learner_t1 = BaseTClassifier(learner = modelt1)
         learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
-        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
-        roc_score = roc_auc_score(y_valid, preds)
-        print('Accuracy:', accuracy_score(y_valid, preds))
-        print('T Learner - RandomForest ATE:',ite.mean())
-        print('T Learner - RandomForest ROC score:', roc_score)
+        roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForestClassifier')
         rocs_r.append(roc_score)
-        ates_r.append(ite.mean())
+        ates_r.append(ate)
 
-        modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
-        learner_t2 = BaseTClassifier(learner = modelt2)
-        learner_t2.fit(X=X_train, treatment=t_train, y=y_train)
-        ite, yhat_cs, yhat_ts = learner_t2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
-        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
-        roc_score = roc_auc_score(y_valid, preds)
-        print('Accuracy:', accuracy_score(y_valid, preds))
-        print('T Learner - LogisticRegression ATE:',ite.mean())
-        print('T Learner - LogisticRegression ROC score:', roc_score)
-        rocs_l.append(roc_score)
-        ates_l.append(ite.mean())
+        modelt1 = RandomForestClassifier(n_estimators = 100, max_depth = 7, class_weight = class_weight_dict)
+        learner_t1 = BaseTClassifier(learner = modelt1)
+        learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
+        ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForestClassifier')
+        rocs_r.append(roc_score)
+        ates_r.append(ate)
+
+        # modelt2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
+        # learner_t2 = BaseTClassifier(learner = modelt2)
+        # learner_t2.fit(X=X_train, treatment=t_train, y=y_train)
+        # ite, yhat_cs, yhat_ts = learner_t2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        # roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'LogisticRegression')
+        # rocs_l.append(roc_score)
+        # ates_l.append(ate)
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
-    # print(f'Median {np.array(rocs_t).median()}, Mean {np.array(rocs_t).mean()}')
     print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}')
     print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}')
     write_text_file(rocs_r, 'rocs_r')
