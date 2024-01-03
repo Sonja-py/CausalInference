@@ -94,6 +94,16 @@ def cevae(final_data):
 )
 def meta_learner_s(final_data):
 
+    def metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, model):
+        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
+        roc_score = roc_auc_score(y_valid, preds)
+        preds[preds>threshold] = 1
+        preds[preds<=threshold] = 0
+        print('Accuracy:', accuracy_score(y_valid, preds))
+        print(f'S Learner - {model} ATE: {ite.mean()}')
+        print(f'S Learner - {model} ROC score: {roc_score}')
+
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     # ingredient_list = main_df.ingredient_concept_id.unique()[:10]
@@ -132,33 +142,40 @@ def meta_learner_s(final_data):
         print('Class weights dict', class_weight_dict)
     
         # S-Learner
-        models1 = RandomForestClassifier(n_estimators = 1000, max_depth = 7, class_weight = class_weight_dict)
-        learner_s1 = BaseSClassifier(learner = models1)
-        learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
-        ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
-        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
-        roc_score = roc_auc_score(y_valid, preds)
-        preds[preds>threshold] = 1
-        preds[preds<=threshold] = 0
-        print('Accuracy:', accuracy_score(y_valid, preds))
-        print('S Learner - RandomForest ATE:',ite.mean())
-        print('S Learner - RandomForest ROC score:', roc_score)
-        rocs_r.append(roc_score)
-        ates_r.append(ite.mean())
+        # models1 = RandomForestClassifier(n_estimators = 1000, max_depth = 7, class_weight = class_weight_dict)
+        # learner_s1 = BaseSClassifier(learner = models1)
+        # learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
+        # ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        # yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        # preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
+        # roc_score = roc_auc_score(y_valid, preds)
+        # preds[preds>threshold] = 1
+        # preds[preds<=threshold] = 0
+        # print('Accuracy:', accuracy_score(y_valid, preds))
+        # print('S Learner - RandomForest ATE:',ite.mean())
+        # print('S Learner - RandomForest ROC score:', roc_score)
+        # rocs_r.append(roc_score)
+        # ates_r.append(ite.mean())
 
         models2 = LogisticRegression(max_iter=10000, class_weight = class_weight_dict)
         learner_s2 = BaseSClassifier(learner = models2)
         learner_s2.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_s2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
-        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
-        roc_score = roc_auc_score(y_valid, preds)
-        preds[preds>threshold] = 1
-        preds[preds<=threshold] = 0
-        print('Accuracy:', accuracy_score(y_valid, preds))
-        print('S Learner - LogisticRegression ATE:',ite.mean())
-        print('S Learner - LogisticRegression ROC score:', roc_score)
+        metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'S-Learner')
+
+        models3 = LogisticRegression(class_weight = class_weight_dict)
+        learner_s3 = BaseSClassifier(learner = models3)
+        learner_s3.fit(X=X_train, treatment=t_train, y=y_train)
+        ite, yhat_cs, yhat_ts = learner_s3.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'S-Learner')
+        # yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        # preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
+        # roc_score = roc_auc_score(y_valid, preds)
+        # preds[preds>threshold] = 1
+        # preds[preds<=threshold] = 0
+        # print('Accuracy:', accuracy_score(y_valid, preds))
+        # print('S Learner - LogisticRegression ATE:',ite.mean())
+        # print('S Learner - LogisticRegression ROC score:', roc_score)
         rocs_l.append(roc_score)
         ates_l.append(ite.mean())
 
