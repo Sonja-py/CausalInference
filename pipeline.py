@@ -132,7 +132,7 @@ def meta_learner_s(final_data):
         print('Class weights dict', class_weight_dict)
     
         # S-Learner
-        models1 = RandomForestClassifier(n_estimators=100, class_weight = class_weight_dict)
+        models1 = RandomForestClassifier(class_weight = class_weight_dict)
         learner_s1 = BaseSClassifier(learner = models1)
         learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
