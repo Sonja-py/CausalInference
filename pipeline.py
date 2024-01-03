@@ -21,14 +21,14 @@ def write_text_file(data, metric):
     output_fs = output.filesystem()
     metric, learner = metric.split('_')
     
-    if metric == 'roc' and learner == 's':
-        filename = 'roc_s.txt'
-    elif metric == 'roc' and learner == 't':
-        filename = 'roc_t.txt'
-    elif metric == 'ate' and learner == 's':
-        filename = 'ate_s.txt'
+    if metric == 'roc' and learner == 'r':
+        filename = 'roc_r.txt'
+    elif metric == 'roc' and learner == 'l':
+        filename = 'roc_l.txt'
+    elif metric == 'ate' and learner == 'r':
+        filename = 'ate_r.txt'
     else:
-        filename = 'ate_t.txt'
+        filename = 'ate_l.txt'
     with output_fs.open(filename, 'w') as f: 
         f.write(str(data))
     
@@ -164,8 +164,8 @@ def meta_learner_s(final_data):
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
     print('Total time taken:',datetime.now() - initial_time)
-    print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}')
-    print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}')
+    print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}, Max {max(rocs_r)}, Min {min(rocs_r)}')
+    print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}, Max {max(rocs_l)}, Min {min(rocs_l)}')
     print(f'RandomForest: Median {median(ates_r)}, Mean {mean(ates_r)}, Max {max(ates_r)}, Min {min(ates_r)}')
     print(f'LogisticRegression: Median {median(ates_l)}, Mean {mean(ates_l)}, Max {max(ates_l)}, Min {min(ates_l)}')
     write_text_file(rocs_r, 'rocs_r')
@@ -234,10 +234,10 @@ def meta_learners_t(final_data):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    # ingredient_list = main_df.ingredient_concept_id.unique()
-    # ingredient_pairs = list(combinations(ingredient_list, 2))
+    ingredient_list = main_df.ingredient_concept_id.unique()
+    ingredient_pairs = list(combinations(ingredient_list, 2))
     initial_time = datetime.now()
-    ingredient_pairs = [(739138, 703547)]
+    # ingredient_pairs = [(739138, 703547)]
     threshold = 0.4
     rocs_r = []
     rocs_l = []
