@@ -128,7 +128,7 @@ def meta_learner_s(final_data):
         t = df['treatment']
 
         # np.random.seed(0)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 2, stratify = y)
         X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 2, stratify = y_test)
         y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
         
