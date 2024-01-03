@@ -121,7 +121,8 @@ def meta_learner_s(final_data):
     for idx, combination in enumerate(ingredient_pairs):
         start_time = datetime.now()
         print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
-        df = main_df[main_df.ingredient_concept_id.isin(list(combination))]
+        df = main_df.copy()
+        df = df[df.ingredient_concept_id.isin(list(combination))]
         # df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
         df.loc[df.ingredient_concept_id == combination[0], 'treatment'] = 0
         df.loc[df.ingredient_concept_id == combination[1], 'treatment'] = 1
