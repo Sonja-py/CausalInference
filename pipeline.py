@@ -128,7 +128,7 @@ def meta_learner_s(final_data):
         t = df['treatment']
 
         # np.random.seed(0)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.4, random_state = 2, stratify = y)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
         X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 2, stratify = y_test)
         y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
         
@@ -152,7 +152,7 @@ def meta_learner_s(final_data):
         rocs_r.append(roc)
         ates_r.append(ate)
 
-        models2 = LogisticRegression(class_weight = class_weight_dict)
+        models2 = LogisticRegression(max_iter=1000, class_weight = class_weight_dict)
         learner_s2 = BaseSClassifier(learner = models2)
         learner_s2.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_s2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
