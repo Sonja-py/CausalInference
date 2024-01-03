@@ -109,9 +109,9 @@ def meta_learner_s(final_data):
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     ingredient_list = main_df.ingredient_concept_id.unique()[:10]
-    ingredient_pairs = list(combinations(ingredient_list, 2))
-    initial_time = datetime.now()
-    # ingredient_pairs = [(739138, 703547)]
+    # ingredient_pairs = list(combinations(ingredient_list, 2))
+    # initial_time = datetime.now()
+    ingredient_pairs = [(739138, 703547)]
     threshold = 0.4
     rocs_l = []
     rocs_r = []
