@@ -21,11 +21,11 @@ def write_text_file(data, metric):
     output_fs = output.filesystem()
     metric, learner = metric.split('_')
     
-    if metric == 'roc' and learner == 'r':
+    if metric == 'rocs' and learner == 'r':
         filename = 'roc_r.txt'
-    elif metric == 'roc' and learner == 'l':
+    elif metric == 'rocs' and learner == 'l':
         filename = 'roc_l.txt'
-    elif metric == 'ate' and learner == 'r':
+    elif metric == 'ates' and learner == 'r':
         filename = 'ate_r.txt'
     else:
         filename = 'ate_l.txt'
