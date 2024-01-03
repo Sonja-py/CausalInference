@@ -108,9 +108,9 @@ def meta_learner_s(final_data):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    # ingredient_list = main_df.ingredient_concept_id.unique()[:10]
-    # ingredient_pairs = list(combinations(ingredient_list, 2))
-    ingredient_pairs = [(739138, 703547)]
+    ingredient_list = main_df.ingredient_concept_id.unique()[:10]
+    ingredient_pairs = list(combinations(ingredient_list, 2))
+    # ingredient_pairs = [(739138, 703547)]
     threshold = 0.4
     rocs_l = []
     rocs_r = []
@@ -231,9 +231,9 @@ def meta_learners_t(final_data):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    # ingredient_list = main_df.ingredient_concept_id.unique()[:10]
-    # ingredient_pairs = list(combinations(ingredient_list, 2))
-    ingredient_pairs = [(739138, 703547)]
+    ingredient_list = main_df.ingredient_concept_id.unique()[:10]
+    ingredient_pairs = list(combinations(ingredient_list, 2))
+    # ingredient_pairs = [(739138, 703547)]
     threshold = 0.4
     rocs_r = []
     rocs_l = []
@@ -284,18 +284,12 @@ def meta_learners_t(final_data):
         rocs_l.append(roc)
         ates_l.append(ate)
 
-        # modelt2 = LogisticRegression(max_iter=1000, class_weight = class_weight_dict)
-        # learner_t2 = BaseTClassifier(learner = modelt2)
-        # learner_t2.fit(X=X_train, treatment=t_train, y=y_train)
-        # ite, yhat_cs, yhat_ts = learner_t2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        # roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'LogisticRegression')
-        # rocs_l.append(roc)
-        # ates_l.append(ate)
-
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
     print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}')
     print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}')
+    print(f'RandomForest: Median {median(ates_r)}, Mean {mean(ates_r)}, Max {max(ates_r)}, Min {min(ates_r)}')
+    print(f'LogisticRegression: Median {median(ates_l)}, Mean {mean(ates_l)}, Max {max(ates_l)}, Min {min(ates_l)}')
     write_text_file(rocs_r, 'rocs_r')
     write_text_file(rocs_l, 'rocs_l')
     write_text_file(ates_r, 'ates_r')
