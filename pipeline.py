@@ -64,9 +64,9 @@ def cevae(final_data):
         y = df['severity_final']
         t = df['treatment']
 
-        np.random.seed(3)
+        # np.random.seed(3)
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.4, random_state = 2, stratify = y)
         X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.2, random_state = 42, stratify = y_test)
 
         t_train = t[X_train.index]
@@ -78,14 +78,8 @@ def cevae(final_data):
         print('Class weights dict', class_weight_dict)
 
         cevae_model = CEVAE(num_epochs = 10, batch_size = 128, learning_rate = 1e-2, num_samples = 100)
-        loss = cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
-        print('Loss:',loss)
-        # plt.plot(loss)
-        # plt.title(f'CEVAE loss for combo {combination}')
-        # plt.xlabel('Epoch')
-        # plt.ylabel('Training Loss')
-        # plt.show()
-
+        cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
+        
         ite = cevae_model.predict(X_valid.to_numpy())
         ate = ite.mean()
         print('ATE:',ate)
@@ -102,8 +96,9 @@ def meta_learner_s(final_data):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    ingredient_list = main_df.ingredient_concept_id.unique()[:10]
-    ingredient_pairs = list(combinations(ingredient_list, 2))
+    # ingredient_list = main_df.ingredient_concept_id.unique()[:10]
+    # ingredient_pairs = list(combinations(ingredient_list, 2))
+    ingredient_pairs = [(739138, 703547)]
     rocs_l = []
     rocs_r = []
     ates_r = []
@@ -120,7 +115,7 @@ def meta_learner_s(final_data):
         t = df['treatment']
 
         # np.random.seed(0)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.6, random_state = 2, stratify = y)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.4, random_state = 2, stratify = y)
         X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 2, stratify = y_test)
         y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
         
@@ -237,7 +232,7 @@ def meta_learners_t(final_data):
         t = df['treatment']
 
         # np.random.seed(0)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.6, random_state = 2, stratify = y)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.4, random_state = 2, stratify = y)
         X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 2, stratify = y_test)
         y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
         
