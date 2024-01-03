@@ -144,7 +144,7 @@ def meta_learner_s(final_data):
         print('Class weights dict', class_weight_dict)
     
         # S-Learner
-        models1 = RandomForestClassifier(n_estimators = 200, max_depth = 7, class_weight = class_weight_dict)
+        models1 = RandomForestClassifier(n_estimators = 100, max_depth = 7, class_weight = class_weight_dict)
         learner_s1 = BaseSClassifier(learner = models1)
         learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
@@ -216,6 +216,18 @@ def meta_learners_bootstrapped(final_data):
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
 def meta_learners_t(final_data):
+
+    def metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, model):
+        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
+        roc = roc_auc_score(y_valid, preds)
+        ate = ite.mean()
+        # preds[preds>threshold] = 1
+        # preds[preds<=threshold] = 0
+        # print('Accuracy:', accuracy_score(y_valid, preds))
+        print(f'S Learner - {model} ATE: {ate}')
+        print(f'S Learner - {model} ROC score: {roc}')
+        return roc, ate
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
