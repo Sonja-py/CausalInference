@@ -144,7 +144,7 @@ def meta_learner_s(final_data):
         print('Class weights dict', class_weight_dict)
     
         # S-Learner
-        models1 = RandomForestClassifier(n_estimators = 200, max_depth = 3, class_weight = class_weight_dict)
+        models1 = RandomForestClassifier(n_estimators = 100, max_depth = 5, class_weight = class_weight_dict)
         learner_s1 = BaseSClassifier(learner = models1)
         learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
@@ -152,7 +152,7 @@ def meta_learner_s(final_data):
         rocs_r.append(roc)
         ates_r.append(ate)
 
-        models1 = RandomForestClassifier(n_estimators = 200, max_depth = 5, class_weight = class_weight_dict)
+        models1 = RandomForestClassifier(n_estimators = 1000, max_depth = 7, class_weight = class_weight_dict)
         learner_s1 = BaseSClassifier(learner = models1)
         learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
         ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
@@ -160,13 +160,13 @@ def meta_learner_s(final_data):
         rocs_r.append(roc)
         ates_r.append(ate)
 
-        models1 = RandomForestClassifier(n_estimators = 400, max_depth = 5, class_weight = class_weight_dict)
-        learner_s1 = BaseSClassifier(learner = models1)
-        learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
-        ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
-        rocs_r.append(roc)
-        ates_r.append(ate)
+        # models1 = RandomForestClassifier(n_estimators = 400, max_depth = 5, class_weight = class_weight_dict)
+        # learner_s1 = BaseSClassifier(learner = models1)
+        # learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
+        # ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        # roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
+        # rocs_r.append(roc)
+        # ates_r.append(ate)
 
         # models2 = LogisticRegression(max_iter=1000, class_weight = class_weight_dict)
         # learner_s2 = BaseSClassifier(learner = models2)
