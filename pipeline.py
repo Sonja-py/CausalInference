@@ -102,16 +102,15 @@ def meta_learner_s(final_data):
         # preds[preds>threshold] = 1
         # preds[preds<=threshold] = 0
         # print('Accuracy:', accuracy_score(y_valid, preds))
-        print(f'S Learner - {model} ATE: {ate}')
-        print(f'S Learner - {model} ROC score: {roc}')
+        print(f'S Learner - {model} ATE: {ate}, ROC score: {roc}')
         return roc, ate
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    # ingredient_list = main_df.ingredient_concept_id.unique()[:10]
-    # ingredient_pairs = list(combinations(ingredient_list, 2))
+    ingredient_list = main_df.ingredient_concept_id.unique()
+    ingredient_pairs = list(combinations(ingredient_list, 2))
     initial_time = datetime.now()
-    ingredient_pairs = [(739138, 703547)]
+    # ingredient_pairs = [(739138, 703547)]
     threshold = 0.4
     rocs_l = []
     rocs_r = []
@@ -124,8 +123,6 @@ def meta_learner_s(final_data):
         df = main_df.copy()
         df = df[df.ingredient_concept_id.isin(list(combination))]
         df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
-        # df.loc[df.ingredient_concept_id == combination[0], 'treatment'] = 0
-        # df.loc[df.ingredient_concept_id == combination[1], 'treatment'] = 1
 
         X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
         y = df['severity_final']
@@ -232,13 +229,12 @@ def meta_learners_t(final_data):
         # preds[preds>threshold] = 1
         # preds[preds<=threshold] = 0
         # print('Accuracy:', accuracy_score(y_valid, preds))
-        print(f'T Learner - {model} ATE: {ate}')
-        print(f'T Learner - {model} ROC score: {roc}')
+        print(f'T Learner - {model} ATE: {ate}, ROC score: {roc}')
         return roc, ate
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    ingredient_list = main_df.ingredient_concept_id.unique()[:10]
+    ingredient_list = main_df.ingredient_concept_id.unique()
     ingredient_pairs = list(combinations(ingredient_list, 2))
     initial_time = datetime.now()
     # ingredient_pairs = [(739138, 703547)]
@@ -251,7 +247,8 @@ def meta_learners_t(final_data):
     for idx, combination in enumerate(ingredient_pairs):
         start_time = datetime.now()
         print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
-        df = main_df[main_df.ingredient_concept_id.isin(list(combination))]
+        df = main_df.copy()
+        df = df[df.ingredient_concept_id.isin(list(combination))]
         df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
 
         X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
