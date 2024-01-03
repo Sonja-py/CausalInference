@@ -99,9 +99,9 @@ def meta_learner_s(final_data):
         preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
         roc = roc_auc_score(y_valid, preds)
         ate = ite.mean()
-        preds[preds>threshold] = 1
-        preds[preds<=threshold] = 0
-        print('Accuracy:', accuracy_score(y_valid, preds))
+        # preds[preds>threshold] = 1
+        # preds[preds<=threshold] = 0
+        # print('Accuracy:', accuracy_score(y_valid, preds))
         print(f'S Learner - {model} ATE: {ate}')
         print(f'S Learner - {model} ROC score: {roc}')
         return roc, ate
