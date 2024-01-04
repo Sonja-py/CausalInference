@@ -272,7 +272,6 @@ def meta_learners_t(final_data):
         print('Class weights dict', class_weight_dict)
 
         # T-Learner
-
         modelt1 = RandomForestClassifier(n_estimators = 400, max_depth = 7, class_weight = class_weight_dict)
         learner_t1 = BaseTClassifier(learner = modelt1)
         learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
@@ -421,4 +420,11 @@ def testing(final_data):
         print('ATE:',ite.mean())
         print('ROC score:', roc_score)
         
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.f54ece32-1f97-4434-95c5-56c4d870300d"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+def unnamed(final_data):
+    
 
