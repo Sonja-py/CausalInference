@@ -173,7 +173,7 @@ def meta_learner_s(final_data):
     # write_text_file(ates_r, 'ates_r')
     # write_text_file(ates_l, 'ates_l')
 
-    return dict([('roc_l', rocs_l), ('roc_r', rocs_r), ('ate_l', ates_l), ('ate_r', ates_r)])
+    return pd.DataFrame.from_dict(dict([('roc_l', rocs_l), ('roc_r', rocs_r), ('ate_l', ates_l), ('ate_r', ates_r)]))
 
     # return rocs_l, rocs_r, ates_l, ates_r
 
