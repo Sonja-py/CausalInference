@@ -168,10 +168,10 @@ def meta_learner_s(final_data):
     print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}, Max {max(rocs_l)}, Min {min(rocs_l)}')
     print(f'RandomForest: Median {median(ates_r)}, Mean {mean(ates_r)}, Max {max(ates_r)}, Min {min(ates_r)}')
     print(f'LogisticRegression: Median {median(ates_l)}, Mean {mean(ates_l)}, Max {max(ates_l)}, Min {min(ates_l)}')
-    write_text_file(rocs_r, 'rocs_r')
-    write_text_file(rocs_l, 'rocs_l')
-    write_text_file(ates_r, 'ates_r')
-    write_text_file(ates_l, 'ates_l')
+    # write_text_file(rocs_r, 'rocs_r')
+    # write_text_file(rocs_l, 'rocs_l')
+    # write_text_file(ates_r, 'ates_r')
+    # write_text_file(ates_l, 'ates_l')
 
     return dict([('roc_l', rocs_l), ('roc_r', rocs_r), ('ate_l', ates_l), ('ate_r', ates_r)])
 
