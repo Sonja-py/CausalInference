@@ -173,6 +173,10 @@ def meta_learner_s(final_data):
     write_text_file(ates_r, 'ates_r')
     write_text_file(ates_l, 'ates_l')
 
+    return dict([('roc_l', rocs_l), ('roc_r', rocs_r), ('ate_l', ates_l), ('ate_r', ates_r)])
+
+    # return rocs_l, rocs_r, ates_l, ates_r
+
 @transform_pandas(
     Output(rid="ri.vector.main.execute.f2cebbba-3c15-4e6c-b89b-d8374a3b91f3"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
