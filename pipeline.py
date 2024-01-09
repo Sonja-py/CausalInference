@@ -441,7 +441,11 @@ def unnamed_1(final_data):
     output_fs = output.filesystem()
     val = []
 
-    with output_fs.open(filename, 'r') as f: 
+    with output_fs.open('roc_r.txt', 'r') as f: 
         f.read('roc_r.txt')
         val.append(list(f))
+
+    print(val)
+
+    
 
