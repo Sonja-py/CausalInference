@@ -433,9 +433,15 @@ def unnamed(final_data):
     
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.e596b3df-d8a5-4f62-975f-4aa095265509"),
+    Output(rid="ri.foundry.main.dataset.99ed3509-4e04-43f9-b117-5e5eb7c31098"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
 def unnamed_1(final_data):
-    
+    output = Transforms.get_output()
+    output_fs = output.filesystem()
+    val = []
+
+    with output_fs.open(filename, 'r') as f: 
+        f.read('roc_r.txt')
+        val.append(list(f))
 
