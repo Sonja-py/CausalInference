@@ -302,10 +302,10 @@ def meta_learners_t(final_data):
 
     print('ROC R',rocs_r)
     print('ROC L',rocs_l)
-    # write_text_file(rocs_r, 'rocs_r')
-    # write_text_file(rocs_l, 'rocs_l')
-    # write_text_file(ates_r, 'ates_r')
-    # write_text_file(ates_l, 'ates_l')
+    write_text_file(rocs_r, 'rocs_r')
+    write_text_file(rocs_l, 'rocs_l')
+    write_text_file(ates_r, 'ates_r')
+    write_text_file(ates_l, 'ates_l')
 
     # output = Transforms.get_output()
     # output_fs = output.filesystem()
