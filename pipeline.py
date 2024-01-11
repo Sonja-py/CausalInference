@@ -94,15 +94,11 @@ def cevae(final_data):
 )
 def meta_learner_s(final_data):
 
-    def metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, model):
+    def metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
         preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
         roc = roc_auc_score(y_valid, preds)
         ate = ite.mean()
-        # preds[preds>threshold] = 1
-        # preds[preds<=threshold] = 0
-        # print('Accuracy:', accuracy_score(y_valid, preds))
-        # print(f'S Learner - {model} ATE: {ate}, ROC score: {roc}')
         return roc, ate
 
     def best_params_df(best_params, best_roc, best_ate, combination, model):
@@ -162,12 +158,12 @@ def meta_learner_s(final_data):
                     learner_s1 = BaseSClassifier(learner = model)
                     learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
                     ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-                    roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
+                    roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts)
                     
                     if roc > best_roc:
                         best_ate = ate
                         best_roc = roc
-                        best_params = {'parameters': {'n_estimators':estimator, 'criterion':criterion, 'max_depth':depth}}
+                        best_params = {'parameters': ('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)}
                     print(f'Done - Estimator: {estimator}, criterion: {criterion}, depth: {depth}')
 
         print('Best params:', best_params)
