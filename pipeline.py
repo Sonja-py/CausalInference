@@ -4,15 +4,15 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from itertools import combinations
 from copy import deepcopy
-from statistics import median, mean
+# from statistics import median, mean
 
-from causalml.inference.meta import BaseSClassifier, BaseTClassifier, BaseXClassifier
+from causalml.inference.meta import BaseSClassifier, BaseTClassifier
 from causalml.inference.nn import CEVAE
 
 from sklearn.utils import class_weight
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, precision_recall_curve, auc, roc_auc_score, roc_curve, confusion_matrix
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.metrics import roc_auc_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
 # Save error metrics
@@ -150,17 +150,17 @@ def meta_learner_s(final_data):
         for estimator in [100, 200, 500]:
             for criterion in ['gini', 'entropy', 'log_loss']:
                 for depth in [3, 5, 7]:
-                    models1 = RandomForestClassifier(n_estimators = estimator, max_depth = depth, criterion = criterion, class_weight = class_weight_dict)
-                    learner_s1 = BaseSClassifier(learner = models1)
+                    model = RandomForestClassifier(n_estimators = estimator, max_depth = depth, criterion = criterion, class_weight = class_weight_dict)
+                    learner_s1 = BaseSClassifier(learner = model)
                     learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
                     ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
                     roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
                     
-                    print(f'Done - Estimator {estimator}, criterion {criterion}, depth {depth}')
                     if roc > best_roc:
                         best_ate = ate
                         best_roc = roc
                         best_params = {'parameters': {'n_estimators':estimator, 'criterion':criterion, 'max_depth':depth}}
+                    print(f'Done - Estimator: {estimator}, criterion: {criterion}, depth: {depth}')
 
         print('Best params:', best_params)
         print('Best ROC roc:', best_roc)
@@ -168,6 +168,7 @@ def meta_learner_s(final_data):
         best_params['ate'] = best_ate
         best_params['drug_0'] = combination[0]
         best_params['drug_1'] = combination[1]
+        best_params['model'] = 'RF'
         best_params_df = pd.DataFrame(best_params, index=[0])
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
     
@@ -179,6 +180,31 @@ def meta_learner_s(final_data):
         # roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
         # rocs_r.append(roc)
         # ates_r.append(ate)
+
+        best_roc = 0.0
+        best_ate = 0.0
+        for penalty in ['l1', 'l2', 'elasticnet', None]:
+            for reg_strength in [0.01, 0.1, 1, 10, 100]:
+                for iters in [100, 1000, 10000]:
+                    model = LogisticRegression(max_iter=iters, C=reg_strength, penalty=penalty, class_weight = class_weight_dict)
+                    learner_s1 = BaseSClassifier(learner = model)
+                    learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
+                    ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+                    roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
+                    
+                    if roc > best_roc:
+                        best_ate = ate
+                        best_roc = roc
+                        best_params = {'parameters': {'penalty':penalty, 'C':reg_strength, 'max_iter':iters}}
+                    print(f'Done - penalty: {penalty}, C: {reg_strength}, max_iter: {iters}')
+
+        best_params['roc'] = best_roc
+        best_params['ate'] = best_ate
+        best_params['drug_0'] = combination[0]
+        best_params['drug_1'] = combination[1]
+        best_params['model'] = 'LR'
+        best_params_df = pd.DataFrame(best_params, index=[0])
+        results_df = pd.concat([results_df, best_params_df], ignore_index=True)
 
         # models2 = LogisticRegression(max_iter=1000, class_weight = class_weight_dict)
         # learner_s2 = BaseSClassifier(learner = models2)
