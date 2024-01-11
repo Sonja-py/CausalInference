@@ -105,6 +105,14 @@ def meta_learner_s(final_data):
         # print(f'S Learner - {model} ATE: {ate}, ROC score: {roc}')
         return roc, ate
 
+    def best_params_df(best_params, best_roc, best_ate, combination, model):
+        best_params['roc'] = best_roc
+        best_params['ate'] = best_ate
+        best_params['drug_0'] = combination[0]
+        best_params['drug_1'] = combination[1]
+        best_params['model'] = model
+        return pd.DataFrame(best_params)
+
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     results_df = pd.DataFrame()
@@ -147,8 +155,8 @@ def meta_learner_s(final_data):
 
         best_roc = 0.0
         best_ate = 0.0
-        for estimator in [100, 200, 500]:
-            for criterion in ['gini', 'entropy', 'log_loss']:
+        for estimator in [100]:#, 200, 500
+            for criterion in ['gini']:#, 'entropy', 'log_loss'
                 for depth in [3, 5, 7]:
                     model = RandomForestClassifier(n_estimators = estimator, max_depth = depth, criterion = criterion, class_weight = class_weight_dict)
                     learner_s1 = BaseSClassifier(learner = model)
@@ -164,12 +172,14 @@ def meta_learner_s(final_data):
 
         print('Best params:', best_params)
         print('Best ROC roc:', best_roc)
-        best_params['roc'] = best_roc
-        best_params['ate'] = best_ate
-        best_params['drug_0'] = combination[0]
-        best_params['drug_1'] = combination[1]
-        best_params['model'] = 'RF'
-        best_params_df = pd.DataFrame(best_params, index=[0])
+        best_params_df = create_dict_for_final_df(best_params, best_roc, best_ate, combination, 'RF')
+        # best_params['roc'] = best_roc
+        # best_params['ate'] = best_ate
+        # best_params['drug_0'] = combination[0]
+        # best_params['drug_1'] = combination[1]
+        # best_params['model'] = 'RF'
+        # drug_dict = {'drug_0':combination[0], 'drug_1':combination[1]}
+        # best_params_df = pd.DataFrame(best_params, index=[0])
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
     
         # S-Learner
@@ -203,7 +213,7 @@ def meta_learner_s(final_data):
         # best_params['drug_0'] = combination[0]
         # best_params['drug_1'] = combination[1]
         # best_params['model'] = 'LR'
-        # best_params_df = pd.DataFrame(best_params, index=[0])
+        # best_params_df = create_dict_for_final_df(best_params, best_roc, best_ate, combination, 'LR')
         # results_df = pd.concat([results_df, best_params_df], ignore_index=True)
 
         # models2 = LogisticRegression(max_iter=1000, class_weight = class_weight_dict)
