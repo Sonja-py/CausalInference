@@ -132,7 +132,7 @@ def lr_slearner(final_data):
                             best_roc = roc
                             # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
                             best_params = {'n_estimators': np.nan, 'criterion': np.nan, 'max_depth': np.nan, 'penalty':crit_1, 'C':crit_2, 'max_iter':crit_3, 'solver':crit_4}
-                        print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}, solver: {crit_4}')
+                        # print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}, solver: {crit_4}')
         return best_roc, best_ate, best_params
 
     # Create and get the data for pair of different antidepressants
@@ -175,7 +175,7 @@ def lr_slearner(final_data):
         class_weight_dict = dict(enumerate(class_weights))
     
         best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'LR')
-        print(f'LR - ROC: {best_roc}, {best_params}')
+        print(f'ROC: {best_roc}, {best_params}')
         best_params_df = best_params_df(best_params, best_roc, best_ate, combination, 'LR')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
 
