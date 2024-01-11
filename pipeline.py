@@ -204,6 +204,7 @@ def meta_learner_s(final_data):
         print('RF - ROC:', best_roc)
         best_params_df = best_params_df(best_params, best_roc, best_ate, combination, 'RF')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
+        print('Time taken for RF', datetime.now()-start_time)
     
         # S-Learner
         # models1 = RandomForestClassifier(n_estimators = 200, max_depth = 7, class_weight = class_weight_dict)
@@ -230,10 +231,12 @@ def meta_learner_s(final_data):
         #                 best_roc = roc
         #                 best_params = {'n_estimators': None, 'criterion': None, 'max_depth': None, 'penalty':penalty, 'C':reg_strength, 'max_iter':iters}
 
+        new_start_time = datetime.now()
         best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'LR')
         print('LR - ROC:', best_roc)
         best_params_df = best_params_df(best_params, best_roc, best_ate, combination, 'LR')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
+        print('Time taken for LR', datetime.now()-new_start_time)
 
         # models2 = LogisticRegression(max_iter=1000, class_weight = class_weight_dict)
         # learner_s2 = BaseSClassifier(learner = models2)
