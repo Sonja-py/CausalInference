@@ -168,8 +168,8 @@ def meta_learner_s(final_data):
                         best_params = {'n_estimators': estimator, 'criterion': criterion, 'max_depth': depth}
                     print(f'Done - Estimator: {estimator}, criterion: {criterion}, depth: {depth}')
 
-        # print('Best params:', best_params)
-        # print('Best ROC roc:', best_roc)
+        print('Best params:', best_params)
+        print('Best ROC roc:', best_roc)
         best_params_df = best_params_df(best_params, best_roc, best_ate, combination, 'RF', 'S')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
     
