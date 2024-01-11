@@ -445,7 +445,7 @@ def rf_slearner(final_data):
 
     print('Total time taken:',datetime.now() - initial_time)
 
-    return results_df
+    return pd.DataFrame(results_df)
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.3cc31dfe-610e-492d-924d-c5f6421324d1"),
