@@ -119,7 +119,7 @@ def meta_learner_s(final_data):
         else:
             estim_1 = ['l1', 'l2', 'elasticnet', None]
             estim_2 = [0.01, 0.1, 1, 10, 100]
-            estim_3 = [100, 1000, 10000]
+            estim_3 = [1000, 5000, 10000]
         for crit_1 in estim_1:
             for crit_2 in estim_2:
                 for crit_3 in estim_3:
