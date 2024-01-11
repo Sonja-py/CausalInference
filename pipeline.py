@@ -383,9 +383,9 @@ def rf_slearner(final_data):
                         best_roc = roc
                         # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
                         if model == 'RF':
-                            best_params = {'n_estimators': crit_1, 'criterion': crit_2, 'max_depth': crit_3, 'penalty':None, 'C':None, 'max_iter':None}
+                            best_params = {'n_estimators': crit_1, 'criterion': crit_2, 'max_depth': crit_3, 'penalty':np.nan, 'C':np.nan, 'max_iter':np.nan}
                         else:
-                            best_params = {'n_estimators': None, 'criterion': None, 'max_depth': None, 'penalty':crit_1, 'C':crit_2, 'max_iter':crit_3}
+                            best_params = {'n_estimators': np.nan, 'criterion': np.nan, 'max_depth': np.nan, 'penalty':crit_1, 'C':crit_2, 'max_iter':crit_3}
                     print(f'Done - n_estimators: {crit_1}, criterion: {crit_2}, max_depth: {crit_3}')
         return best_roc, best_ate, best_params
 
