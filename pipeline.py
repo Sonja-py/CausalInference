@@ -120,6 +120,7 @@ def lr_slearner(final_data):
             for crit_2 in estim_2:
                 for crit_3 in estim_3:
                     for crit_4 in estim_4:
+                        if estim_1 == 'none': crit_2 = 1
                         clf = LogisticRegression(penalty=crit_1, C=crit_2, max_iter=crit_3, solver=crit_4, class_weight=class_weight_dict)
                         clf_learner = BaseSClassifier(learner = clf)
                         clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
