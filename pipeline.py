@@ -172,7 +172,7 @@ def meta_learner_s(final_data):
 
         print('Best params:', best_params)
         print('Best ROC roc:', best_roc)
-        best_params_df = create_dict_for_final_df(best_params, best_roc, best_ate, combination, 'RF')
+        best_params_df = best_params_df(best_params, best_roc, best_ate, combination, 'RF')
         # best_params['roc'] = best_roc
         # best_params['ate'] = best_ate
         # best_params['drug_0'] = combination[0]
