@@ -101,7 +101,7 @@ def lr_slearner(final_data):
         ate = ite.mean()
         return roc, ate
 
-    def best_params_df(best_params, best_roc, best_ate, combination, model):
+    def create_best_params_df(best_params, best_roc, best_ate, combination, model):
         best_params['roc'] = best_roc
         best_params['ate'] = best_ate
         best_params['drug_0'] = combination[0]
@@ -176,7 +176,7 @@ def lr_slearner(final_data):
     
         best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'LR')
         print(f'ROC: {best_roc}, {best_params}')
-        best_params_df = best_params_df(best_params, best_roc, best_ate, combination, 'LR')
+        best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, 'LR')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
