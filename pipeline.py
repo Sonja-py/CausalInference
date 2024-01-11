@@ -109,6 +109,40 @@ def meta_learner_s(final_data):
         best_params['model'] = model
         return pd.DataFrame(best_params, index=[0])
 
+    def grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, model):
+        best_roc = 0.0
+        best_ate = 0.0
+        if model == 'RF':
+            estim_1 = [100, 200, 500]
+            estim_2 = ['gini', 'entropy', 'log_loss']
+            estim_3 = [3, 5, 7]
+        else:
+            estim_1 = ['l1', 'l2', 'elasticnet', None]
+            estim_2 = [0.01, 0.1, 1, 10, 100]
+            estim_3 = [100, 1000, 10000]
+        for crit_1 in estim_1:
+            for crit_2 in estim_2:
+                for crit_3 in estim_3:
+                    if model == 'RF':
+                        clf = RandomForestClassifier(n_estimators = crit_1, criterion = crit_2, max_depth = crit_3, class_weight=class_weight_dict)
+                    else:
+                        clf = LogisticRegression(penalty=crit_1, C=crit_2, max_iter=crit_3, solver='saga', class_weight=class_weight_dict)
+                    clf_learner = BaseSClassifier(learner = clf)
+                    clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
+                    ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+                    roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts)
+                    
+                    if roc > best_roc:
+                        best_ate = ate
+                        best_roc = roc
+                        # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
+                        if model == 'RF':
+                            best_params = {'n_estimators': crit_1, 'criterion': crit_2, 'max_depth': crit_3, 'penalty':None, 'C':None, 'max_iter':None}
+                        else:
+                            best_params = {'n_estimators': None, 'criterion': None, 'max_depth': None, 'penalty':crit_1, 'C':crit_2, 'max_iter':crit_3}
+
+        return best_roc, best_ate, best_params
+
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     results_df = pd.DataFrame()
@@ -147,28 +181,27 @@ def meta_learner_s(final_data):
 
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
-        # print('Class weights dict', class_weight_dict)
 
-        best_roc = 0.0
-        best_ate = 0.0
-        for estimator in [100, 200, 500]:
-            for criterion in ['gini', 'entropy', 'log_loss']:
-                for depth in [3, 5, 7]:
-                    model = RandomForestClassifier(n_estimators = estimator, max_depth = depth, criterion = criterion, class_weight = class_weight_dict)
-                    learner_s1 = BaseSClassifier(learner = model)
-                    learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
-                    ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-                    roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts)
+        best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'RF')
+
+        # best_roc = 0.0
+        # best_ate = 0.0
+        # for estimator in [100, 200, 500]:
+        #     for criterion in ['gini', 'entropy', 'log_loss']:
+        #         for depth in [3, 5, 7]:
+        #             model = RandomForestClassifier(n_estimators = estimator, max_depth = depth, criterion = criterion, class_weight = class_weight_dict)
+        #             learner_s1 = BaseSClassifier(learner = model)
+        #             learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
+        #             ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        #             roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts)
                     
-                    if roc > best_roc:
-                        best_ate = ate
-                        best_roc = roc
-                        # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
-                        best_params = {'n_estimators': estimator, 'criterion': criterion, 'max_depth': depth, 'penalty':None, 'C':None, 'max_iter':None}
-                    # print(f'Done - Estimator: {estimator}, criterion: {criterion}, depth: {depth}')
-        print('RF Done')
-        # print('Best params:', best_params)
-        # print('Best ROC roc:', best_roc)
+        #             if roc > best_roc:
+        #                 best_ate = ate
+        #                 best_roc = roc
+        #                 # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
+        #                 best_params = {'n_estimators': estimator, 'criterion': criterion, 'max_depth': depth, 'penalty':None, 'C':None, 'max_iter':None}
+
+        print('RF - ROC:', best_roc)
         best_params_df = best_params_df(best_params, best_roc, best_ate, combination, 'RF')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
     
@@ -181,23 +214,24 @@ def meta_learner_s(final_data):
         # rocs_r.append(roc)
         # ates_r.append(ate)
 
-        best_roc = 0.0
-        best_ate = 0.0
-        for penalty in ['l1', 'l2', 'elasticnet', None]:
-            for reg_strength in [0.01, 0.1, 1, 10, 100]:
-                for iters in [100, 1000, 10000]:
-                    model = LogisticRegression(max_iter=iters, C=reg_strength, penalty=penalty, class_weight = class_weight_dict)
-                    learner_s1 = BaseSClassifier(learner = model)
-                    learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
-                    ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-                    roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
+        # best_roc = 0.0
+        # best_ate = 0.0
+        # for penalty in ['l1', 'l2', 'elasticnet', None]:
+        #     for reg_strength in [0.01, 0.1, 1, 10, 100]:
+        #         for iters in [100, 1000, 10000]:
+        #             model = LogisticRegression(max_iter=iters, C=reg_strength, penalty=penalty, solver='saga', class_weight = class_weight_dict)
+        #             learner_s1 = BaseSClassifier(learner = model)
+        #             learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
+        #             ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        #             roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
                     
-                    if roc > best_roc:
-                        best_ate = ate
-                        best_roc = roc
-                        best_params = {'n_estimators': None, 'criterion': None, 'max_depth': None, 'penalty':penalty, 'C':reg_strength, 'max_iter':iters}
-                    # print(f'Done - penalty: {penalty}, C: {reg_strength}, max_iter: {iters}')
+        #             if roc > best_roc:
+        #                 best_ate = ate
+        #                 best_roc = roc
+        #                 best_params = {'n_estimators': None, 'criterion': None, 'max_depth': None, 'penalty':penalty, 'C':reg_strength, 'max_iter':iters}
 
+        best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'LR')
+        print('LR - ROC:', best_roc)
         best_params_df = best_params_df(best_params, best_roc, best_ate, combination, 'LR')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
 
@@ -222,9 +256,6 @@ def meta_learner_s(final_data):
     # write_text_file(ates_l, 'ates_l')
 
     return results_df
-    # pd.DataFrame.from_dict(dict([('roc_l', rocs_l), ('roc_r', rocs_r), ('ate_l', ates_l), ('ate_r', ates_r)]))
-
-    # return rocs_l, rocs_r, ates_l, ates_r
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.f2cebbba-3c15-4e6c-b89b-d8374a3b91f3"),
