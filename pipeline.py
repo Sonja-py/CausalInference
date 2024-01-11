@@ -184,53 +184,11 @@ def meta_learner_s(final_data):
 
         best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'RF')
 
-        # best_roc = 0.0
-        # best_ate = 0.0
-        # for estimator in [100, 200, 500]:
-        #     for criterion in ['gini', 'entropy', 'log_loss']:
-        #         for depth in [3, 5, 7]:
-        #             model = RandomForestClassifier(n_estimators = estimator, max_depth = depth, criterion = criterion, class_weight = class_weight_dict)
-        #             learner_s1 = BaseSClassifier(learner = model)
-        #             learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
-        #             ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        #             roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts)
-                    
-        #             if roc > best_roc:
-        #                 best_ate = ate
-        #                 best_roc = roc
-        #                 # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
-        #                 best_params = {'n_estimators': estimator, 'criterion': criterion, 'max_depth': depth, 'penalty':None, 'C':None, 'max_iter':None}
-
         print(f'RF - ROC: {best_roc}, {best_params}')
         best_params_df = best_params_df(best_params, best_roc, best_ate, combination, 'RF')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
         print('Time taken for RF', datetime.now()-start_time)
     
-        # S-Learner
-        # models1 = RandomForestClassifier(n_estimators = 200, max_depth = 7, class_weight = class_weight_dict)
-        # learner_s1 = BaseSClassifier(learner = models1)
-        # learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
-        # ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        # roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
-        # rocs_r.append(roc)
-        # ates_r.append(ate)
-
-        # best_roc = 0.0
-        # best_ate = 0.0
-        # for penalty in ['l1', 'l2', 'elasticnet', None]:
-        #     for reg_strength in [0.01, 0.1, 1, 10, 100]:
-        #         for iters in [100, 1000, 10000]:
-        #             model = LogisticRegression(max_iter=iters, C=reg_strength, penalty=penalty, solver='saga', class_weight = class_weight_dict)
-        #             learner_s1 = BaseSClassifier(learner = model)
-        #             learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
-        #             ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        #             roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
-                    
-        #             if roc > best_roc:
-        #                 best_ate = ate
-        #                 best_roc = roc
-        #                 best_params = {'n_estimators': None, 'criterion': None, 'max_depth': None, 'penalty':penalty, 'C':reg_strength, 'max_iter':iters}
-
         new_start_time = datetime.now()
         best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'LR')
         print(f'LR - ROC: {best_roc}, {best_params}')
@@ -238,25 +196,9 @@ def meta_learner_s(final_data):
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
         print('Time taken for LR', datetime.now()-new_start_time)
 
-        # models2 = LogisticRegression(max_iter=1000, class_weight = class_weight_dict)
-        # learner_s2 = BaseSClassifier(learner = models2)
-        # learner_s2.fit(X=X_train, treatment=t_train, y=y_train)
-        # ite, yhat_cs, yhat_ts = learner_s2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        # roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'LogisticRegression')
-        # rocs_l.append(roc)
-        # ates_l.append(ate)
-
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
     print('Total time taken:',datetime.now() - initial_time)
-    # print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}, Max {max(rocs_r)}, Min {min(rocs_r)}')
-    # print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}, Max {max(rocs_l)}, Min {min(rocs_l)}')
-    # print(f'RandomForest: Median {median(ates_r)}, Mean {mean(ates_r)}, Max {max(ates_r)}, Min {min(ates_r)}')
-    # print(f'LogisticRegression: Median {median(ates_l)}, Mean {mean(ates_l)}, Max {max(ates_l)}, Min {min(ates_l)}')
-    # write_text_file(rocs_r, 'rocs_r')
-    # write_text_file(rocs_l, 'rocs_l')
-    # write_text_file(ates_r, 'ates_r')
-    # write_text_file(ates_l, 'ates_l')
 
     return results_df
 
@@ -543,5 +485,12 @@ def unnamed_1(final_data):
 
     print(val)
 
+    
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.1a1fd72d-d343-44c1-95b9-53791d8e7abf"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+def unnamed_2(final_data):
     
 
