@@ -120,7 +120,7 @@ def lr_slearner(final_data):
             for crit_2 in estim_2:
                 for crit_3 in estim_3:
                     for crit_4 in estim_4:
-                        if crit_1 == 'none': crit_2 = 1
+                        # if crit_1 == 'none': crit_2 = 1
                         clf = LogisticRegression(penalty=crit_1, C=crit_2, max_iter=crit_3, solver=crit_4, class_weight=class_weight_dict)
                         clf_learner = BaseSClassifier(learner = clf)
                         clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
@@ -138,10 +138,10 @@ def lr_slearner(final_data):
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     results_df = pd.DataFrame()
-    # ingredient_list = main_df.ingredient_concept_id.unique()
-    # ingredient_pairs = list(combinations(ingredient_list, 2))
+    ingredient_list = main_df.ingredient_concept_id.unique()[:10]
+    ingredient_pairs = list(combinations(ingredient_list, 2))
     initial_time = datetime.now()
-    ingredient_pairs = [(739138, 703547)]
+    # ingredient_pairs = [(739138, 703547)]
     threshold = 0.4
     rocs_l = []
     rocs_r = []
