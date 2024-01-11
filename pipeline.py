@@ -102,7 +102,7 @@ def meta_learner_s(final_data):
         # preds[preds>threshold] = 1
         # preds[preds<=threshold] = 0
         # print('Accuracy:', accuracy_score(y_valid, preds))
-        print(f'S Learner - {model} ATE: {ate}, ROC score: {roc}')
+        # print(f'S Learner - {model} ATE: {ate}, ROC score: {roc}')
         return roc, ate
 
     # Create and get the data for pair of different antidepressants
@@ -143,7 +143,7 @@ def meta_learner_s(final_data):
 
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
-        print('Class weights dict', class_weight_dict)
+        # print('Class weights dict', class_weight_dict)
 
         best_roc = 0.0
         best_ate = 0.0
@@ -156,6 +156,7 @@ def meta_learner_s(final_data):
                     ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
                     roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
                     
+                    print(f'Done - Estimator {estimator}, criterion {criterion}, depth {depth}')
                     if roc > best_roc:
                         best_ate = ate
                         best_roc = roc
