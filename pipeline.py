@@ -386,7 +386,7 @@ def rf_slearner(final_data):
                             best_params = {'n_estimators': crit_1, 'criterion': crit_2, 'max_depth': crit_3, 'penalty':None, 'C':None, 'max_iter':None}
                         else:
                             best_params = {'n_estimators': None, 'criterion': None, 'max_depth': None, 'penalty':crit_1, 'C':crit_2, 'max_iter':crit_3}
-                    print(f'Done - estimator_1 {crit_1}, estimator_2 {crit_2}, estimator_3 {crit_3}')
+                    print(f'Done - n_estimators: {crit_1}, criterion: {crit_2}, max_depth: {crit_3}')
         return best_roc, best_ate, best_params
 
     # Create and get the data for pair of different antidepressants
