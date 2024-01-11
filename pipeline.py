@@ -107,7 +107,7 @@ def meta_learner_s(final_data):
         best_params['drug_0'] = combination[0]
         best_params['drug_1'] = combination[1]
         best_params['model'] = model
-        return pd.DataFrame(best_params)
+        return pd.DataFrame(best_params, index=[0])
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
