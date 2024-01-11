@@ -163,7 +163,8 @@ def meta_learner_s(final_data):
                     if roc > best_roc:
                         best_ate = ate
                         best_roc = roc
-                        best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
+                        # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
+                        best_params = {'paramters':[estimator, criterion, depth]}
                     print(f'Done - Estimator: {estimator}, criterion: {criterion}, depth: {depth}')
 
         print('Best params:', best_params)
