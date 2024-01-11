@@ -112,7 +112,7 @@ def lr_slearner(final_data):
     def grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, model):
         best_roc = 0.0
         best_ate = 0.0
-        estim_1 = ['l2', None]
+        estim_1 = ['l2', 'none']
         estim_2 = [0.1, 1, 10]
         estim_3 = [1000, 10000]
         estim_4 = ['lbfgs', 'newton-cg']
@@ -360,10 +360,7 @@ def rf_slearner(final_data):
         for crit_1 in estim_1:
             for crit_2 in estim_2:
                 for crit_3 in estim_3:
-                    if model == 'RF':
-                        clf = RandomForestClassifier(n_estimators = crit_1, criterion = crit_2, max_depth = crit_3, class_weight=class_weight_dict)
-                    else:
-                        clf = LogisticRegression(penalty=crit_1, C=crit_2, max_iter=crit_3, solver='saga', class_weight=class_weight_dict)
+                    clf = RandomForestClassifier(n_estimators = crit_1, criterion = crit_2, max_depth = crit_3, class_weight=class_weight_dict)
                     clf_learner = BaseSClassifier(learner = clf)
                     clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
                     ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
@@ -373,10 +370,7 @@ def rf_slearner(final_data):
                         best_ate = ate
                         best_roc = roc
                         # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
-                        if model == 'RF':
-                            best_params = {'n_estimators': crit_1, 'criterion': crit_2, 'max_depth': crit_3, 'penalty':np.nan, 'C':np.nan, 'max_iter':np.nan}
-                        else:
-                            best_params = {'n_estimators': np.nan, 'criterion': np.nan, 'max_depth': np.nan, 'penalty':crit_1, 'C':crit_2, 'max_iter':crit_3}
+                        best_params = {'n_estimators': crit_1, 'criterion': crit_2, 'max_depth': crit_3, 'penalty':np.nan, 'C':np.nan, 'max_iter':np.nan, 'solver':np.nan}
                     print(f'Done - n_estimators: {crit_1}, criterion: {crit_2}, max_depth: {crit_3}')
         return best_roc, best_ate, best_params
 
@@ -424,13 +418,6 @@ def rf_slearner(final_data):
         best_params_df = best_params_df(best_params, best_roc, best_ate, combination, 'RF')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
         print('Time taken for RF', datetime.now()-start_time)
-    
-        # new_start_time = datetime.now()
-        # best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'LR')
-        # print(f'LR - ROC: {best_roc}, {best_params}')
-        # best_params_df = best_params_df(best_params, best_roc, best_ate, combination, 'LR')
-        # results_df = pd.concat([results_df, best_params_df], ignore_index=True)
-        # print('Time taken for LR', datetime.now()-new_start_time)
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
