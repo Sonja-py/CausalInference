@@ -113,8 +113,8 @@ def lr_slearner(final_data):
         best_roc = 0.0
         best_ate = 0.0
         estim_1 = ['l2', 'none']
-        estim_2 = [0.1, 1, 10]
-        estim_3 = [1000, 10000]
+        estim_2 = [0.1, 1, 10, 100]
+        estim_3 = [1000, 5000, 10000]
         estim_4 = ['lbfgs', 'newton-cg']
         for crit_1 in estim_1:
             for crit_2 in estim_2:
@@ -130,7 +130,7 @@ def lr_slearner(final_data):
                             best_ate = ate
                             best_roc = roc
                             # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
-                            best_params = {'n_estimators': None, 'criterion': None, 'max_depth': None, 'penalty':crit_1, 'C':crit_2, 'max_iter':crit_3, 'solver':crit_4}
+                            best_params = {'n_estimators': np.nan, 'criterion': np.nan, 'max_depth': np.nan, 'penalty':crit_1, 'C':crit_2, 'max_iter':crit_3, 'solver':crit_4}
                         print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}, solver: {crit_4}')
         return best_roc, best_ate, best_params
 
