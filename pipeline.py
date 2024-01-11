@@ -112,35 +112,26 @@ def lr_slearner(final_data):
     def grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, model):
         best_roc = 0.0
         best_ate = 0.0
-        if model == 'RF':
-            estim_1 = [100, 200, 500]
-            estim_2 = ['gini', 'entropy', 'log_loss']
-            estim_3 = [3, 5, 7]
-        else:
-            estim_1 = ['l1', 'l2', 'elasticnet', None]
-            estim_2 = [0.1, 1, 10, 100]
-            estim_3 = [1000, 5000, 10000]
+        estim_1 = ['l2', None]
+        estim_2 = [0.1, 1, 10]
+        estim_3 = [1000, 10000]
+        estim_4 = ['lbfgs', 'newton-cg']
         for crit_1 in estim_1:
             for crit_2 in estim_2:
                 for crit_3 in estim_3:
-                    if model == 'RF':
-                        clf = RandomForestClassifier(n_estimators = crit_1, criterion = crit_2, max_depth = crit_3, class_weight=class_weight_dict)
-                    else:
-                        clf = LogisticRegression(penalty=crit_1, C=crit_2, max_iter=crit_3, solver='saga', class_weight=class_weight_dict)
-                    clf_learner = BaseSClassifier(learner = clf)
-                    clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
-                    ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-                    roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts)
-                    
-                    if roc > best_roc:
-                        best_ate = ate
-                        best_roc = roc
-                        # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
-                        if model == 'RF':
-                            best_params = {'n_estimators': crit_1, 'criterion': crit_2, 'max_depth': crit_3, 'penalty':None, 'C':None, 'max_iter':None}
-                        else:
-                            best_params = {'n_estimators': None, 'criterion': None, 'max_depth': None, 'penalty':crit_1, 'C':crit_2, 'max_iter':crit_3}
-                    print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}')
+                    for crit_4 in estim_4:
+                        clf = LogisticRegression(penalty=crit_1, C=crit_2, max_iter=crit_3, solver=estim_4, class_weight=class_weight_dict)
+                        clf_learner = BaseSClassifier(learner = clf)
+                        clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
+                        ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+                        roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts)
+                        
+                        if roc > best_roc:
+                            best_ate = ate
+                            best_roc = roc
+                            # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
+                            best_params = {'n_estimators': None, 'criterion': None, 'max_depth': None, 'penalty':crit_1, 'C':crit_2, 'max_iter':crit_3, 'solver':crit_4}
+                        print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}, solver: {crit_4}')
         return best_roc, best_ate, best_params
 
     # Create and get the data for pair of different antidepressants
@@ -445,7 +436,7 @@ def rf_slearner(final_data):
 
     print('Total time taken:',datetime.now() - initial_time)
 
-    return pd.DataFrame(results_df)
+    return results_df
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.3cc31dfe-610e-492d-924d-c5f6421324d1"),
