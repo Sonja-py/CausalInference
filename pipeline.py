@@ -107,10 +107,11 @@ def meta_learner_s(final_data):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    ingredient_list = main_df.ingredient_concept_id.unique()
-    ingredient_pairs = list(combinations(ingredient_list, 2))
+    results_df = pd.DataFrame()
+    # ingredient_list = main_df.ingredient_concept_id.unique()
+    # ingredient_pairs = list(combinations(ingredient_list, 2))
     initial_time = datetime.now()
-    # ingredient_pairs = [(739138, 703547)]
+    ingredient_pairs = [(739138, 703547)]
     threshold = 0.4
     rocs_l = []
     rocs_r = []
@@ -143,37 +144,63 @@ def meta_learner_s(final_data):
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
         print('Class weights dict', class_weight_dict)
+
+        best_roc = 0.0
+        best_ate = 0.0
+        for estimator in [100, 200, 500]:
+            for criterion in ['gini', 'entropy', 'log_loss']:
+                for depth in [3, 5, 7]:
+                    models1 = RandomForestClassifier(n_estimators = estimator, max_depth = depth, criterion = criterion, class_weight = class_weight_dict)
+                    learner_s1 = BaseSClassifier(learner = models1)
+                    learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
+                    ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+                    roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
+                    
+                    if roc > best_roc:
+                        best_ate = ate
+                        best_roc = roc
+                        best_params = {'parameters': {'n_estimators':estimator, 'criterion':criterion, 'max_depth':depth}}
+
+        print('Best params:', best_params)
+        print('Best ROC roc:', best_roc)
+        best_params['roc'] = best_roc
+        best_params['ate'] = best_ate
+        best_params['drug_0'] = combination[0]
+        best_params['drug_1'] = combination[1]
+        best_params_df = pd.DataFrame(best_params, index=[0])
+        results_df = pd.concat([results_df, best_params_df], ignore_index=True)
     
         # S-Learner
-        models1 = RandomForestClassifier(n_estimators = 200, max_depth = 7, class_weight = class_weight_dict)
-        learner_s1 = BaseSClassifier(learner = models1)
-        learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
-        ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
-        rocs_r.append(roc)
-        ates_r.append(ate)
+        # models1 = RandomForestClassifier(n_estimators = 200, max_depth = 7, class_weight = class_weight_dict)
+        # learner_s1 = BaseSClassifier(learner = models1)
+        # learner_s1.fit(X=X_train, treatment=t_train, y=y_train)
+        # ite, yhat_cs, yhat_ts = learner_s1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        # roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForest')
+        # rocs_r.append(roc)
+        # ates_r.append(ate)
 
-        models2 = LogisticRegression(max_iter=1000, class_weight = class_weight_dict)
-        learner_s2 = BaseSClassifier(learner = models2)
-        learner_s2.fit(X=X_train, treatment=t_train, y=y_train)
-        ite, yhat_cs, yhat_ts = learner_s2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'LogisticRegression')
-        rocs_l.append(roc)
-        ates_l.append(ate)
+        # models2 = LogisticRegression(max_iter=1000, class_weight = class_weight_dict)
+        # learner_s2 = BaseSClassifier(learner = models2)
+        # learner_s2.fit(X=X_train, treatment=t_train, y=y_train)
+        # ite, yhat_cs, yhat_ts = learner_s2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+        # roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'LogisticRegression')
+        # rocs_l.append(roc)
+        # ates_l.append(ate)
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
     print('Total time taken:',datetime.now() - initial_time)
-    print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}, Max {max(rocs_r)}, Min {min(rocs_r)}')
-    print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}, Max {max(rocs_l)}, Min {min(rocs_l)}')
-    print(f'RandomForest: Median {median(ates_r)}, Mean {mean(ates_r)}, Max {max(ates_r)}, Min {min(ates_r)}')
-    print(f'LogisticRegression: Median {median(ates_l)}, Mean {mean(ates_l)}, Max {max(ates_l)}, Min {min(ates_l)}')
+    # print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}, Max {max(rocs_r)}, Min {min(rocs_r)}')
+    # print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}, Max {max(rocs_l)}, Min {min(rocs_l)}')
+    # print(f'RandomForest: Median {median(ates_r)}, Mean {mean(ates_r)}, Max {max(ates_r)}, Min {min(ates_r)}')
+    # print(f'LogisticRegression: Median {median(ates_l)}, Mean {mean(ates_l)}, Max {max(ates_l)}, Min {min(ates_l)}')
     # write_text_file(rocs_r, 'rocs_r')
     # write_text_file(rocs_l, 'rocs_l')
     # write_text_file(ates_r, 'ates_r')
     # write_text_file(ates_l, 'ates_l')
 
-    return pd.DataFrame.from_dict(dict([('roc_l', rocs_l), ('roc_r', rocs_r), ('ate_l', ates_l), ('ate_r', ates_r)]))
+    return results_df
+    # pd.DataFrame.from_dict(dict([('roc_l', rocs_l), ('roc_r', rocs_r), ('ate_l', ates_l), ('ate_r', ates_r)]))
 
     # return rocs_l, rocs_r, ates_l, ates_r
 
