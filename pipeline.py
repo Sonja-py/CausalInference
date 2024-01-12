@@ -112,10 +112,10 @@ def lr_slearner(final_data):
     def grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, model):
         best_roc = 0.0
         best_ate = 0.0
-        estim_1 = ['l2', 'none'] # penalty
+        estim_1 = ['l1', 'l2', 'elasticnet', 'none'] # penalty
         estim_2 = [0.1, 1, 10, 100] # C - regularization strength
         # estim_3 = [1000, 5000, 10000] # max_iter
-        estim_4 = ['lbfgs', 'newton-cg'] # solver
+        estim_4 = ['lbfgs', 'newton-cg', 'saga'] # solver
         for crit_1 in estim_1:
             for crit_2 in estim_2:
                 # for crit_3 in estim_3:
