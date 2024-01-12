@@ -112,10 +112,10 @@ def lr_slearner(final_data):
     def grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, model):
         best_roc = 0.0
         best_ate = 0.0
-        estim_1 = ['l2', 'none']
-        estim_2 = [0.1, 1, 10, 100]
-        estim_3 = [1000, 5000, 10000]
-        estim_4 = ['lbfgs', 'newton-cg']
+        estim_1 = ['l2', 'none'] # penalty
+        estim_2 = [0.1, 1, 10, 100] # C - regularization strength
+        estim_3 = [1000, 5000, 10000] # max_iter
+        estim_4 = ['lbfgs', 'newton-cg'] # solver
         for crit_1 in estim_1:
             for crit_2 in estim_2:
                 for crit_3 in estim_3:
@@ -373,10 +373,10 @@ def rf_slearner(final_data):
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     results_df = pd.DataFrame()
-    # ingredient_list = main_df.ingredient_concept_id.unique()
-    # ingredient_pairs = list(combinations(ingredient_list, 2))
+    ingredient_list = main_df.ingredient_concept_id.unique()[:5]
+    ingredient_pairs = list(combinations(ingredient_list, 2))
     initial_time = datetime.now()
-    ingredient_pairs = [(739138, 703547)]
+    # ingredient_pairs = [(739138, 703547)]
     threshold = 0.4
     rocs_l = []
     rocs_r = []
