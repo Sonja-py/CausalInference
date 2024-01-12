@@ -144,10 +144,10 @@ def lr_slearner(final_data):
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     results_df = pd.DataFrame()
-    ingredient_list = main_df.ingredient_concept_id.unique()[:10]
-    ingredient_pairs = list(combinations(ingredient_list, 2))
+    # ingredient_list = main_df.ingredient_concept_id.unique()[:10]
+    # ingredient_pairs = list(combinations(ingredient_list, 2))
     initial_time = datetime.now()
-    # ingredient_pairs = [(739138, 703547)]
+    ingredient_pairs = [(716968, 19080226)]
     threshold = 0.4
     rocs_l = []
     rocs_r = []
