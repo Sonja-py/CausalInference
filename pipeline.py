@@ -339,7 +339,7 @@ def rf_slearner(final_data):
         ate = ite.mean()
         return roc, ate
 
-    def best_params_df(best_params, best_roc, best_ate, combination, model):
+    def create_best_params_df(best_params, best_roc, best_ate, combination, model):
         best_params['roc'] = best_roc
         best_params['ate'] = best_ate
         best_params['drug_0'] = combination[0]
@@ -350,7 +350,7 @@ def rf_slearner(final_data):
     def grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, model):
         best_roc = 0.0
         best_ate = 0.0
-        estim_1 = [100, 200, 500]
+        estim_1 = [100, 200]
         estim_2 = ['gini', 'entropy', 'log_loss']
         estim_3 = [3, 5, 7]
         for crit_1 in estim_1:
@@ -367,7 +367,7 @@ def rf_slearner(final_data):
                         best_roc = roc
                         # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
                         best_params = {'n_estimators': crit_1, 'criterion': crit_2, 'max_depth': crit_3, 'penalty':np.nan, 'C':np.nan, 'max_iter':np.nan, 'solver':np.nan}
-                    print(f'Done - n_estimators: {crit_1}, criterion: {crit_2}, max_depth: {crit_3}')
+                    # print(f'Done - n_estimators: {crit_1}, criterion: {crit_2}, max_depth: {crit_3}')
         return best_roc, best_ate, best_params
 
     # Create and get the data for pair of different antidepressants
@@ -410,10 +410,9 @@ def rf_slearner(final_data):
         class_weight_dict = dict(enumerate(class_weights))
 
         best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'RF')
-        print(f'RF - ROC: {best_roc}, {best_params}')
-        best_params_df = best_params_df(best_params, best_roc, best_ate, combination, 'RF')
+        print(f'ROC: {best_roc}, {best_params}')
+        best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, 'RF')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
-        print('Time taken for RF', datetime.now()-start_time)
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
