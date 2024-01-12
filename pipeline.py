@@ -112,6 +112,7 @@ def lr_slearner(final_data):
     def grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, model):
         best_roc = 0.0
         best_ate = 0.0
+        l1_ratio = None
         estim_1 = ['l1', 'l2', 'elasticnet', 'none'] # penalty
         estim_2 = [0.1, 1, 10, 100] # C - regularization strength
         # estim_3 = [1000, 5000, 10000] # max_iter
@@ -123,7 +124,8 @@ def lr_slearner(final_data):
                     # if crit_1 == 'none': crit_2 = 1
                     if (crit_4 == 'lbfgs' and crit_1 == 'l1') or (crit_4 == 'lbfgs' and crit_1 == 'elasticnet'): continue
                     if (crit_4 == 'newton-cg' and crit_1 == 'l1') or (crit_4 == 'newton-cg' and crit_1 == 'elasticnet'): continue
-                    clf = LogisticRegression(penalty=crit_1, C=crit_2, max_iter=1000, solver=crit_4, class_weight=class_weight_dict)
+                    if crit_1 == 'elasticnet': l1_ratio = 0.5
+                    clf = LogisticRegression(penalty=crit_1, C=crit_2, max_iter=1000, solver=crit_4, class_weight=class_weight_dict, l1_ratio=l1_ratio)
                     clf_learner = BaseSClassifier(learner = clf)
                     clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
                     ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
@@ -140,7 +142,7 @@ def lr_slearner(final_data):
                             'C':crit_2,
                             # 'max_iter':crit_3,
                             'solver':crit_4}
-                    # print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}, solver: {crit_4}')
+                    print(f'Done - penalty: {crit_1}, C: {crit_2}, solver: {crit_4}')
         return best_roc, best_ate, best_params
 
     # Create and get the data for pair of different antidepressants
