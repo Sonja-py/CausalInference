@@ -121,6 +121,8 @@ def lr_slearner(final_data):
                 # for crit_3 in estim_3:
                 for crit_4 in estim_4:
                     # if crit_1 == 'none': crit_2 = 1
+                    if (crit_4 == 'lbfgs' and crit_1 == 'l1') or (crit_4 == 'lbfgs' and crit_1 == 'elasticnet'): continue
+                    if (crit_4 == 'newton-cg' and crit_1 == 'l1') or (crit_4 == 'newton-cg' and crit_1 == 'elasticnet'): continue
                     clf = LogisticRegression(penalty=crit_1, C=crit_2, max_iter=1000, solver=crit_4, class_weight=class_weight_dict)
                     clf_learner = BaseSClassifier(learner = clf)
                     clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
