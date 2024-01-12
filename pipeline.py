@@ -358,7 +358,7 @@ def rf_slearner(final_data):
         best_ate = 0.0
         estim_1 = [100, 200]
         estim_2 = ['gini', 'entropy', 'log_loss']
-        estim_3 = [3, 5, 7]
+        estim_3 = [7, 10]
         for crit_1 in estim_1:
             for crit_2 in estim_2:
                 for crit_3 in estim_3:
