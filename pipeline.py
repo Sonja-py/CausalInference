@@ -93,6 +93,8 @@ def cevae(final_data):
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
 def lr_slearner(final_data):
+    import warnings
+    warnings.filterwarnings('ignore')
 
     def metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
@@ -152,7 +154,7 @@ def lr_slearner(final_data):
     ingredient_pairs = list(combinations(ingredient_list, 2))
     initial_time = datetime.now()
     # ingredient_pairs = [(716968, 19080226), (739138, 703547)]
-    threshold = 0.4
+    # threshold = 0.4
     rocs_l = []
     rocs_r = []
     ates_r = []
