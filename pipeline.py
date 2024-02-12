@@ -134,13 +134,13 @@ def lr_slearner(final_data):
                     best_roc = roc
                     # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
                     best_params = {'n_estimators': np.nan, 
-                        'criterion': np.nan,
-                        'max_depth': np.nan,
-                        # 'penalty':,
-                        'C':crit_4,
-                        # 'max_iter':crit_3,
-                        # 'solver':crit_4,
-                        'l1_ratio':crit_2}
+                                    'criterion': np.nan,
+                                    'max_depth': np.nan,
+                                    'l1_ratio':crit_2,
+                                    'C':crit_4,
+                                    # 'max_iter':crit_3,
+                                    # 'solver':crit_4,
+                                    }
                 print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
                 # print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}, solver: {crit_4}')
         return best_roc, best_ate, best_params
@@ -360,9 +360,9 @@ def rf_slearner(final_data):
     def grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, model):
         best_roc = 0.0
         best_ate = 0.0
-        estim_1 = [100, 200]
-        estim_2 = ['gini', 'entropy', 'log_loss']
-        estim_3 = [7, 10]
+        estim_1 = [100, 200] # n_estimators
+        estim_2 = ['gini', 'entropy', 'log_loss'] # criterion
+        estim_3 = [7, 10] # max_depth
         for crit_1 in estim_1:
             for crit_2 in estim_2:
                 for crit_3 in estim_3:
@@ -572,5 +572,12 @@ def unnamed_1(final_data):
 
     print(val)
 
+    
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.f5acd343-2d39-4261-82f0-0b454809e43c"),
+    meta_learners_t=Input(rid="ri.foundry.main.dataset.3cbc3c8c-65b6-4f67-8c4e-40bc4da8bbe8")
+)
+def unnamed_2(meta_learners_t):
     
 
