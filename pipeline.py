@@ -141,6 +141,7 @@ def lr_slearner(final_data):
                             'max_iter':crit_3,
                             # 'solver':crit_4,
                             'l1_ratio':crit_2}
+                    print(f'C {crit_4}, max_iter {crit_3}, l1_ratio {crit_2}, roc {roc}')
                     # print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}, solver: {crit_4}')
         return best_roc, best_ate, best_params
 
