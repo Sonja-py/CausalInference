@@ -116,33 +116,33 @@ def lr_slearner(final_data):
         best_ate = 0.0
         l1_ratio = None
         # estim_1 = ['elasticnet'] # penalty
-        estim_2 = [0, 0.3, 0.7, 1] # l1_ratio
-        estim_3 = [100, 500, 1000] # max_iter
+        estim_2 = [0, 0.25, 0.5, 0.75, 1] # l1_ratio
+        # estim_3 = [100, 500, 1000] # max_iter
         estim_4 = [0.01, 0.1, 1, 10, 100] # C - regularization strength
         # for crit_1 in estim_1:
         for crit_2 in estim_2:
-            for crit_3 in estim_3:
-                for crit_4 in estim_4:
-                    clf = LogisticRegression(penalty='elasticnet', l1_ratio=crit_2, max_iter=crit_3, C=crit_4, solver='saga', class_weight=class_weight_dict)
-                    clf_learner = BaseSClassifier(learner = clf)
-                    clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
-                    ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-                    roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts)
-                    
-                    if roc > best_roc:
-                        best_ate = ate
-                        best_roc = roc
-                        # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
-                        best_params = {'n_estimators': np.nan, 
-                            'criterion': np.nan,
-                            'max_depth': np.nan,
-                            # 'penalty':,
-                            'C':crit_4,
-                            'max_iter':crit_3,
-                            # 'solver':crit_4,
-                            'l1_ratio':crit_2}
-                    print(f'C {crit_4}, max_iter {crit_3}, l1_ratio {crit_2}, roc {roc}')
-                    # print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}, solver: {crit_4}')
+            # for crit_3 in estim_3:
+            for crit_4 in estim_4:
+                clf = LogisticRegression(penalty='elasticnet', l1_ratio=crit_2, max_iter=100, C=crit_4, solver='saga', class_weight=class_weight_dict)
+                clf_learner = BaseSClassifier(learner = clf)
+                clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
+                ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+                roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts)
+                
+                if roc > best_roc:
+                    best_ate = ate
+                    best_roc = roc
+                    # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
+                    best_params = {'n_estimators': np.nan, 
+                        'criterion': np.nan,
+                        'max_depth': np.nan,
+                        # 'penalty':,
+                        'C':crit_4,
+                        # 'max_iter':crit_3,
+                        # 'solver':crit_4,
+                        'l1_ratio':crit_2}
+                print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
+                # print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}, solver: {crit_4}')
         return best_roc, best_ate, best_params
 
     # Create and get the data for pair of different antidepressants
