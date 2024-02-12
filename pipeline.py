@@ -116,9 +116,9 @@ def lr_slearner(final_data):
         best_ate = 0.0
         l1_ratio = None
         # estim_1 = ['elasticnet'] # penalty
-        estim_2 = [0, 0.2, 0.5, 0.8, 1] # l1_ratio
-        estim_3 = [100, 500, 1000, 5000, 10000] # max_iter
-        estim_4 = [0.01, 0.1, 1, 10, 100, 1000] # C - regularization strength
+        estim_2 = [0, 0.3, 0.7, 1] # l1_ratio
+        estim_3 = [100, 500, 1000] # max_iter
+        estim_4 = [0.01, 0.1, 1, 10, 100] # C - regularization strength
         # for crit_1 in estim_1:
         for crit_2 in estim_2:
             for crit_3 in estim_3:
