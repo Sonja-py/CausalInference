@@ -542,16 +542,18 @@ def test_lr_slearner(final_data):
     import warnings
     warnings.filterwarnings('ignore')
 
-    def metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts):
+    def metrics(y, t, ite, yhat_cs, yhat_ts):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
-        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
-        roc = roc_auc_score(y_valid, preds)
+        preds = (1. - t) * yhat_cs + t * yhat_ts
+        roc = roc_auc_score(y, preds)
         ate = ite.mean()
         return roc, ate
 
-    def create_best_params_df(best_params, best_roc, best_ate, combination, model):
-        best_params['roc'] = best_roc
-        best_params['ate'] = best_ate
+    def create_best_params_df(best_params, best_roc, best_ate, test_roc, test_ate, combination, model):
+        best_params['val_roc'] = best_roc
+        best_params['val_ate'] = best_ate
+        best_params['test_roc'] = test_roc
+        best_params['test_ate'] = test_ate
         best_params['drug_0'] = combination[0]
         best_params['drug_1'] = combination[1]
         best_params['model'] = model
@@ -615,8 +617,8 @@ def test_lr_slearner(final_data):
         y = df['severity_final']
         t = df['treatment']
 
-        skf = StratifiedKFold(n_splits=5, shuffle=False)
         np.random.seed(0)
+        skf = StratifiedKFold(n_splits=5, shuffle=False)
         X_train_val, X_test, y_train_val, y_test, t_train_val, t_test = train_test_split(X, y, t, test_size=0.2, random_state=42, stratify=y)
 
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
@@ -637,7 +639,14 @@ def test_lr_slearner(final_data):
     
         # best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'LR')
         print(f'ROC: {best_roc}, {best_params}')
-        best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, 'LR')
+
+        # Get test data results
+        clf = LogisticRegression(penalty='elasticnet', l1_ratio=best_params.get('l1_ratio'), max_iter=100, C=best_params.get('C'), solver='saga', class_weight=class_weight_dict)
+        clf_learner = BaseSClassifier(learner = clf)
+        ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_test, treatment=t_test, y=y_test, return_components=True, verbose=True)
+        test_roc, test_ate = metrics(y_test, t_test, ite, yhat_cs, yhat_ts)
+
+        best_params_df = create_best_params_df(best_params, best_roc, best_ate, test_roc, test_ate, combination, 'LR')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
