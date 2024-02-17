@@ -41,6 +41,14 @@ def save_model(model, output_filename):
     with output_fs.open(output_filename + ".h5", 'w') as f:
         model.save(str(output_filename)+'.h5')
 
+# Save GS model
+def to_pickle(data, filename):
+    output = Transforms.get_output()
+    output_fs = output.filesystem()
+    
+    with output_fs.open(f'{filename}.pickle', 'wb') as f:
+        pickle.dump(data, f)
+
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.aa8fcdda-8570-4c04-b0d5-3b1afa7d04e6"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
@@ -562,7 +570,6 @@ def test_lr_slearner(final_data):
         best_ate = 0.0
         best_model = None
         for idx, (train_index, val_index) in enumerate(skf.split(X_train_val, y_train_val)):
-            print(f'Fold {idx+1}')
             # Generate training and validation sets for the fold
             X_train, X_val = X_train_val.iloc[train_index], X_train_val.iloc[val_index]
             y_train, y_val = y_train_val.iloc[train_index], y_train_val.iloc[val_index]
@@ -590,7 +597,7 @@ def test_lr_slearner(final_data):
                                         }
                     # print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
 
-        return best_roc, best_ate, best_params
+        return best_roc, best_ate, best_params, best_model
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
@@ -619,7 +626,7 @@ def test_lr_slearner(final_data):
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
 
-        best_roc, best_ate, best_params = grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, 'LR')
+        best_roc, best_ate, best_params, best_model = grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, 'LR')
 
         # X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 2, stratify = y_test)
         # y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
@@ -640,6 +647,7 @@ def test_lr_slearner(final_data):
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
+        to_pickle(best_model, f'{combination[0]}_{combination[1]}')
     print('Total time taken:',datetime.now() - initial_time)
 
     return results_df
