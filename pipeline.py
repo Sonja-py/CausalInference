@@ -616,6 +616,7 @@ def test_lr_slearner(final_data):
         t = df['treatment']
 
         skf = StratifiedKFold(n_splits=5, shuffle=False)
+        np.random.seed(0)
         X_train_val, X_test, y_train_val, y_test, t_train_val, t_test = train_test_split(X, y, t, test_size=0.2, random_state=42, stratify=y)
 
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
@@ -623,7 +624,6 @@ def test_lr_slearner(final_data):
 
         best_roc, best_ate, best_params = grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, 'LR')
 
-        np.random.seed(0)
         # X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 2, stratify = y_test)
         # y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
         
