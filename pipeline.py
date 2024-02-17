@@ -535,7 +535,7 @@ def rf_slearner(final_data):
     return results_df
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.cc5195c2-1402-418d-ae9f-ed47d0928db3"),
+    Output(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
 def test_lr_slearner(final_data):
@@ -552,8 +552,6 @@ def test_lr_slearner(final_data):
     def create_best_params_df(best_params, best_roc, best_ate, combination, model):
         best_params['val_roc'] = best_roc
         best_params['val_ate'] = best_ate
-        # best_params['test_roc'] = test_roc
-        # best_params['test_ate'] = test_ate
         best_params['drug_0'] = combination[0]
         best_params['drug_1'] = combination[1]
         best_params['model'] = model
@@ -563,7 +561,8 @@ def test_lr_slearner(final_data):
         best_roc = 0.0
         best_ate = 0.0
         best_model = None
-        for train_index, val_index in skf.split(X_train_val, y_train_val):
+        for idx, (train_index, val_index) in enumerate(skf.split(X_train_val, y_train_val)):
+            print(f'Fold {idx+1}')
             # Generate training and validation sets for the fold
             X_train, X_val = X_train_val.iloc[train_index], X_train_val.iloc[val_index]
             y_train, y_val = y_train_val.iloc[train_index], y_train_val.iloc[val_index]
@@ -589,22 +588,18 @@ def test_lr_slearner(final_data):
                                         'l1_ratio':crit_2,
                                         'C':crit_4,
                                         }
-                    print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
+                    # print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
 
         return best_roc, best_ate, best_params
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     results_df = pd.DataFrame()
-    ingredient_list = main_df.ingredient_concept_id.unique()[:2]
+    ingredient_list = main_df.ingredient_concept_id.unique()
     ingredient_pairs = list(combinations(ingredient_list, 2))
     initial_time = datetime.now()
     # ingredient_pairs = [(716968, 19080226), (739138, 703547)]
     # threshold = 0.4
-    rocs_l = []
-    rocs_r = []
-    ates_r = []
-    ates_l = []
 
     for idx, combination in enumerate(ingredient_pairs):
         start_time = datetime.now()
@@ -639,12 +634,6 @@ def test_lr_slearner(final_data):
     
         # best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'LR')
         print(f'ROC: {best_roc}, {best_params}')
-
-        # Get test data results
-        # clf = LogisticRegression(penalty='elasticnet', l1_ratio=best_params.get('l1_ratio'), max_iter=100, C=best_params.get('C'), solver='saga', class_weight=class_weight_dict)
-        # clf_learner = BaseSClassifier(learner = clf)
-        # ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_test, treatment=t_test, y=y_test, return_components=True, verbose=True)
-        # test_roc, test_ate = metrics(y_test, t_test, ite, yhat_cs, yhat_ts)
 
         best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, 'LR')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
