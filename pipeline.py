@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from itertools import combinations
 from copy import deepcopy
-import joblib
+import pickle
 # from statistics import median, mean
 
 from causalml.inference.meta import BaseSClassifier, BaseTClassifier
@@ -48,7 +48,7 @@ def to_pickle(data, filename):
     output_fs = output.filesystem()
     
     with output_fs.open(f'{filename}.pickle', 'wb') as f:
-        joblib.dump(data, f)
+        pickle.dump(data, f)
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.aa8fcdda-8570-4c04-b0d5-3b1afa7d04e6"),
