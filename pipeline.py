@@ -13,7 +13,7 @@ from sklearn.utils import class_weight
 from sklearn.metrics import roc_auc_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 
 # Save error metrics
 def write_text_file(data, metric):
@@ -115,6 +115,7 @@ def lr_slearner(final_data):
         best_roc = 0.0
         best_ate = 0.0
         l1_ratio = None
+        roc_auc_scorer = make_scorer(roc_auc_score, greater_is_better=True, needs_threshold=True)
         # estim_1 = ['elasticnet'] # penalty
         estim_2 = [0, 0.25, 0.5, 0.75, 1] # l1_ratio
         # estim_3 = [100, 500, 1000] # max_iter
@@ -141,14 +142,14 @@ def lr_slearner(final_data):
                                     # 'max_iter':crit_3,
                                     # 'solver':crit_4,
                                     }
-                print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
+                # print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
                 # print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}, solver: {crit_4}')
         return best_roc, best_ate, best_params
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     results_df = pd.DataFrame()
-    ingredient_list = main_df.ingredient_concept_id.unique()[:10]
+    ingredient_list = main_df.ingredient_concept_id.unique()
     ingredient_pairs = list(combinations(ingredient_list, 2))
     initial_time = datetime.now()
     # ingredient_pairs = [(716968, 19080226), (739138, 703547)]
@@ -675,5 +676,12 @@ def unnamed_1(final_data):
 
     print(val)
 
+    
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.cc5195c2-1402-418d-ae9f-ed47d0928db3"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+def unnamed_2(final_data):
     
 
