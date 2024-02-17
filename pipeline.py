@@ -557,7 +557,7 @@ def test_lr_slearner(final_data):
         best_params['model'] = model
         return pd.DataFrame(best_params, index=[0])
 
-    def grid_search(X_train_val, y_train_val, t_train_val, class_weight_dict, model):
+    def grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, model):
         best_roc = 0.0
         best_ate = 0.0
         best_model = None
@@ -567,13 +567,9 @@ def test_lr_slearner(final_data):
             y_train, y_val = y_train_val.iloc[train_index], y_train_val.iloc[val_index]
             t_train, t_val = t_train_val.iloc[train_index], t_train_val.iloc[val_index]
 
-            # estim_1 = ['elasticnet'] # penalty
             estim_2 = [0, 0.25, 0.5, 0.75, 1] # l1_ratio
-            # estim_3 = [100, 500, 1000] # max_iter
             estim_4 = [0.01, 0.1, 1, 10, 100] # C - regularization strength
-            # for crit_1 in estim_1:
             for crit_2 in estim_2:
-                # for crit_3 in estim_3:
                 for crit_4 in estim_4:
                     clf = LogisticRegression(penalty='elasticnet', l1_ratio=crit_2, max_iter=100, C=crit_4, solver='saga', class_weight=class_weight_dict)
                     clf_learner = BaseSClassifier(learner = clf)
@@ -619,13 +615,13 @@ def test_lr_slearner(final_data):
         y = df['severity_final']
         t = df['treatment']
 
-        skf = StratifiedKFold(n_splits=5, shuffle=False, random_state=42)
+        skf = StratifiedKFold(n_splits=5, shuffle=False)
         X_train_val, X_test, y_train_val, y_test, t_train_val, t_test = train_test_split(X, y, t, test_size=0.2, random_state=42, stratify=y)
 
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
 
-        best_roc, best_ate, best_params = grid_search(X_train_val, y_train_val, t_train_val, class_weight_dict, 'LR')
+        best_roc, best_ate, best_params = grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, 'LR')
 
         np.random.seed(0)
         # X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 2, stratify = y_test)
