@@ -549,11 +549,11 @@ def test_lr_slearner(final_data):
         ate = ite.mean()
         return roc, ate
 
-    def create_best_params_df(best_params, best_roc, best_ate, test_roc, test_ate, combination, model):
+    def create_best_params_df(best_params, best_roc, best_ate, combination, model):
         best_params['val_roc'] = best_roc
         best_params['val_ate'] = best_ate
-        best_params['test_roc'] = test_roc
-        best_params['test_ate'] = test_ate
+        # best_params['test_roc'] = test_roc
+        # best_params['test_ate'] = test_ate
         best_params['drug_0'] = combination[0]
         best_params['drug_1'] = combination[1]
         best_params['model'] = model
@@ -641,12 +641,12 @@ def test_lr_slearner(final_data):
         print(f'ROC: {best_roc}, {best_params}')
 
         # Get test data results
-        clf = LogisticRegression(penalty='elasticnet', l1_ratio=best_params.get('l1_ratio'), max_iter=100, C=best_params.get('C'), solver='saga', class_weight=class_weight_dict)
-        clf_learner = BaseSClassifier(learner = clf)
-        ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_test, treatment=t_test, y=y_test, return_components=True, verbose=True)
-        test_roc, test_ate = metrics(y_test, t_test, ite, yhat_cs, yhat_ts)
+        # clf = LogisticRegression(penalty='elasticnet', l1_ratio=best_params.get('l1_ratio'), max_iter=100, C=best_params.get('C'), solver='saga', class_weight=class_weight_dict)
+        # clf_learner = BaseSClassifier(learner = clf)
+        # ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_test, treatment=t_test, y=y_test, return_components=True, verbose=True)
+        # test_roc, test_ate = metrics(y_test, t_test, ite, yhat_cs, yhat_ts)
 
-        best_params_df = create_best_params_df(best_params, best_roc, best_ate, test_roc, test_ate, combination, 'LR')
+        best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, 'LR')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
@@ -804,5 +804,92 @@ def unnamed_1(final_data):
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
 def unnamed_2(final_data):
+    class SLearnerNetwork(nn.Module):
+        def __init__(self, input_size, hidden_size, output_size):
+            super(SLearnerNetwork, self).__init__()
+            self.layer1 = nn.Linear(input_size, hidden_size)
+            self.relu = nn.ReLU()
+            self.layer2 = nn.Linear(hidden_size, output_size)
+            self.sigmoid = nn.Sigmoid()
+        
+        def forward(self, x):
+            out = self.layer1(x)
+            out = self.relu(out)
+            out = self.layer2(out)
+            out = self.sigmoid(out)
+            return out
+
+    # Assuming df is your DataFrame and it already contains 'X', 't', and 'y'
+    # Create and get the data for pair of different antidepressants
+    main_df = final_data.toPandas()
+    results_df = pd.DataFrame()
+    ingredient_list = main_df.ingredient_concept_id.unique()[:2]
+    ingredient_pairs = list(combinations(ingredient_list, 2))
+
+    for idx, combination in enumerate(ingredient_pairs):
+        start_time = datetime.now()
+        print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
+        df = main_df.copy()
+        df = df[df.ingredient_concept_id.isin(list(combination))]
+        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
     
+        X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
+        y = df['severity_final']
+        X['t'] = df['treatment']
+
+        # Convert to PyTorch tensors
+        X_tensor = torch.tensor(X.values, dtype=torch.float32)
+        y_tensor = torch.tensor(y.values, dtype=torch.float32).unsqueeze(1)  # Reshape for nn
+
+        # Split the dataset
+        X_train_val, X_test, y_train_val, y_test = train_test_split(X_tensor, y_tensor, test_size=0.2, stratify=y_tensor)
+        X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=0.25, stratify=y_train_val)  # 0.25 x 0.8 = 0.2
+
+        param_grid = {
+        'hidden_size': [64, 128, 256],
+        'learning_rate': [0.001, 0.01, 0.1],
+        'batch_size': [16, 32, 64],
+        }
+
+        # Convert to a list of dictionaries for iteration
+        param_list = list(ParameterGrid(param_grid))
+
+        best_model = None
+        best_auc = 0
+        best_params = {}
+
+        for params in param_list:
+            model = SLearnerNetwork(input_size=X_train.shape[1], hidden_size=params['hidden_size'], output_size=1)
+            criterion = nn.BCELoss()
+            optimizer = torch.optim.Adam(model.parameters(), lr=params['learning_rate'])
+            batch_size = params['batch_size']
+            
+            # DataLoader for training
+            train_data = TensorDataset(X_train, y_train)
+            train_loader = DataLoader(dataset=train_data, batch_size=batch_size, shuffle=True)
+            
+            # Training loop (simplified, without early stopping or epoch tracking)
+            for epoch in range(100):  # Fixed number of epochs
+                for i, (features, labels) in enumerate(train_loader):
+                    # Forward pass
+                    outputs = model(features)
+                    loss = criterion(outputs, labels)
+                    
+                    # Backward and optimize
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
+            
+            # Evaluation on validation set
+            model.eval()
+            with torch.no_grad():
+                val_preds = model(X_val)
+                val_auc = roc_auc_score(y_val.numpy(), val_preds.numpy())
+                if val_auc > best_auc:
+                    best_auc = val_auc
+                    best_model = model
+                    best_params = params
+
+        print(f"Best AUC: {best_auc}")
+        print(f"Best Parameters: {best_params}")
 
