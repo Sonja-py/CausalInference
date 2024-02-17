@@ -590,10 +590,8 @@ def test_lr_slearner(final_data):
                                         'max_depth': np.nan,
                                         'l1_ratio':crit_2,
                                         'C':crit_4,
-                                        # 'max_iter':crit_3,
-                                        # 'solver':crit_4,
                                         }
-                    # print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
+                    print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
 
         return best_roc, best_ate, best_params
 
