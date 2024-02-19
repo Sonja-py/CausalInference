@@ -206,100 +206,6 @@ def lr_slearner(final_data):
     return results_df
 
 @transform_pandas(
-    Output(rid="ri.foundry.main.dataset.720ebfa7-629e-4ae2-9d4d-e23ab6099284"),
-    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
-)
-def lr_tlearner(final_data):
-    import warnings
-    warnings.filterwarnings('ignore')
-
-    def metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts):
-        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
-        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
-        roc = roc_auc_score(y_valid, preds)
-        ate = ite.mean()
-        return roc, ate
-
-    def create_best_params_df(best_params, best_roc, best_ate, combination, model):
-        best_params['roc'] = best_roc
-        best_params['ate'] = best_ate
-        best_params['drug_0'] = combination[0]
-        best_params['drug_1'] = combination[1]
-        best_params['model'] = model
-        return pd.DataFrame(best_params, index=[0])
-
-    def grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, model):
-        best_roc = 0.0
-        best_ate = 0.0
-        l1_ratio = None
-        # roc_auc_scorer = make_scorer(roc_auc_score, greater_is_better=True, needs_threshold=True)
-        estim_2 = [0, 0.25, 0.5, 0.75, 1] # l1_ratio
-        estim_4 = [0.01, 0.1, 1, 10, 100] # C - regularization strength
-        for crit_2 in estim_2:
-            for crit_4 in estim_4:
-                clf = LogisticRegression(penalty='elasticnet', l1_ratio=crit_2, max_iter=100, C=crit_4, solver='saga', class_weight=class_weight_dict)
-                clf_learner = BaseTClassifier(learner = clf)
-                clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
-                ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-                roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts)
-                
-                if roc > best_roc:
-                    best_ate = ate
-                    best_roc = roc
-                    best_params = {'n_estimators': np.nan, 
-                                    'criterion': np.nan,
-                                    'max_depth': np.nan,
-                                    'l1_ratio':crit_2,
-                                    'C':crit_4,
-                                    }
-                # print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
-        return best_roc, best_ate, best_params
-
-    # Create and get the data for pair of different antidepressants
-    main_df = final_data.toPandas()
-    results_df = pd.DataFrame()
-    ingredient_list = main_df.ingredient_concept_id.unique()
-    ingredient_pairs = list(combinations(ingredient_list, 2))
-    initial_time = datetime.now()
-
-    for idx, combination in enumerate(ingredient_pairs):
-        start_time = datetime.now()
-        print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
-        df = main_df.copy()
-        df = df[df.ingredient_concept_id.isin(list(combination))]
-        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
-
-        X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
-        y = df['severity_final']
-        t = df['treatment']
-
-        np.random.seed(0)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
-        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 2, stratify = y_test)
-        y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
-        
-        t_train = t[X_train.index]
-        t_train = t_train.values
-        t_test = t[X_test.index]
-        t_test = t_test.values
-        t_valid = t[X_valid.index]
-        t_valid = t_valid.values
-
-        class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
-        class_weight_dict = dict(enumerate(class_weights))
-    
-        best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'LR')
-        print(f'ROC: {best_roc}, {best_params}')
-        best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, 'LR')
-        results_df = pd.concat([results_df, best_params_df], ignore_index=True)
-
-        print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
-
-    print('Total time taken:',datetime.now() - initial_time)
-
-    return results_df
-
-@transform_pandas(
     Output(rid="ri.vector.main.execute.f2cebbba-3c15-4e6c-b89b-d8374a3b91f3"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
@@ -470,6 +376,116 @@ def test_lr_slearner(final_data):
                 for crit_4 in estim_4:
                     clf = LogisticRegression(penalty='elasticnet', l1_ratio=crit_2, max_iter=100, C=crit_4, solver='saga', class_weight=class_weight_dict)
                     clf_learner = BaseSClassifier(learner = clf)
+                    clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
+                    ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_val, treatment=t_val, y=y_val, return_components=True, verbose=True)
+                    roc, ate = metrics(y_val, t_val, ite, yhat_cs, yhat_ts)
+                    
+                    if roc > best_roc:
+                        best_model = clf_learner
+                        best_ate = ate
+                        best_roc = roc
+                        best_params = {'n_estimators': np.nan, 
+                                        'criterion': np.nan,
+                                        'max_depth': np.nan,
+                                        'l1_ratio':crit_2,
+                                        'C':crit_4,
+                                        }
+                    # print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
+
+        return best_roc, best_ate, best_params, best_model
+
+    # Create and get the data for pair of different antidepressants
+    main_df = final_data.toPandas()
+    results_df = pd.DataFrame()
+    ingredient_list = main_df.ingredient_concept_id.unique()
+    ingredient_pairs = list(combinations(ingredient_list, 2))
+    initial_time = datetime.now()
+    # ingredient_pairs = [(716968, 19080226), (739138, 703547)]
+    # threshold = 0.4
+
+    for idx, combination in enumerate(ingredient_pairs):
+        start_time = datetime.now()
+        print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
+        df = main_df.copy()
+        df = df[df.ingredient_concept_id.isin(list(combination))]
+        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
+
+        X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
+        y = df['severity_final']
+        t = df['treatment']
+
+        np.random.seed(0)
+        skf = StratifiedKFold(n_splits=5, shuffle=False)
+        X_train_val, X_test, y_train_val, y_test, t_train_val, t_test = train_test_split(X, y, t, test_size=0.2, random_state=42, stratify=y)
+
+        class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
+        class_weight_dict = dict(enumerate(class_weights))
+
+        best_roc, best_ate, best_params, best_model = grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, 'LR')
+
+        # X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 2, stratify = y_test)
+        # y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
+        
+        # t_train = t[X_train.index]
+        # t_train = t_train.values
+        # t_test = t[X_test.index]
+        # t_test = t_test.values
+        # t_valid = t[X_valid.index]
+        # t_valid = t_valid.values
+
+    
+        # best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'LR')
+        print(f'ROC: {best_roc}, {best_params}')
+
+        best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, 'LR')
+        results_df = pd.concat([results_df, best_params_df], ignore_index=True)
+
+        print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
+
+        to_pickle(best_model, f'{combination[0]}_{combination[1]}')
+    print('Total time taken:',datetime.now() - initial_time)
+
+    return results_df
+
+@transform_pandas(
+    Output(rid="ri.foundry.main.dataset.720ebfa7-629e-4ae2-9d4d-e23ab6099284"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+def test_lr_tlearner(final_data):
+    import warnings
+    warnings.filterwarnings('ignore')
+
+    def metrics(y, t, ite, yhat_cs, yhat_ts):
+        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        preds = (1. - t) * yhat_cs + t * yhat_ts
+        roc = roc_auc_score(y, preds)
+        ate = ite.mean()
+        return roc, ate
+
+    def create_best_params_df(best_params, best_roc, best_ate, combination, model):
+        best_params['val_roc'] = best_roc
+        best_params['val_ate'] = best_ate
+        best_params['drug_0'] = combination[0]
+        best_params['drug_1'] = combination[1]
+        best_params['model'] = model
+        return pd.DataFrame(best_params, index=[0])
+
+    def grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, model):
+        best_roc = 0.0
+        best_ate = 0.0
+        best_model = None
+        for idx, (train_index, val_index) in enumerate(skf.split(X_train_val, y_train_val)):
+            # Generate training and validation sets for the fold
+            X_train, X_val = X_train_val.iloc[train_index], X_train_val.iloc[val_index]
+            y_train, y_val = y_train_val.iloc[train_index], y_train_val.iloc[val_index]
+            t_train, t_val = t_train_val.iloc[train_index], t_train_val.iloc[val_index]
+
+            estim_2 = [0, 0.25, 0.5, 0.75, 1] # l1_ratio
+            estim_4 = [0.01, 0.1, 1, 10, 100] # C - regularization strength
+            for crit_2 in estim_2:
+                for crit_4 in estim_4:
+                    clf = LogisticRegression(penalty='elasticnet', l1_ratio=crit_2, max_iter=100, C=crit_4, solver='saga', class_weight=class_weight_dict)
+                    clf_learner = BaseTClassifier(learner = clf)
                     clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
                     ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_val, treatment=t_val, y=y_val, return_components=True, verbose=True)
                     roc, ate = metrics(y_val, t_val, ite, yhat_cs, yhat_ts)
