@@ -591,8 +591,8 @@ def test_rf_slearner(final_data):
             y_train, y_val = y_train_val.iloc[train_index], y_train_val.iloc[val_index]
             t_train, t_val = t_train_val.iloc[train_index], t_train_val.iloc[val_index]
 
-            estim_2 = [100, 500, 1000] # n_estimators
-            estim_4 = [None, 25, 50, 75, 100] # max_depth
+            estim_2 = [50, 100, 500] # n_estimators
+            estim_4 = [None, 5, 10, 20, 50] # max_depth
             for crit_2 in estim_2:
                 for crit_4 in estim_4:
                     clf = RandomForestClassifier(n_estimators = crit_2, criterion = 'log_loss', max_depth = crit_4, class_weight=class_weight_dict)
