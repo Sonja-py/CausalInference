@@ -232,14 +232,10 @@ def lr_tlearner(final_data):
         best_roc = 0.0
         best_ate = 0.0
         l1_ratio = None
-        roc_auc_scorer = make_scorer(roc_auc_score, greater_is_better=True, needs_threshold=True)
-        # estim_1 = ['elasticnet'] # penalty
+        # roc_auc_scorer = make_scorer(roc_auc_score, greater_is_better=True, needs_threshold=True)
         estim_2 = [0, 0.25, 0.5, 0.75, 1] # l1_ratio
-        # estim_3 = [100, 500, 1000] # max_iter
         estim_4 = [0.01, 0.1, 1, 10, 100] # C - regularization strength
-        # for crit_1 in estim_1:
         for crit_2 in estim_2:
-            # for crit_3 in estim_3:
             for crit_4 in estim_4:
                 clf = LogisticRegression(penalty='elasticnet', l1_ratio=crit_2, max_iter=100, C=crit_4, solver='saga', class_weight=class_weight_dict)
                 clf_learner = BaseTClassifier(learner = clf)
@@ -250,17 +246,13 @@ def lr_tlearner(final_data):
                 if roc > best_roc:
                     best_ate = ate
                     best_roc = roc
-                    # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
                     best_params = {'n_estimators': np.nan, 
                                     'criterion': np.nan,
                                     'max_depth': np.nan,
                                     'l1_ratio':crit_2,
                                     'C':crit_4,
-                                    # 'max_iter':crit_3,
-                                    # 'solver':crit_4,
                                     }
                 # print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
-                # print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}, solver: {crit_4}')
         return best_roc, best_ate, best_params
 
     # Create and get the data for pair of different antidepressants
@@ -269,12 +261,6 @@ def lr_tlearner(final_data):
     ingredient_list = main_df.ingredient_concept_id.unique()
     ingredient_pairs = list(combinations(ingredient_list, 2))
     initial_time = datetime.now()
-    # ingredient_pairs = [(716968, 19080226), (739138, 703547)]
-    # threshold = 0.4
-    rocs_l = []
-    rocs_r = []
-    ates_r = []
-    ates_l = []
 
     for idx, combination in enumerate(ingredient_pairs):
         start_time = datetime.now()
@@ -640,7 +626,7 @@ def test_lr_slearner(final_data):
     return results_df
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.dd685f0a-a8b0-4f85-94bc-9c3506c1610f"),
+    Output(rid="ri.foundry.main.dataset.d8a3ce5b-5472-4704-9d3a-205920048c80"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
 def test_rf_slearner(final_data):
@@ -672,11 +658,11 @@ def test_rf_slearner(final_data):
             y_train, y_val = y_train_val.iloc[train_index], y_train_val.iloc[val_index]
             t_train, t_val = t_train_val.iloc[train_index], t_train_val.iloc[val_index]
 
-            estim_2 = [0, 0.25, 0.5, 0.75, 1] # l1_ratio
-            estim_4 = [0.01, 0.1, 1, 10, 100] # C - regularization strength
+            estim_2 = [100, 500, 1000] # n_estimators
+            estim_4 = [None, 25, 50, 75, 100] # max_depth
             for crit_2 in estim_2:
                 for crit_4 in estim_4:
-                    clf = Rand(penalty='elasticnet', l1_ratio=crit_2, max_iter=100, C=crit_4, solver='saga', class_weight=class_weight_dict)
+                    clf = RandomForestClassifier(n_estimators = crit_2, criterion = 'log_loss', max_depth = crit_4, class_weight=class_weight_dict)
                     clf_learner = BaseSClassifier(learner = clf)
                     clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
                     ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_val, treatment=t_val, y=y_val, return_components=True, verbose=True)
