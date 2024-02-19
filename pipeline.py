@@ -351,105 +351,6 @@ def meta_learners_bootstrapped(final_data):
     
 
 @transform_pandas(
-    Output(rid="ri.foundry.main.dataset.3cbc3c8c-65b6-4f67-8c4e-40bc4da8bbe8"),
-    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
-)
-def meta_learners_t(final_data):
-
-    def metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, model):
-        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
-        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
-        roc = roc_auc_score(y_valid, preds)
-        ate = ite.mean()
-        # preds[preds>threshold] = 1
-        # preds[preds<=threshold] = 0
-        # print('Accuracy:', accuracy_score(y_valid, preds))
-        print(f'T Learner - {model} ATE: {ate}, ROC score: {roc}')
-        return roc, ate
-
-    # Create and get the data for pair of different antidepressants
-    main_df = final_data.toPandas()
-    ingredient_list = main_df.ingredient_concept_id.unique()
-    ingredient_pairs = list(combinations(ingredient_list, 2))
-    initial_time = datetime.now()
-    # ingredient_pairs = [(739138, 703547)]
-    threshold = 0.4
-    rocs_r = []
-    rocs_l = []
-    ates_r = []
-    ates_l = []
-
-    for idx, combination in enumerate(ingredient_pairs):
-        start_time = datetime.now()
-        print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
-        df = main_df.copy()
-        df = df[df.ingredient_concept_id.isin(list(combination))]
-        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
-
-        X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
-        y = df['severity_final']
-        t = df['treatment']
-
-        np.random.seed(0)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
-        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 2, stratify = y_test)
-        y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
-        
-        t_train = t[X_train.index]
-        t_train = t_train.values
-        t_test = t[X_test.index]
-        t_test = t_test.values
-        t_valid = t[X_valid.index]
-        t_valid = t_valid.values
-
-        class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
-        class_weight_dict = dict(enumerate(class_weights))
-        print('Class weights dict', class_weight_dict)
-
-        # T-Learner
-        modelt1 = RandomForestClassifier(n_estimators = 400, max_depth = 7, class_weight = class_weight_dict)
-        learner_t1 = BaseTClassifier(learner = modelt1)
-        learner_t1.fit(X=X_train, treatment=t_train, y=y_train)
-        ite, yhat_cs, yhat_ts = learner_t1.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'RandomForestClassifier')
-        rocs_r.append(roc)
-        ates_r.append(ate)
-
-        modelt2 = LogisticRegression(max_iter=1000, class_weight = class_weight_dict)
-        learner_t2 = BaseTClassifier(learner = modelt2)
-        learner_t2.fit(X=X_train, treatment=t_train, y=y_train)
-        ite, yhat_cs, yhat_ts = learner_t2.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
-        roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts, threshold, 'LogisticRegression')
-        rocs_l.append(roc)
-        ates_l.append(ate)
-
-        print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
-
-    print('Total time taken:',datetime.now() - initial_time)
-    print(f'RandomForest: Median {median(rocs_r)}, Mean {mean(rocs_r)}')
-    print(f'LogisticRegression: Median {median(rocs_l)}, Mean {mean(rocs_l)}')
-    print(f'RandomForest: Median {median(ates_r)}, Mean {mean(ates_r)}, Max {max(ates_r)}, Min {min(ates_r)}')
-    print(f'LogisticRegression: Median {median(ates_l)}, Mean {mean(ates_l)}, Max {max(ates_l)}, Min {min(ates_l)}')
-
-    print('ROC R',rocs_r)
-    print('ROC L',rocs_l)
-    write_text_file(rocs_r, 'rocs_r')
-    write_text_file(rocs_l, 'rocs_l')
-    write_text_file(ates_r, 'ates_r')
-    write_text_file(ates_l, 'ates_l')
-
-    # output = Transforms.get_output()
-    # output_fs = output.filesystem()
-    # val = []
-
-    # with output_fs.open('roc_r.txt', 'r') as f: 
-    #     f.read('roc_r.txt')
-    #     val.append(list(f))
-
-    # print(val)
-        
-
-@transform_pandas(
     Output(rid="ri.foundry.main.dataset.c55c9d7f-ff97-450b-8d2c-fabecfaaa8ab"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
@@ -501,6 +402,90 @@ def rf_slearner(final_data):
     rocs_r = []
     ates_r = []
     ates_l = []
+
+    for idx, combination in enumerate(ingredient_pairs):
+        start_time = datetime.now()
+        print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
+        df = main_df.copy()
+        df = df[df.ingredient_concept_id.isin(list(combination))]
+        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
+
+        X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
+        y = df['severity_final']
+        t = df['treatment']
+
+        np.random.seed(0)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 2, stratify = y)
+        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.5, random_state = 2, stratify = y_test)
+        y_train, y_valid, y_test = y_train.values, y_valid.values, y_test.values
+        
+        t_train = t[X_train.index]
+        t_train = t_train.values
+        t_test = t[X_test.index]
+        t_test = t_test.values
+        t_valid = t[X_valid.index]
+        t_valid = t_valid.values
+
+        class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
+        class_weight_dict = dict(enumerate(class_weights))
+
+        best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'RF')
+        print(f'ROC: {best_roc}, {best_params}')
+        best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, 'RF')
+        results_df = pd.concat([results_df, best_params_df], ignore_index=True)
+
+        print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
+
+    print('Total time taken:',datetime.now() - initial_time)
+
+    return results_df
+
+@transform_pandas(
+    Output(rid="ri.foundry.main.dataset.3cbc3c8c-65b6-4f67-8c4e-40bc4da8bbe8"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+def rf_tlearner(final_data):
+
+    def metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts):
+        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        preds = (1. - t_valid) * yhat_cs + t_valid * yhat_ts
+        roc = roc_auc_score(y_valid, preds)
+        ate = ite.mean()
+        return roc, ate
+
+    def create_best_params_df(best_params, best_roc, best_ate, combination, model):
+        best_params['roc'] = best_roc
+        best_params['ate'] = best_ate
+        best_params['drug_0'] = combination[0]
+        best_params['drug_1'] = combination[1]
+        best_params['model'] = model
+        return pd.DataFrame(best_params, index=[0])
+
+    def grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, model):
+        best_roc = 0.0
+        best_ate = 0.0
+        estim_1 = [100, 500, 1000] # n_estimators
+        estim_3 = [None, 25, 50, 75, 100] # max_depth
+        for crit_1 in estim_1:
+            for crit_3 in estim_3:
+                clf = RandomForestClassifier(n_estimators = crit_1, criterion = 'log_loss', max_depth = crit_3, class_weight=class_weight_dict)
+                clf_learner = BaseTClassifier(learner = clf)
+                clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
+                ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_valid, treatment=t_valid, y=y_valid, return_components=True, verbose=True)
+                roc, ate = metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts)
+                
+                if roc > best_roc:
+                    best_ate = ate
+                    best_roc = roc
+                    best_params = {'n_estimators': crit_1, 'max_depth': crit_3, 'penalty':np.nan, 'C':np.nan, 'max_iter':np.nan, 'solver':np.nan}
+        return best_roc, best_ate, best_params
+
+    # Create and get the data for pair of different antidepressants
+    main_df = final_data.toPandas()
+    results_df = pd.DataFrame()
+    ingredient_list = main_df.ingredient_concept_id.unique()
+    ingredient_pairs = list(combinations(ingredient_list, 2))
+    initial_time = datetime.now()
 
     for idx, combination in enumerate(ingredient_pairs):
         start_time = datetime.now()
