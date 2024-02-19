@@ -336,6 +336,7 @@ def rf_slearner(final_data):
     print('Total time taken:',datetime.now() - initial_time)
 
     return results_df
+    
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
@@ -664,6 +665,7 @@ def test_rf_slearner(final_data):
     print('Total time taken:',datetime.now() - initial_time)
 
     return results_df
+    
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.3cbc3c8c-65b6-4f67-8c4e-40bc4da8bbe8"),
@@ -698,7 +700,7 @@ def test_rf_tlearner(final_data):
             y_train, y_val = y_train_val.iloc[train_index], y_train_val.iloc[val_index]
             t_train, t_val = t_train_val.iloc[train_index], t_train_val.iloc[val_index]
 
-            estim_2 = [100, 500, 1000] # n_estimators
+            estim_2 = [50, 100, 500] # n_estimators
             estim_4 = [None, 25, 50, 75, 100] # max_depth
             for crit_2 in estim_2:
                 for crit_4 in estim_4:
