@@ -232,6 +232,7 @@ def lr_tlearner(final_data):
         best_roc = 0.0
         best_ate = 0.0
         l1_ratio = None
+        roc_auc_scorer = make_scorer(roc_auc_score, greater_is_better=True, needs_threshold=True)
         # estim_1 = ['elasticnet'] # penalty
         estim_2 = [0, 0.25, 0.5, 0.75, 1] # l1_ratio
         # estim_3 = [100, 500, 1000] # max_iter
@@ -258,18 +259,22 @@ def lr_tlearner(final_data):
                                     # 'max_iter':crit_3,
                                     # 'solver':crit_4,
                                     }
-                print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
+                # print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
                 # print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}, solver: {crit_4}')
         return best_roc, best_ate, best_params
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     results_df = pd.DataFrame()
-    ingredient_list = main_df.ingredient_concept_id.unique()[:10]
+    ingredient_list = main_df.ingredient_concept_id.unique()
     ingredient_pairs = list(combinations(ingredient_list, 2))
     initial_time = datetime.now()
     # ingredient_pairs = [(716968, 19080226), (739138, 703547)]
     # threshold = 0.4
+    rocs_l = []
+    rocs_r = []
+    ates_r = []
+    ates_l = []
 
     for idx, combination in enumerate(ingredient_pairs):
         start_time = datetime.now()
