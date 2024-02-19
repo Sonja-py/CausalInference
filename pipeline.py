@@ -11,7 +11,7 @@ from causalml.inference.meta import BaseSClassifier, BaseTClassifier
 from causalml.inference.nn import CEVAE
 
 from sklearn.utils import class_weight
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, make_scorer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, StratifiedKFold
