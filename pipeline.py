@@ -631,27 +631,30 @@ def test_rf_slearner(final_data):
             y_train, y_val = y_train_val.iloc[train_index], y_train_val.iloc[val_index]
             t_train, t_val = t_train_val.iloc[train_index], t_train_val.iloc[val_index]
 
-            estim_2 = [50, 100, 500] # n_estimators
-            estim_4 = [None, 5, 10, 20, 50] # max_depth
-            for crit_2 in estim_2:
-                for crit_4 in estim_4:
-                    clf = RandomForestClassifier(n_estimators = crit_2, criterion = 'log_loss', max_depth = crit_4, class_weight=class_weight_dict)
-                    clf_learner = BaseSClassifier(learner = clf)
-                    clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
-                    ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_val, treatment=t_val, y=y_val, return_components=True, verbose=True)
-                    roc, ate = metrics(y_val, t_val, ite, yhat_cs, yhat_ts)
-                    
-                    if roc > best_roc:
-                        best_model = clf_learner
-                        best_ate = ate
-                        best_roc = roc
-                        best_params = {'n_estimators': np.nan, 
-                                        'criterion': np.nan,
-                                        'max_depth': np.nan,
-                                        'l1_ratio':crit_2,
-                                        'C':crit_4,
-                                        }
-                    # print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
+            estim_1 = [2, 5] # min_samples_split
+            # estim_2 = [50, 100] # n_estimators
+            estim_3 = [1, 5, 10] # min_samples_leaf
+            estim_4 = [None, 25, 50] # max_depth
+            for crit_1 in estim_1:
+                for crit_3 in estim_3:
+                    for crit_4 in estim_4:
+                        clf = RandomForestClassifier(min_samples_split=crit_1, min_samples_leaf=crit_3, n_estimators=100, criterion='log_loss', max_depth=crit_4, class_weight=class_weight_dict)
+                        clf_learner = BaseSClassifier(learner = clf)
+                        clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
+                        ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_val, treatment=t_val, y=y_val, return_components=True, verbose=True)
+                        roc, ate = metrics(y_val, t_val, ite, yhat_cs, yhat_ts)
+                        
+                        if roc > best_roc:
+                            best_model = clf_learner
+                            best_ate = ate
+                            best_roc = roc
+                            best_params = {'min_samples_split': crit_1, 
+                                            'min_samples_leaf': crit_3,
+                                            'max_depth': crit_4,
+                                            'l1_ratio':np.nan,
+                                            'C':np.nan,
+                                            }
+                        # print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
 
         return best_roc, best_ate, best_params, best_model
 
