@@ -75,9 +75,49 @@ def cevae(final_data):
 
         # np.random.seed(3)
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.4, random_state = 2, stratify = y)
+        X_train_val, X_test, y_train_val, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
         X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.2, random_state = 42, stratify = y_test)
 
+        # Cross-validation setup
+        kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+        # Parameter grid (you should customize this)
+        param_grid = [
+            {'dim_hidden': 20, 'dim_latent': 5, 'num_layers': 2},
+            {'dim_hidden': 20, 'dim_latent': 5, 'num_layers': 3},
+            # Add more parameter combinations as needed
+        ]
+
+        # Best model score and parameters
+        best_score = 0
+        best_params = None
+
+        # Loop over each fold
+        for train_index, test_index in kf.split(X):
+            X_train, X_test = X[train_index], X[test_index]
+            t_train, t_test = t[train_index], t[test_index]
+            y_train, y_test = y[train_index], y[test_index]
+            
+            # Inner loop: iterate over all possible combinations of parameters
+            for params in param_grid:
+                # Initialize and fit the CEVAE model with current set of parameters
+                cevae = CEVAE(outcome_dist="binary", **params)
+                cevae.fit(X=X_train, treatment=t_train, y=y_train)
+                
+                # Predict the causal effect on the validation data
+                y_pred = cevae.predict(X_test)
+                
+                # Calculate ROC AUC score
+                score = roc_auc_score(y_test, y_pred)
+                
+                # Update best score and parameters if current model is better
+                if score > best_score:
+                    best_score = score
+                    best_params = params
+
+        # Print out the best parameter set and its performance
+        print(f'Best parameters: {best_params}')
+        print(f'Best ROC AUC score: {best_score}')
         t_train = t[X_train.index]
         t_test = t[X_test.index]
         t_valid = t[X_valid.index]
@@ -700,27 +740,30 @@ def test_rf_tlearner(final_data):
             y_train, y_val = y_train_val.iloc[train_index], y_train_val.iloc[val_index]
             t_train, t_val = t_train_val.iloc[train_index], t_train_val.iloc[val_index]
 
-            estim_2 = [50, 100, 500] # n_estimators
-            estim_4 = [None, 25, 50, 75, 100] # max_depth
-            for crit_2 in estim_2:
-                for crit_4 in estim_4:
-                    clf = RandomForestClassifier(n_estimators = crit_2, criterion = 'log_loss', max_depth = crit_4, class_weight=class_weight_dict)
-                    clf_learner = BaseTClassifier(learner = clf)
-                    clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
-                    ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_val, treatment=t_val, y=y_val, return_components=True, verbose=True)
-                    roc, ate = metrics(y_val, t_val, ite, yhat_cs, yhat_ts)
-                    
-                    if roc > best_roc:
-                        best_model = clf_learner
-                        best_ate = ate
-                        best_roc = roc
-                        best_params = {'n_estimators': np.nan, 
-                                        'criterion': np.nan,
-                                        'max_depth': np.nan,
-                                        'l1_ratio':crit_2,
-                                        'C':crit_4,
-                                        }
-                    # print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
+            estim_1 = [2, 5] # min_samples_split
+            # estim_2 = [50, 100] # n_estimators
+            estim_3 = [1, 5, 10] # min_samples_leaf
+            estim_4 = [None, 25, 50] # max_depth
+            for crit_1 in estim_1:
+                for crit_3 in estim_3:
+                    for crit_4 in estim_4:
+                        clf = RandomForestClassifier(min_samples_split=crit_1, min_samples_leaf=crit_3, n_estimators=100, criterion='log_loss', max_depth=crit_4, class_weight=class_weight_dict)
+                        clf_learner = BaseTClassifier(learner = clf)
+                        clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
+                        ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_val, treatment=t_val, y=y_val, return_components=True, verbose=True)
+                        roc, ate = metrics(y_val, t_val, ite, yhat_cs, yhat_ts)
+                        
+                        if roc > best_roc:
+                            best_model = clf_learner
+                            best_ate = ate
+                            best_roc = roc
+                            best_params = {'min_samples_split': crit_1, 
+                                            'min_samples_leaf': crit_3,
+                                            'max_depth': crit_4,
+                                            'l1_ratio':np.nan,
+                                            'C':np.nan,
+                                            }
+                        # print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
 
         return best_roc, best_ate, best_params, best_model
 
