@@ -1036,8 +1036,8 @@ def unnamed_2():
             # weight_decay=args.weight_decay,
         )
 
-        y_0 = cevae.model.y_mean(x_train, torch.zeros(x_train.size(0))
-        y_1 = cevae.model.y_mean(x_train, torch.ones(x_train.size(0))
+        y_0 = cevae.model.y_mean(x_train, torch.zeros(x_train.size(0)))
+        y_1 = cevae.model.y_mean(x_train, torch.ones(x_train.size(0)))
         # print(y_train)
         y = y_1 - y_0
         print(f'y is {y})')
