@@ -972,5 +972,5 @@ def unnamed_1(final_data):
 def unnamed_2():
     cevae = CEVAE(1)
     # cevae
-    print(dir(cevae))
+    print(dir(cevae.model()))
 
