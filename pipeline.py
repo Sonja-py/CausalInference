@@ -8,7 +8,8 @@ import pickle
 # from statistics import median, mean
 
 from causalml.inference.meta import BaseSClassifier, BaseTClassifier
-from causalml.inference.nn import CEVAE
+# from causalml.inference.nn import CEVAE
+from pyro.contrib.cevae import CEVAE
 
 from sklearn.utils import class_weight
 from sklearn.metrics import roc_auc_score, make_scorer
@@ -969,6 +970,7 @@ def unnamed_1(final_data):
     Output(rid="ri.vector.main.execute.16efea9d-b80f-4579-8b8f-775e5fa2b60b")
 )
 def unnamed_2():
-    cevae = CEVAE(outcome_dist="binary")
+    cevae = CEVAE()
+    # cevae
     print(dir(cevae))
 
