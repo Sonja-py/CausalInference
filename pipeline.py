@@ -1036,7 +1036,7 @@ def unnamed_2():
             # weight_decay=args.weight_decay,
         )
 
-        print(dir(cevae))
+        print(dir(cevae.model()))
 
         # Evaluate.
         # x_test, t_test, y_test, true_ite = generate_data(args)
