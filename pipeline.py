@@ -1013,11 +1013,16 @@ def unnamed_2():
         # Train.
         pyro.set_rng_seed(args.seed)
         pyro.clear_param_store()
+        # parser.add_argument("--num-data", default=1000, type=int)
+    # parser.add_argument("--feature-dim", default=5, type=int)
+    # parser.add_argument("--latent-dim", default=20, type=int)
+    # parser.add_argument("--hidden-dim", default=200, type=int)
+    # parser.add_argument("--num-layers", default=3, type=int)
         cevae = CEVAE(
-            feature_dim=args.feature_dim,
-            latent_dim=args.latent_dim,
-            hidden_dim=args.hidden_dim,
-            num_layers=args.num_layers,
+            feature_dim=5,
+            latent_dim=10,
+            hidden_dim=10,
+            num_layers=3,
             num_samples=10,
         )
         cevae.fit(
