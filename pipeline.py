@@ -966,9 +966,9 @@ def unnamed_1(final_data):
     
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.16efea9d-b80f-4579-8b8f-775e5fa2b60b"),
-    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+    Output(rid="ri.vector.main.execute.16efea9d-b80f-4579-8b8f-775e5fa2b60b")
 )
-def unnamed_2(final_data):
-    
+def unnamed_2():
+    cevae = CEVAE(outcome_dist="binary")
+    print(dir(cevae))
 
