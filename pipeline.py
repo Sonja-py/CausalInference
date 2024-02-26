@@ -986,13 +986,13 @@ def unnamed_2():
     # logging.getLogger("pyro").setLevel(logging.DEBUG)
     # logging.getLogger("pyro").handlers[0].setLevel(logging.DEBUG)
 
-    def generate_data(args):
+    def generate_data():
         """
         This implements the generative process of [1], but using larger feature and
         latent spaces ([1] assumes ``feature_dim=1`` and ``latent_dim=5``).
         """
-        z = dist.Bernoulli(0.5).sample([args.num_data])
-        x = dist.Normal(z, 5 * z + 3 * (1 - z)).sample([args.feature_dim]).t()
+        z = dist.Bernoulli(0.5).sample([100])
+        x = dist.Normal(z, 5 * z + 3 * (1 - z)).sample([5]).t()
         t = dist.Bernoulli(0.75 * z + 0.25 * (1 - z)).sample()
         y = dist.Bernoulli(logits=3 * (z + 2 * (2 * t - 2))).sample()
 
@@ -1002,13 +1002,13 @@ def unnamed_2():
         true_ite = y_t1 - y_t0
         return x, t, y, true_ite
 
-    def main(args):
-        if args.cuda:
-            torch.set_default_device("cuda")
+    def main():
+        # if args.cuda:
+        #     torch.set_default_device("cuda")
 
         # Generate synthetic data.
-        pyro.set_rng_seed(args.seed)
-        x_train, t_train, y_train, _ = generate_data(args)
+        # pyro.set_rng_seed(args.seed)
+        x_train, t_train, y_train, _ = generate_data()
 
         # Train.
         # pyro.set_rng_seed(args.seed)
@@ -1039,16 +1039,16 @@ def unnamed_2():
         print(dir(cevae))
 
         # Evaluate.
-        x_test, t_test, y_test, true_ite = generate_data(args)
-        true_ate = true_ite.mean()
-        print("true ATE = {:0.3g}".format(true_ate.item()))
-        naive_ate = y_test[t_test == 1].mean() - y_test[t_test == 0].mean()
-        print("naive ATE = {:0.3g}".format(naive_ate))
-        if args.jit:
-            cevae = cevae.to_script_module()
-        est_ite = cevae.ite(x_test)
-        est_ate = est_ite.mean()
-        print("estimated ATE = {:0.3g}".format(est_ate.item()))
+        # x_test, t_test, y_test, true_ite = generate_data(args)
+        # true_ate = true_ite.mean()
+        # print("true ATE = {:0.3g}".format(true_ate.item()))
+        # naive_ate = y_test[t_test == 1].mean() - y_test[t_test == 0].mean()
+        # print("naive ATE = {:0.3g}".format(naive_ate))
+        # if args.jit:
+        #     cevae = cevae.to_script_module()
+        # est_ite = cevae.ite(x_test)
+        # est_ate = est_ite.mean()
+        # print("estimated ATE = {:0.3g}".format(est_ate.item()))
 
     # assert pyro.__version__.startswith("1.9.0")
     # parser = argparse.ArgumentParser(
