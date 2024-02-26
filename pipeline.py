@@ -974,8 +974,8 @@ def unnamed_2():
     # # cevae
     # print(dir(cevae))
 
-    import argparse
-    import logging
+    # import argparse
+    # import logging
 
     import torch
 
@@ -983,8 +983,8 @@ def unnamed_2():
     import pyro.distributions as dist
     from pyro.contrib.cevae import CEVAE
 
-    logging.getLogger("pyro").setLevel(logging.DEBUG)
-    logging.getLogger("pyro").handlers[0].setLevel(logging.DEBUG)
+    # logging.getLogger("pyro").setLevel(logging.DEBUG)
+    # logging.getLogger("pyro").handlers[0].setLevel(logging.DEBUG)
 
     def generate_data(args):
         """
