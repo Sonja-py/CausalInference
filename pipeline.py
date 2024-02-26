@@ -1037,6 +1037,7 @@ def unnamed_2():
         )
 
         print(cevae.model(x_train))
+        print(y_train)
 
         # Evaluate.
         # x_test, t_test, y_test, true_ite = generate_data()
