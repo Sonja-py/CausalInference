@@ -1011,7 +1011,7 @@ def unnamed_2():
         x_train, t_train, y_train, _ = generate_data(args)
 
         # Train.
-        pyro.set_rng_seed(args.seed)
+        # pyro.set_rng_seed(args.seed)
         pyro.clear_param_store()
         # parser.add_argument("--num-data", default=1000, type=int)
     # parser.add_argument("--feature-dim", default=5, type=int)
@@ -1029,11 +1029,11 @@ def unnamed_2():
             x_train,
             t_train,
             y_train,
-            num_epochs=args.num_epochs,
-            batch_size=args.batch_size,
-            learning_rate=args.learning_rate,
-            learning_rate_decay=args.learning_rate_decay,
-            weight_decay=args.weight_decay,
+            num_epochs=5,
+            batch_size=32,
+            learning_rate=1e-3,
+            # learning_rate_decay=args.learning_rate_decay,
+            # weight_decay=args.weight_decay,
         )
 
         print(dir(cevae))
