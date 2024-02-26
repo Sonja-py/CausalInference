@@ -970,7 +970,7 @@ def unnamed_1(final_data):
     Output(rid="ri.vector.main.execute.16efea9d-b80f-4579-8b8f-775e5fa2b60b")
 )
 def unnamed_2():
-    cevae = CEVAE()
+    cevae = CEVAE(1)
     # cevae
     print(dir(cevae))
 
