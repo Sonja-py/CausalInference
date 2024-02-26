@@ -1036,10 +1036,10 @@ def unnamed_2():
             # weight_decay=args.weight_decay,
         )
 
-        print(dir(cevae.model()))
+        print(dir(cevae.model(x_train)))
 
         # Evaluate.
-        # x_test, t_test, y_test, true_ite = generate_data(args)
+        # x_test, t_test, y_test, true_ite = generate_data()
         # true_ate = true_ite.mean()
         # print("true ATE = {:0.3g}".format(true_ate.item()))
         # naive_ate = y_test[t_test == 1].mean() - y_test[t_test == 0].mean()
