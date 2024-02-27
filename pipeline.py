@@ -505,17 +505,17 @@ def lr_slearner_bootstrap(final_data):
     #                 clf_learner = BaseSClassifier(learner = clf)
     #                 # clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
     #                 # ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_val, treatment=t_val, y=y_val, return_components=True, verbose=True)
-    #                 # te, te_lower, te_upper = clf_learner.fit_predict(X=X_train,
-    #                 #                                                 treatment=t_train,
-    #                 #                                                 y=y_train,
-    #                 #                                                 return_components=True,
-    #                 #                                                 n_bootstraps=10,
-    #                 #                                                 bootstrap_size=1000,
-    #                 #                                                 return_ci=True)
+                    te, te_lower, te_upper = clf_learner.fit_predict(X=X_train,
+                                                                    treatment=t_train,
+                                                                    y=y_train,
+                                                                    return_components=True,
+                                                                    n_bootstraps=10,
+                                                                    bootstrap_size=1000,
+                                                                    return_ci=True)
                     
-    #                 # Unpack ite, yhat_cs, yhat_ts
-    #                 ite, yhat_cs, yhat_ts = te[0], te[1], te[2]
-    #                 roc, ate = metrics(y_train, t_train, ite, yhat_cs, yhat_ts)
+                    # Unpack ite, yhat_cs, yhat_ts
+                    ite, yhat_cs, yhat_ts = te[0], te[1], te[2]
+                    roc, ate = metrics(y_train, t_train, ite, yhat_cs, yhat_ts)
                     
     #                 if roc > best_roc:
     #                     best_model = clf_learner
@@ -539,9 +539,18 @@ def lr_slearner_bootstrap(final_data):
             t_train, t_val = t_train_val.iloc[train_index], t_train_val.iloc[val_index]
 
             clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
-            idxs = np.random.choice(np.arange(0, X_train.shape[0]), size=1000)
-            X_b = X_train[idxs]
-            print(X_b)
+            te, te_lower, te_upper = clf_learner.fit_predict(X=X_train,
+                                                            treatment=t_train,
+                                                            y=y_train,
+                                                            return_components=True,
+                                                            n_bootstraps=10,
+                                                            bootstrap_size=1000,
+                                                            return_ci=True)
+                    
+            # Unpack ite, yhat_cs, yhat_ts
+            ite, yhat_cs, yhat_ts = te[0], te[1], te[2]
+            roc, ate = metrics(y_train, t_train, ite, yhat_cs, yhat_ts)
+            print(roc, ate, yhat_cs, yhat_ts, te_lower, te_upper)
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
@@ -566,22 +575,13 @@ def lr_slearner_bootstrap(final_data):
         np.random.seed(0)
         skf = StratifiedKFold(n_splits=5, shuffle=False)
         X_train_val, X_test, y_train_val, y_test, t_train_val, t_test = train_test_split(X, y, t, test_size=0.2, random_state=42, stratify=y)
-        
         X_train_val, y_train_val, t_train_val = X_train_val.to_numpy(), y_train_val.to_numpy(), t_train_val.to_numpy()
+        X_test, y_test, t_test = X_test.to_numpy(), y_test.to_numpy(), t_test.to_numpy()
+        
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
-        # print(X_train_val)
-        # print(X_train_val.to_numpy())
-        # print(y_train_val)
-        # print(t_train_val)
-        idxs = np.random.choice(np.arange(0, X_train_val.shape[0]), size=10)
-        print(idxs)
-        print(f'Max: originial data {X.shape[0]}, in new list {max(idxs)}')
-        print(f'Min: originial data {X.shape[0]}, in new list {min(idxs)}')
-
-        X_b = X_train_val[idxs]
-        print(X_b)
-        # temp(X_train_val, y_train_val, t_train_val, skf, class_weight_dict)
+        
+        temp(X_train_val, y_train_val, t_train_val, skf, class_weight_dict)
 
     #     best_roc, best_ate, best_params, best_model = grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, 'LR')
 
