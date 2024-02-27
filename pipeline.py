@@ -505,17 +505,17 @@ def lr_slearner_bootstrap(final_data):
     #                 clf_learner = BaseSClassifier(learner = clf)
     #                 # clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
     #                 # ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_val, treatment=t_val, y=y_val, return_components=True, verbose=True)
-                    te, te_lower, te_upper = clf_learner.fit_predict(X=X_train,
-                                                                    treatment=t_train,
-                                                                    y=y_train,
-                                                                    return_components=True,
-                                                                    n_bootstraps=10,
-                                                                    bootstrap_size=1000,
-                                                                    return_ci=True)
+                    # te, te_lower, te_upper = clf_learner.fit_predict(X=X_train,
+                    #                                                 treatment=t_train,
+                    #                                                 y=y_train,
+                    #                                                 return_components=True,
+                    #                                                 n_bootstraps=10,
+                    #                                                 bootstrap_size=1000,
+                    #                                                 return_ci=True)
                     
-                    # Unpack ite, yhat_cs, yhat_ts
-                    ite, yhat_cs, yhat_ts = te[0], te[1], te[2]
-                    roc, ate = metrics(y_train, t_train, ite, yhat_cs, yhat_ts)
+                    # # Unpack ite, yhat_cs, yhat_ts
+                    # ite, yhat_cs, yhat_ts = te[0], te[1], te[2]
+                    # roc, ate = metrics(y_train, t_train, ite, yhat_cs, yhat_ts)
                     
     #                 if roc > best_roc:
     #                     best_model = clf_learner
