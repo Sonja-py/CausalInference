@@ -539,7 +539,7 @@ def lr_slearner_bootstrap(final_data):
             t_train, t_val = t_train_val.iloc[train_index].reset_index(drop=True), t_train_val.iloc[val_index].reset_index(drop=True)
 
             print(X_train)
-            idxs = np.random.choice(np.arange(0, X.shape[0]), size=100)
+            idxs = np.random.choice(np.arange(0, X_train.shape[0]), size=100)
             print(idxs)
             
             # clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
