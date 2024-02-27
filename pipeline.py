@@ -538,26 +538,26 @@ def lr_slearner_bootstrap(final_data):
             y_train, y_val = y_train_val.iloc[train_index].to_numpy(), y_train_val.iloc[val_index].to_numpy()
             t_train, t_val = t_train_val.iloc[train_index].to_numpy(), t_train_val.iloc[val_index].to_numpy()
 
-            print(X_train)
-            idxs = np.random.choice(np.arange(0, X_train.shape[0]), size=100)
-            print(idxs)
-            X_b = X_train[idxs]
-            print(X_b)
+            # print(X_train)
+            # idxs = np.random.choice(np.arange(0, X_train.shape[0]), size=100)
+            # print(idxs)
+            # X_b = X_train[idxs]
+            # print(X_b)
             
-            # clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
-            # clf_learner = BaseSClassifier(learner = clf)
-            # te, te_lower, te_upper = clf_learner.fit_predict(X=X_train,
-            #                                                 treatment=t_train,
-            #                                                 y=y_train,
-            #                                                 return_components=True,
-            #                                                 n_bootstraps=10,
-            #                                                 bootstrap_size=1000,
-            #                                                 return_ci=True)
+            clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
+            clf_learner = BaseSClassifier(learner = clf)
+            te, te_lower, te_upper = clf_learner.fit_predict(X=X_train,
+                                                            treatment=t_train,
+                                                            y=y_train,
+                                                            return_components=True,
+                                                            n_bootstraps=10,
+                                                            bootstrap_size=1000,
+                                                            return_ci=True)
                     
             # Unpack ite, yhat_cs, yhat_ts
-            # ite, yhat_cs, yhat_ts = te[0], te[1], te[2]
-            # roc, ate = metrics(y_train, t_train, ite, yhat_cs, yhat_ts)
-            # print(roc, ate, yhat_cs, yhat_ts, te_lower, te_upper)
+            ite, yhat_cs, yhat_ts = te[0], te[1], te[2]
+            roc, ate = metrics(y_train, t_train, ite, yhat_cs, yhat_ts)
+            print(roc, ate, yhat_cs, yhat_ts, te_lower, te_upper)
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
