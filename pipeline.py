@@ -567,11 +567,11 @@ def lr_slearner_bootstrap(final_data):
         skf = StratifiedKFold(n_splits=5, shuffle=False)
         X_train_val, X_test, y_train_val, y_test, t_train_val, t_test = train_test_split(X, y, t, test_size=0.2, random_state=42, stratify=y)
         
-        # X_train_val, 
+        X_train_val, y_train_val, t_train_val = X_train_val.to_numpy(), y_train_val.to_numpy(), t_train_val.to_numpy()
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
-        print(X_train_val)
-        print(X_train_val.to_numpy())
+        # print(X_train_val)
+        # print(X_train_val.to_numpy())
         # print(y_train_val)
         # print(t_train_val)
         idxs = np.random.choice(np.arange(0, X_train_val.shape[0]), size=10)
