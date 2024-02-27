@@ -571,7 +571,7 @@ def lr_slearner_bootstrap(final_data):
         class_weight_dict = dict(enumerate(class_weights))
 
         # idxs = np.random.choice(np.arange(0, X.shape[0]), size=X)
-        print(np.arange(0, X.shape[0]))
+        print(np.random.choice(np.arange(0, X.shape[0])))
         # X_b = X[idxs]
         # print(X_b)
         # temp(X_train_val, y_train_val, t_train_val, skf, class_weight_dict)
