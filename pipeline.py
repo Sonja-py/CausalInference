@@ -539,9 +539,9 @@ def lr_slearner_bootstrap(final_data):
             t_train, t_val = t_train_val.iloc[train_index], t_train_val.iloc[val_index]
 
             clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
-            idxs = np.random.choice(np.arange(0, X_train.shape[0]), size=size)
+            idxs = np.random.choice(np.arange(0, X_train.shape[0]), size=1000)
             X_b = X_train[idxs]
-            print(X_)
+            print(X_b)
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
