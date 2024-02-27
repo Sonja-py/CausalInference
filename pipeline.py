@@ -570,9 +570,9 @@ def lr_slearner_bootstrap(final_data):
         # X_train_val, 
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
-        print(X_train_val)
-        print(y_train_val)
-        print(t_train_val)
+        print(X_train_val.numpy())
+        # print(y_train_val)
+        # print(t_train_val)
         idxs = np.random.choice(np.arange(0, X_train_val.shape[0]), size=10)
         print(idxs)
         print(f'Max: originial data {X.shape[0]}, in new list {max(idxs)}')
