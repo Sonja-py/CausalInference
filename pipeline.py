@@ -534,9 +534,9 @@ def lr_slearner_bootstrap(final_data):
     def temp(X_train_val, y_train_val, t_train_val, skf, class_weight_dict):
         for idx, (train_index, val_index) in enumerate(skf.split(X_train_val, y_train_val)):
             # Generate training and validation sets for the fold
-            X_train, X_val = X_train_val.iloc[train_index].reset_index(), X_train_val.iloc[val_index].reset_index()
-            y_train, y_val = y_train_val.iloc[train_index].reset_index(), y_train_val.iloc[val_index].reset_index()
-            t_train, t_val = t_train_val.iloc[train_index].reset_index(), t_train_val.iloc[val_index].reset_index()
+            X_train, X_val = X_train_val.iloc[train_index].reset_index(drop=True), X_train_val.iloc[val_index].reset_index(drop=True)
+            y_train, y_val = y_train_val.iloc[train_index].reset_index(drop=True), y_train_val.iloc[val_index].reset_index(drop=True)
+            t_train, t_val = t_train_val.iloc[train_index].reset_index(drop=True), t_train_val.iloc[val_index].reset_index(drop=True)
 
             clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
             clf_learner = BaseSClassifier(learner = clf)
