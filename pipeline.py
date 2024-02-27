@@ -579,8 +579,8 @@ def lr_slearner_bootstrap(final_data):
         print(f'Max: originial data {X.shape[0]}, in new list {max(idxs)}')
         print(f'Min: originial data {X.shape[0]}, in new list {min(idxs)}')
 
-        # X_b = X[idxs]
-        # print(X_b)
+        X_b = X_train_val[idxs]
+        print(X_b)
         # temp(X_train_val, y_train_val, t_train_val, skf, class_weight_dict)
 
     #     best_roc, best_ate, best_params, best_model = grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, 'LR')
