@@ -570,7 +570,10 @@ def lr_slearner_bootstrap(final_data):
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
 
-        temp(X_train_val, y_train_val, t_train_val, skf, class_weight_dict)
+        idxs = np.random.choice(np.arange(0, X.shape[0]), size=1000)
+        X_b = X[idxs]
+        print(X_b)
+        # temp(X_train_val, y_train_val, t_train_val, skf, class_weight_dict)
 
     #     best_roc, best_ate, best_params, best_model = grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, 'LR')
 
