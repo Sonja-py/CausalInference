@@ -502,7 +502,7 @@ def lr_slearner_bootstrap(final_data):
     #         for crit_2 in estim_2:
     #             for crit_4 in estim_4:
     #                 clf = LogisticRegression(penalty='elasticnet', l1_ratio=crit_2, max_iter=100, C=crit_4, solver='saga', class_weight=class_weight_dict)
-    #                 clf_learner = BaseSClassifier(learner = clf)
+                    # clf_learner = BaseSClassifier(learner = clf)
     #                 # clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
     #                 # ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_val, treatment=t_val, y=y_val, return_components=True, verbose=True)
                     # te, te_lower, te_upper = clf_learner.fit_predict(X=X_train,
@@ -539,6 +539,7 @@ def lr_slearner_bootstrap(final_data):
             t_train, t_val = t_train_val.iloc[train_index].reset_index(), t_train_val.iloc[val_index].reset_index()
 
             clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
+            clf_learner = BaseSClassifier(learner = clf)
             te, te_lower, te_upper = clf_learner.fit_predict(X=X_train,
                                                             treatment=t_train,
                                                             y=y_train,
