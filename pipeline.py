@@ -538,15 +538,19 @@ def lr_slearner_bootstrap(final_data):
             y_train, y_val = y_train_val.iloc[train_index].reset_index(drop=True), y_train_val.iloc[val_index].reset_index(drop=True)
             t_train, t_val = t_train_val.iloc[train_index].reset_index(drop=True), t_train_val.iloc[val_index].reset_index(drop=True)
 
-            clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
-            clf_learner = BaseSClassifier(learner = clf)
-            te, te_lower, te_upper = clf_learner.fit_predict(X=X_train,
-                                                            treatment=t_train,
-                                                            y=y_train,
-                                                            return_components=True,
-                                                            n_bootstraps=10,
-                                                            bootstrap_size=1000,
-                                                            return_ci=True)
+            print(X_train)
+            idxs = np.random.choice(np.arange(0, X.shape[0]), size=100)
+            print(idxs)
+            
+            # clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
+            # clf_learner = BaseSClassifier(learner = clf)
+            # te, te_lower, te_upper = clf_learner.fit_predict(X=X_train,
+            #                                                 treatment=t_train,
+            #                                                 y=y_train,
+            #                                                 return_components=True,
+            #                                                 n_bootstraps=10,
+            #                                                 bootstrap_size=1000,
+            #                                                 return_ci=True)
                     
             # Unpack ite, yhat_cs, yhat_ts
             ite, yhat_cs, yhat_ts = te[0], te[1], te[2]
