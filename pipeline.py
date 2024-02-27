@@ -541,7 +541,8 @@ def lr_slearner_bootstrap(final_data):
             print(X_train)
             idxs = np.random.choice(np.arange(0, X_train.shape[0]), size=100)
             print(idxs)
-            pri(X_train[idxs])
+            X_b = X_train[idxs]
+            print(X_b)
             
             # clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
             # clf_learner = BaseSClassifier(learner = clf)
