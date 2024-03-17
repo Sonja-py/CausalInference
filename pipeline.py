@@ -491,7 +491,7 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
             return model
 
     def temp(X_test, y_test, t_test, class_weight_dict):
-        X_test, y_test, t_test = X_test.to_numpy(), y_test.to_numpy(), t_test.to_numpy()
+        # X_test, y_test, t_test = X_test.to_numpy(), y_test.to_numpy(), t_test.to_numpy()
 
         clf_learner = sample(Test_lr_slearner)
         ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
@@ -527,14 +527,14 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         t = df['treatment']
 
         np.random.seed(0)
-        skf = StratifiedKFold(n_splits=5, shuffle=False)
+        # skf = StratifiedKFold(n_splits=5, shuffle=False)
         X_train_val, X_test, y_train_val, y_test, t_train_val, t_test = train_test_split(X, y, t, test_size=0.2, random_state=42, stratify=y)
         # X_train_val, y_train_val, t_train_val = X_train_val.to_numpy(), y_train_val.to_numpy(), t_train_val.to_numpy()
         # X_test, y_test, t_test = X_test.to_numpy(), y_test.to_numpy(), t_test.to_numpy()
-        
+        print(1)
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
-        print(1)
+        print(2)
         
         temp(X_test, y_test, t_test, class_weight_dict)
 
