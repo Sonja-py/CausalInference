@@ -512,6 +512,7 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
     ingredient_list = main_df.ingredient_concept_id.unique()
     ingredient_pairs = list(combinations(ingredient_list, 2))[:2]
     initial_time = datetime.now()
+    print('done')
     # ingredient_pairs = [(716968, 19080226), (739138, 703547)]
     # threshold = 0.4
 
@@ -527,10 +528,7 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         t = df['treatment']
 
         np.random.seed(0)
-        # skf = StratifiedKFold(n_splits=5, shuffle=False)
         X_train_val, X_test, y_train_val, y_test, t_train_val, t_test = train_test_split(X, y, t, test_size=0.2, random_state=42, stratify=y)
-        # X_train_val, y_train_val, t_train_val = X_train_val.to_numpy(), y_train_val.to_numpy(), t_train_val.to_numpy()
-        # X_test, y_test, t_test = X_test.to_numpy(), y_test.to_numpy(), t_test.to_numpy()
         print(1)
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
