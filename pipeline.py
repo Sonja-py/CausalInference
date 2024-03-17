@@ -509,7 +509,7 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
     main_df = final_data.toPandas()
     results_df = pd.DataFrame(columns=['ate', 'ate_lower', 'ate_upper', 'variance', 'drug_0', 'drug_1', 'model'])
     ingredient_list = main_df.ingredient_concept_id.unique()
-    ingredient_pairs = list(combinations(ingredient_list, 2))[:2]
+    ingredient_pairs = list(combinations(ingredient_list, 2))
     initial_time = datetime.now()
     # ingredient_pairs = [(40234834, 710062)]
 
@@ -536,10 +536,10 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         params_df = create_best_params_df(ate, ate_l, ate_u, ate_u - ate_l, combination, 'S_LR')
         results_df = pd.concat([results_df, params_df], ignore_index=True)
 
-    #     print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
+        print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
     #     to_pickle(best_model, f'{combination[0]}_{combination[1]}')
-    # print('Total time taken:',datetime.now() - initial_time)
+    print('Total time taken:',datetime.now() - initial_time)
 
     return results_df
 
