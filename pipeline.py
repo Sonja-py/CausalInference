@@ -490,8 +490,6 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         return model
 
     def temp(X_test, y_test, t_test, class_weight_dict, clf_learner):
-        # X_test, y_test, t_test = X_test.to_numpy(), y_test.to_numpy(), t_test.to_numpy()
-
         ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
                                                             treatment=t_test,
                                                             y=y_test,
@@ -527,7 +525,7 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         X_train_val, X_test, y_train_val, y_test, t_train_val, t_test = train_test_split(X, y, t, test_size=0.2, random_state=42, stratify=y)
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
-
+        print(f'combination[0]_combination[1]')
         clf_learner = sample(Test_lr_slearner, f'combination[0]_combination[1]')
         temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
 
