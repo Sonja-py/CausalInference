@@ -497,12 +497,12 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
                                                             treatment=t_test,
                                                             y=y_test,
-                                                            # p=None,
                                                             return_ci=True,
                                                             bootstrap_ci=True,
                                                             n_bootstraps=50,
                                                             bootstrap_size=1000,
-                                                            pretrain=True,)
+                                                            # pretrain=True,
+                                                            )
 
         print(f'ATE: {ate}, lower: {ate_lower}, upper: {ate_upper}')
 
