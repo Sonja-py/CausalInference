@@ -624,7 +624,7 @@ def rf_slearner_bootstrap(final_data, Test_rf_slearner):
     return results_df
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.26f8137b-be28-4f94-a0c3-18e75a2d8ec5"),
+    Output(rid="ri.foundry.main.dataset.f659a7c1-d747-471d-94d5-80a85fb8e1c3"),
     Test_rf_tlearner=Input(rid="ri.foundry.main.dataset.3cbc3c8c-65b6-4f67-8c4e-40bc4da8bbe8"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
