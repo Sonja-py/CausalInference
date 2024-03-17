@@ -33,15 +33,7 @@ def write_text_file(data, metric):
         filename = 'ate_l.txt'
     with output_fs.open(filename, 'w') as f: 
         f.write(str(data))
-    
-
-# Save model
-def save_model(model, output_filename):
-    output = Transforms.get_output()
-    output_fs = output.filesystem()
-    
-    with output_fs.open(output_filename + ".h5", 'w') as f:
-        model.save(str(output_filename)+'.h5')
+   
 
 # Save GS model
 def to_pickle(data, filename):
@@ -845,9 +837,8 @@ def test_lr_slearner(final_data):
         # t_valid = t[X_valid.index]
         # t_valid = t_valid.values
 
-    
         # best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'LR')
-        print(f'ROC: {best_roc}, {best_params}')
+        print(f'ROC: {best_roc}, ATE: {best_ate}, {best_params}')
 
         best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, 'LR')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
@@ -1226,4 +1217,10 @@ def unnamed_2():
     # args = parser.parse_args()
 
     main()
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.cd197f30-d267-452a-be57-98ea5c9168bc")
+)
+def unnamed_3():
+    
 
