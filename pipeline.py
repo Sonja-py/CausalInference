@@ -1237,3 +1237,5 @@ def unnamed_3(Test_lr_slearner):
     print(type(data))
     print(data.keys())
 
+    return data
+
