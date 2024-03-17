@@ -1233,7 +1233,9 @@ def unnamed_3(Test_lr_slearner):
 # /UNITE/[RP-1225E6] Effects of drugs on COVID-19 trajectory/Anugrah Analysis/workbook-output/Model_Training_Meta_Learners/Test lr slearner
     with output_fs.open('40234834_710062.pickle', 'rb') as f:
         data = pickle.load(f)
-
+        print('Load done')
+    
+    print(data.best_params_)
     print(type(data))
     print(data.keys())
 
