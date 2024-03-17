@@ -597,8 +597,9 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
+        print(1)
         
-        temp(X_test, y_test, t_test, skf, class_weight_dict)
+        temp(X_test, y_test, t_test, class_weight_dict)
 
     #     best_roc, best_ate, best_params, best_model = grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, 'LR')
 
