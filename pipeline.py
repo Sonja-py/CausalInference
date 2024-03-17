@@ -1231,7 +1231,7 @@ def unnamed_3(test_lr_slearner):
     output = Transforms.get_output()
     output_fs = output.filesystem()
 
-    with output_fs.open('test_lr_slearner/40234834_710062.pickle', 'rb') as f:
+    with output_fs.open('40234834_710062.pickle', 'rb') as f:
         data = pickle.load(f)
 
     print(data)
