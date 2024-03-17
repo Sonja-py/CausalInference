@@ -1234,5 +1234,6 @@ def unnamed_3(Test_lr_slearner):
     with output_fs.open('40234834_710062.pickle', 'rb') as f:
         data = pickle.load(f)
 
+    print(type(data))
     print(data.keys())
 
