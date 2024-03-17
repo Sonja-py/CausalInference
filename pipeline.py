@@ -480,54 +480,7 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         best_params['model'] = model
         return pd.DataFrame(best_params, index=[0])
 
-    # def grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict):
-    #     best_roc = 0.0
-    #     best_ate = 0.0
-    #     best_model = None
-    #     for idx, (train_index, val_index) in enumerate(skf.split(X_train_val, y_train_val)):
-    #         # Generate training and validation sets for the fold
-    #         X_train, X_val = X_train_val.iloc[train_index], X_train_val.iloc[val_index]
-    #         y_train, y_val = y_train_val.iloc[train_index], y_train_val.iloc[val_index]
-    #         t_train, t_val = t_train_val.iloc[train_index], t_train_val.iloc[val_index]
-
-    #         estim_2 = [0, 0.25, 0.5, 0.75, 1] # l1_ratio
-    #         estim_4 = [0.01, 0.1, 1, 10, 100] # C - regularization strength
-    #         for crit_2 in estim_2:
-    #             for crit_4 in estim_4:
-    #                 clf = LogisticRegression(penalty='elasticnet', l1_ratio=crit_2, max_iter=100, C=crit_4, solver='saga', class_weight=class_weight_dict)
-                    # clf_learner = BaseSClassifier(learner = clf)
-    #                 # clf_learner.fit(X=X_train, treatment=t_train, y=y_train)
-    #                 # ite, yhat_cs, yhat_ts = clf_learner.predict(X=X_val, treatment=t_val, y=y_val, return_components=True, verbose=True)
-                    # te, te_lower, te_upper = clf_learner.fit_predict(X=X_train,
-                    #                                                 treatment=t_train,
-                    #                                                 y=y_train,
-                    #                                                 return_components=True,
-                    #                                                 n_bootstraps=10,
-                    #                                                 bootstrap_size=1000,
-                    #                                                 return_ci=True)
-                    
-                    # # Unpack ite, yhat_cs, yhat_ts
-                    # ite, yhat_cs, yhat_ts = te[0], te[1], te[2]
-                    # roc, ate = metrics(y_train, t_train, ite, yhat_cs, yhat_ts)
-                    
-    #                 if roc > best_roc:
-    #                     best_model = clf_learner
-    #                     best_ate = ate
-    #                     best_roc = roc
-    #                     best_params = {'n_estimators': np.nan, 
-    #                                     'criterion': np.nan,
-    #                                     'max_depth': np.nan,
-    #                                     'l1_ratio':crit_2,
-    #                                     'C':crit_4,
-    #                                     }
-    #                 print(f'Bootstrap done for l1_ratio {crit_2}, C {crit_4}, roc {roc}')
-
-    #     return best_roc, best_ate, best_params, best_model
-
-    def temp(X_test, y_test, t_test, class_weight_dict):
-        X_test, y_test, t_test = X_test.to_numpy(), y_test.to_numpy(), t_test.to_numpy()
-
-        def sample(datasetOfZippedFiles):
+    def sample(datasetOfZippedFiles):
             df = datasetOfZippedFiles
             fs = df.filesystem() # This is the FileSystem object.
             
@@ -537,37 +490,21 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
             # print(str(model))
             return model
 
-        # for idx, (train_index, val_index) in enumerate(skf.split(X_train_val, y_train_val)):
-            # Generate training and validation sets for the fold
-            # X_train, X_val = X_train_val.iloc[train_index].to_numpy(), X_train_val.iloc[val_index].to_numpy()
-            # y_train, y_val = y_train_val.iloc[train_index].to_numpy(), y_train_val.iloc[val_index].to_numpy()
-            # t_train, t_val = t_train_val.iloc[train_index].to_numpy(), t_train_val.iloc[val_index].to_numpy()
+    def temp(X_test, y_test, t_test, class_weight_dict):
+        X_test, y_test, t_test = X_test.to_numpy(), y_test.to_numpy(), t_test.to_numpy()
 
-            # print(X_train)
-            # idxs = np.random.choice(np.arange(0, X_train.shape[0]), size=100)
-            # print(idxs)
-            # X_b = X_train[idxs]
-            # print(X_b)
-            
-            # clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
-            # clf_learner = BaseSClassifier(learner = clf)
-            clf_learner = sample(Test_lr_slearner)
-            ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
-                                                                treatment=t_test,
-                                                                y=y_test,
-                                                                # p=None,
-                                                                return_ci=True,
-                                                                bootstrap_ci=True,
-                                                                n_bootstraps=50,
-                                                                bootstrap_size=1000,
-                                                                pretrain=True,)
-                    
-            # # Unpack ite, yhat_cs, yhat_ts
-            # ite, yhat_cs, yhat_ts = te[0], te[1], te[2]
-            # roc, ate = metrics(y_train, t_train, ite, yhat_cs, yhat_ts)
-            # print(roc, ate, yhat_cs, yhat_ts, te_lower, te_upper)
+        clf_learner = sample(Test_lr_slearner)
+        ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
+                                                            treatment=t_test,
+                                                            y=y_test,
+                                                            # p=None,
+                                                            return_ci=True,
+                                                            bootstrap_ci=True,
+                                                            n_bootstraps=50,
+                                                            bootstrap_size=1000,
+                                                            pretrain=True,)
 
-            print(f'ATE: {ate}, lower: {ate_lower}, upper: {ate_upper}')
+        print(f'ATE: {ate}, lower: {ate_lower}, upper: {ate_upper}')
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
