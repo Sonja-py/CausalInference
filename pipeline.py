@@ -480,20 +480,18 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         best_params['model'] = model
         return pd.DataFrame(best_params, index=[0])
 
-    def sample(datasetOfZippedFiles):
+    def sample(datasetOfZippedFiles, filename):
         df = datasetOfZippedFiles
         fs = df.filesystem() # This is the FileSystem object.
         
-        with fs.open('40234834_710062.pickle', mode='rb') as f:
+        with fs.open(f'{filename}.pickle', mode='rb') as f:
             model = pickle.load(f)
         print(model)
-        print(str(model))
         return model
 
-    def temp(X_test, y_test, t_test, class_weight_dict):
+    def temp(X_test, y_test, t_test, class_weight_dict, clf_learner):
         # X_test, y_test, t_test = X_test.to_numpy(), y_test.to_numpy(), t_test.to_numpy()
 
-        clf_learner = sample(Test_lr_slearner)
         ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
                                                             treatment=t_test,
                                                             y=y_test,
@@ -512,7 +510,6 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
     # ingredient_list = main_df.ingredient_concept_id.unique()
     # ingredient_pairs = list(combinations(ingredient_list, 2))[:2]
     initial_time = datetime.now()
-    print('done')
     ingredient_pairs = [(40234834, 710062)]
 
     for idx, combination in enumerate(ingredient_pairs):
@@ -528,12 +525,11 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
 
         np.random.seed(0)
         X_train_val, X_test, y_train_val, y_test, t_train_val, t_test = train_test_split(X, y, t, test_size=0.2, random_state=42, stratify=y)
-        print(1)
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
-        print(2)
-        
-        temp(X_test, y_test, t_test, class_weight_dict)
+
+        clf_learner = sample(Test_lr_slearner, f'combination[0]_combination[1]')
+        temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
 
     #     best_roc, best_ate, best_params, best_model = grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, 'LR')
 
