@@ -523,12 +523,13 @@ def lr_slearner_bootstrap(final_data):
 
     #     return best_roc, best_ate, best_params, best_model
 
-    def temp(X_train_val, y_train_val, t_train_val, skf, class_weight_dict):
-        for idx, (train_index, val_index) in enumerate(skf.split(X_train_val, y_train_val)):
+    def temp(X_test, y_test, t_test, class_weight_dict):
+        X_test, y_test, t_test = X_test.to_numpy(), y_test.to_numpy(), t_test.to_numpy()
+        # for idx, (train_index, val_index) in enumerate(skf.split(X_train_val, y_train_val)):
             # Generate training and validation sets for the fold
-            X_train, X_val = X_train_val.iloc[train_index].to_numpy(), X_train_val.iloc[val_index].to_numpy()
-            y_train, y_val = y_train_val.iloc[train_index].to_numpy(), y_train_val.iloc[val_index].to_numpy()
-            t_train, t_val = t_train_val.iloc[train_index].to_numpy(), t_train_val.iloc[val_index].to_numpy()
+            # X_train, X_val = X_train_val.iloc[train_index].to_numpy(), X_train_val.iloc[val_index].to_numpy()
+            # y_train, y_val = y_train_val.iloc[train_index].to_numpy(), y_train_val.iloc[val_index].to_numpy()
+            # t_train, t_val = t_train_val.iloc[train_index].to_numpy(), t_train_val.iloc[val_index].to_numpy()
 
             # print(X_train)
             # idxs = np.random.choice(np.arange(0, X_train.shape[0]), size=100)
@@ -538,18 +539,22 @@ def lr_slearner_bootstrap(final_data):
             
             clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
             clf_learner = BaseSClassifier(learner = clf)
-            te, te_lower, te_upper = clf_learner.fit_predict(X=X_train,
-                                                            treatment=t_train,
-                                                            y=y_train,
-                                                            return_components=True,
-                                                            n_bootstraps=10,
-                                                            bootstrap_size=1000,
-                                                            return_ci=True)
+            ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
+                                                                treatment=t_test,
+                                                                y=y_test,
+                                                                # p=None,
+                                                                return_ci=True,
+                                                                bootstrap_ci=True,
+                                                                n_bootstraps=50,
+                                                                bootstrap_size=1000,
+                                                                pretrain=False,)
                     
-            # Unpack ite, yhat_cs, yhat_ts
-            ite, yhat_cs, yhat_ts = te[0], te[1], te[2]
-            roc, ate = metrics(y_train, t_train, ite, yhat_cs, yhat_ts)
-            print(roc, ate, yhat_cs, yhat_ts, te_lower, te_upper)
+            # # Unpack ite, yhat_cs, yhat_ts
+            # ite, yhat_cs, yhat_ts = te[0], te[1], te[2]
+            # roc, ate = metrics(y_train, t_train, ite, yhat_cs, yhat_ts)
+            # print(roc, ate, yhat_cs, yhat_ts, te_lower, te_upper)
+
+            print(f'ATE: {ate}, lower: {ate_lower}, upper: {ate_upper}')
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
@@ -580,7 +585,7 @@ def lr_slearner_bootstrap(final_data):
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
         
-        temp(X_train_val, y_train_val, t_train_val, skf, class_weight_dict)
+        temp(X_test, y_test, t_test, skf, class_weight_dict)
 
     #     best_roc, best_ate, best_params, best_model = grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, 'LR')
 
@@ -1219,8 +1224,14 @@ def unnamed_2():
     main()
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.cd197f30-d267-452a-be57-98ea5c9168bc")
+    Output(rid="ri.foundry.main.dataset.cece95e1-548c-4d0f-95c5-9240d885dec0")
 )
 def unnamed_3():
-    
+    output = Transforms.get_output()
+    output_fs = output.filesystem()
+
+    with output_fs.open('Test lr slearner/40234834_710062.pickle', 'rb') as f:
+        data = pickle.load(f)
+
+    print(data)
 
