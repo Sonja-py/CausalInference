@@ -1265,7 +1265,7 @@ def unnamed_3(Test_lr_slearner):
         print(rdd)
         # df = rdd.toDF()
         # return df
-        return data
+        return rdd
 
     sample(Test_lr_slearner)
 
