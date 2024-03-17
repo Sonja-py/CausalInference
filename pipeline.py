@@ -1224,13 +1224,14 @@ def unnamed_2():
     main()
 
 @transform_pandas(
-    Output(rid="ri.foundry.main.dataset.cece95e1-548c-4d0f-95c5-9240d885dec0")
+    Output(rid="ri.foundry.main.dataset.cece95e1-548c-4d0f-95c5-9240d885dec0"),
+    test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405")
 )
-def unnamed_3():
-    output = Transforms.get_input()
+def unnamed_3(test_lr_slearner):
+    output = Transforms.get_output()
     output_fs = output.filesystem()
 
-    with output_fs.open('40234834_710062.pickle', 'rb') as f:
+    with output_fs.open('test_lr_slearner/40234834_710062.pickle', 'rb') as f:
         data = pickle.load(f)
 
     print(data)
