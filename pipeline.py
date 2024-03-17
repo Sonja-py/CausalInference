@@ -1267,6 +1267,8 @@ def unnamed_3(Test_lr_slearner):
         # return df
         return data
 
+    sample(Test_lr_slearner)
+
 #     import os
 #     output = Transforms.get_output()
 #     output_fs = output.filesystem()
