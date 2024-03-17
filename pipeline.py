@@ -505,11 +505,11 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    results_df = pd.DataFrame(columns=['ate', 'ate_l', 'ate_u', 'drug_0', 'drug_1', 'model'])
+    results_df = pd.DataFrame(columns=['ate', 'ate_lower', 'ate_upper', 'drug_0', 'drug_1', 'model'])
     # ingredient_list = main_df.ingredient_concept_id.unique()
-    # ingredient_pairs = list(combinations(ingredient_list, 2))[:2]
+    ingredient_pairs = list(combinations(ingredient_list, 2))[:2]
     initial_time = datetime.now()
-    ingredient_pairs = [(40234834, 710062)]
+    # ingredient_pairs = [(40234834, 710062)]
 
     for idx, combination in enumerate(ingredient_pairs):
         start_time = datetime.now()
@@ -531,9 +531,6 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
 
         results_df.loc[-1] = [ate, ate_l, ate_u, combination[0], combination[1], 'S_LR']
-
-    #     best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, 'LR')
-    #     results_df = pd.concat([results_df, best_params_df], ignore_index=True)
 
     #     print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
