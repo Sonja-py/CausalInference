@@ -1228,18 +1228,54 @@ def unnamed_2():
     Test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405")
 )
 def unnamed_3(Test_lr_slearner):
-    import os
-    output = Transforms.get_output()
-    output_fs = output.filesystem()
-# /UNITE/[RP-1225E6] Effects of drugs on COVID-19 trajectory/Anugrah Analysis/workbook-output/Model_Training_Meta_Learners/Test lr slearner
-    with output_fs.open('Test_lr_slearner/40234834_710062.pickle', 'rb') as f:
-        print(os.getcwd())
-        data = pickle.load(f)
-        print('Load done')
-    
-    print(data.best_params_)
-    print(type(data))
-    print(data.keys())
 
-    return data
+    import tempfile
+    import zipfile
+    import shutil
+    import io
+    from pyspark.sql import Row
+
+    # datasetOfZippedFiles is a dataset with a single zipped file that contains 3 CSVs with the same schema: ["id", name"].
+    def sample(datasetOfZippedFiles):
+        df = datasetOfZippedFiles
+        fs = df.filesystem() # This is the FileSystem object.
+        # MyRow = Row("id", "name")
+        def process_file(file_status):
+            with fs.open(file_status.path, 'rb') as f:
+                data = pickle.load(f)
+                print('Data Loaded')
+                print(data)
+                return data
+        #         with tempfile.NamedTemporaryFile() as tmp:
+        #             shutil.copyfileobj(f, tmp)
+        #             tmp.flush()
+        #             with zipfile.ZipFile(tmp) as archive:
+        #                 for filename in archive.namelist():
+        #                     with archive.open(filename) as f2:
+        #                         br = io.BufferedReader(f2)
+        #                         tw = io.TextIOWrapper(br)
+        #                         tw.readline() # Skip the first line of each CSV
+        #                         for line in tw:
+        #                             yield MyRow(*line.split(","))
+        rdd = fs.files().rdd
+        rdd = rdd.flatMap(process_file)
+        print(rdd)
+        # df = rdd.toDF()
+        # return df
+        return data
+
+#     import os
+#     output = Transforms.get_output()
+#     output_fs = output.filesystem()
+# # /UNITE/[RP-1225E6] Effects of drugs on COVID-19 trajectory/Anugrah Analysis/workbook-output/Model_Training_Meta_Learners/Test lr slearner
+#     with output_fs.open('Test_lr_slearner/40234834_710062.pickle', 'rb') as f:
+#         print(os.getcwd())
+#         data = pickle.load(f)
+#         print('Load done')
+    
+#     print(data.best_params_)
+#     print(type(data))
+#     print(data.keys())
+
+#     return data
 
