@@ -1232,7 +1232,7 @@ def unnamed_3(Test_lr_slearner):
     output = Transforms.get_output()
     output_fs = output.filesystem()
 # /UNITE/[RP-1225E6] Effects of drugs on COVID-19 trajectory/Anugrah Analysis/workbook-output/Model_Training_Meta_Learners/Test lr slearner
-    with output_fs.open('40234834_710062.pickle', 'rb') as f:
+    with output_fs.open('Test_lr_slearner/40234834_710062.pickle', 'rb') as f:
         print(os.getcwd())
         data = pickle.load(f)
         print('Load done')
