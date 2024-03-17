@@ -1225,12 +1225,12 @@ def unnamed_2():
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.cece95e1-548c-4d0f-95c5-9240d885dec0"),
-    test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405")
+    Test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405")
 )
-def unnamed_3(test_lr_slearner):
+def unnamed_3(Test_lr_slearner):
     output = Transforms.get_output()
     output_fs = output.filesystem()
-
+# /UNITE/[RP-1225E6] Effects of drugs on COVID-19 trajectory/Anugrah Analysis/workbook-output/Model_Training_Meta_Learners/Test lr slearner
     with output_fs.open('40234834_710062.pickle', 'rb') as f:
         data = pickle.load(f)
 
