@@ -1262,8 +1262,10 @@ def unnamed_3(Test_lr_slearner):
         #                         tw.readline() # Skip the first line of each CSV
         #                         for line in tw:
         #                             yield MyRow(*line.split(","))
-        rdd = fs.open('40234834_710062.pickle', mode='rb')
-        print(pickle.load(rdd))
+        with fs.open('40234834_710062.pickle', mode='rb') as f:
+            data = pickle.load(f)
+        # print(pickle.load(rdd))
+        print(data)
         print(3)
         # rdd(process_file)
         # rdd = rdd.flatMap(process_file)
