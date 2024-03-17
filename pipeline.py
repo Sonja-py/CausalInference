@@ -505,7 +505,7 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    results_df = pd.DataFrame()
+    results_df = pd.DataFrame(column=['ate', 'ate_l', 'ate_u', 'drug_0', 'drug_1', 'model'])
     # ingredient_list = main_df.ingredient_concept_id.unique()
     # ingredient_pairs = list(combinations(ingredient_list, 2))[:2]
     initial_time = datetime.now()
