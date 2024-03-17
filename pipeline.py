@@ -1224,7 +1224,7 @@ def unnamed_2():
     main()
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.cd197f30-d267-452a-be57-98ea5c9168bc"),
+    Output(rid="ri.foundry.main.dataset.cece95e1-548c-4d0f-95c5-9240d885dec0"),
     Test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405")
 )
 def unnamed_3(Test_lr_slearner):
