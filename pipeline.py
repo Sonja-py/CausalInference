@@ -530,7 +530,7 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         clf_learner = sample(Test_lr_slearner, f'{combination[0]}_{combination[1]}')
         ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
 
-        results_df.loc[-1] = {ate, ate_l, ate_u, combination[0], combination[1], 'S_LR'}
+        results_df.loc[-1] = [ate, ate_l, ate_u, combination[0], combination[1], 'S_LR']
 
     #     best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, 'LR')
     #     results_df = pd.concat([results_df, best_params_df], ignore_index=True)
