@@ -1263,7 +1263,7 @@ def unnamed_3(Test_lr_slearner):
         #                         for line in tw:
         #                             yield MyRow(*line.split(","))
         rdd = fs.open('40234834_710062.pickle', mode='rb')
-        print(rdd)
+        print(pickle.load(rdd))
         print(3)
         # rdd(process_file)
         # rdd = rdd.flatMap(process_file)
