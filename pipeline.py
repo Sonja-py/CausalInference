@@ -1238,8 +1238,10 @@ def unnamed_3(Test_lr_slearner):
     # datasetOfZippedFiles is a dataset with a single zipped file that contains 3 CSVs with the same schema: ["id", name"].
     def sample(datasetOfZippedFiles):
         df = datasetOfZippedFiles
+        print(df)
         print(1)
         fs = df.filesystem() # This is the FileSystem object.
+        print(fs)
         print(2)
         # MyRow = Row("id", "name")
         def process_file(file_status):
