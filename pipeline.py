@@ -1243,6 +1243,7 @@ def unnamed_3(Test_lr_slearner):
         with fs.open('40234834_710062.pickle', mode='rb') as f:
             data = pickle.load(f)
         print(data)
+        print(str(data))
         # print(data.keys())
         print(data.best_params_)
         # return rdd
