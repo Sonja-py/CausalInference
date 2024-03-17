@@ -363,7 +363,7 @@ def lr_tlearner_bootstrap(final_data, Test_lr_tlearner):
                                                             bootstrap_ci=True,
                                                             n_bootstraps=100,
                                                             bootstrap_size=10000,
-                                                            pretrain=True,
+                                                            # pretrain=True,
                                                             )
 
         print(f'ATE: {ate}, lower: {ate_lower}, upper: {ate_upper}')
