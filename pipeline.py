@@ -323,10 +323,11 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
     return results_df
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.6deff404-08aa-4823-8c6b-a0064e380644"),
+    Output(rid="ri.foundry.main.dataset.492668a1-6094-4392-9901-c5b86103fb69"),
+    Test_lr_tlearner=Input(rid="ri.foundry.main.dataset.720ebfa7-629e-4ae2-9d4d-e23ab6099284"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
-def lr_tlearner_bootstrap(final_data, Test_lr_tlearner_1):
+def lr_tlearner_bootstrap(final_data, Test_lr_tlearner):
     def metrics(y, t, ite, yhat_cs, yhat_ts):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
         preds = (1. - t) * yhat_cs + t * yhat_ts
@@ -391,11 +392,11 @@ def lr_tlearner_bootstrap(final_data, Test_lr_tlearner_1):
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
         
-        clf_learner = sample(Test_lr_slearner, f'{combination[0]}_{combination[1]}')
+        clf_learner = sample(Test_lr_tlearner, f'{combination[0]}_{combination[1]}')
         ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
 
         # results_df.loc[-1] = [ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR']
-        params_df = create_best_params_df(ate, ate_l, ate_u, ate_u - ate_l, combination, 'S_LR')
+        params_df = create_best_params_df(ate, ate_l, ate_u, ate_u - ate_l, combination, 'T_LR')
         results_df = pd.concat([results_df, params_df], ignore_index=True)
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
