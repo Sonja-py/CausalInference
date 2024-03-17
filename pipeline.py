@@ -1227,7 +1227,7 @@ def unnamed_2():
     Output(rid="ri.foundry.main.dataset.cece95e1-548c-4d0f-95c5-9240d885dec0")
 )
 def unnamed_3():
-    output = Transforms.get_output()
+    output = Transforms.get_input()
     output_fs = output.filesystem()
 
     with output_fs.open('40234834_710062.pickle', 'rb') as f:
