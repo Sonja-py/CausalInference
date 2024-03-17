@@ -1228,10 +1228,12 @@ def unnamed_2():
     Test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405")
 )
 def unnamed_3(Test_lr_slearner):
+    import os
     output = Transforms.get_output()
     output_fs = output.filesystem()
 # /UNITE/[RP-1225E6] Effects of drugs on COVID-19 trajectory/Anugrah Analysis/workbook-output/Model_Training_Meta_Learners/Test lr slearner
     with output_fs.open('40234834_710062.pickle', 'rb') as f:
+        print(os.getcwd())
         data = pickle.load(f)
         print('Load done')
     
