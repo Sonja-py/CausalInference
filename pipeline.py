@@ -352,7 +352,6 @@ def lr_tlearner_bootstrap(final_data, Test_lr_tlearner):
         
         with fs.open(f'{filename}.pickle', mode='rb') as f:
             model = pickle.load(f)
-        print(model)
         return model
 
     def temp(X_test, y_test, t_test, class_weight_dict, clf_learner):
