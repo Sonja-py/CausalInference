@@ -525,8 +525,8 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         X_train_val, X_test, y_train_val, y_test, t_train_val, t_test = train_test_split(X, y, t, test_size=0.2, random_state=42, stratify=y)
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
-        print(f'combination[0]_combination[1]')
-        clf_learner = sample(Test_lr_slearner, f'combination[0]_combination[1]')
+        print(f'{combination[0]}_{combination[1]}')
+        clf_learner = sample(Test_lr_slearner, f'{combination[0]}_{combination[1]}')
         temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
 
     #     best_roc, best_ate, best_params, best_model = grid_search(X_train_val, y_train_val, t_train_val, skf, class_weight_dict, 'LR')
