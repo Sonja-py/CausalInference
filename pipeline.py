@@ -266,9 +266,14 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         df = datasetOfZippedFiles
         fs = df.filesystem() # This is the FileSystem object.
         
-        with fs.open(f'{filename}.pickle', mode='rb') as f:
-            model = pickle.load(f)
-        return model
+        try:
+            with fs.open(f"{filename[0]}.pickle", mode="rb") as f:
+                model = pickle.load(f)
+                return model
+        except Exception as e:
+            with fs.open(f"{filename[1]}.pickle", mode="rb") as f:
+                model = pickle.load(f)
+                return model
 
     def temp(X_test, y_test, t_test, class_weight_dict, clf_learner):
         ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
@@ -308,7 +313,10 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
         
-        clf_learner = sample(Test_lr_slearner, f'{combination[0]}_{combination[1]}')
+        clf_learner = sample(Test_lr_slearner, [
+                f"{combination[0]}_{combination[1]}",
+                f"{combination[1]}_{combination[0]}",
+            ])
         ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
 
         # results_df.loc[-1] = [ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR']
@@ -350,9 +358,14 @@ def lr_tlearner_bootstrap(final_data, Test_lr_tlearner):
         df = datasetOfZippedFiles
         fs = df.filesystem() # This is the FileSystem object.
         
-        with fs.open(f'{filename}.pickle', mode='rb') as f:
-            model = pickle.load(f)
-        return model
+        try:
+            with fs.open(f"{filename[0]}.pickle", mode="rb") as f:
+                model = pickle.load(f)
+                return model
+        except Exception as e:
+            with fs.open(f"{filename[1]}.pickle", mode="rb") as f:
+                model = pickle.load(f)
+                return model
 
     def temp(X_test, y_test, t_test, class_weight_dict, clf_learner):
         ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
@@ -392,7 +405,10 @@ def lr_tlearner_bootstrap(final_data, Test_lr_tlearner):
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
         
-        clf_learner = sample(Test_lr_tlearner, f'{combination[0]}_{combination[1]}')
+        clf_learner = sample(Test_lr_tlearner, [
+                f"{combination[0]}_{combination[1]}",
+                f"{combination[1]}_{combination[0]}",
+            ])
         ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
 
         # results_df.loc[-1] = [ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR']
@@ -567,9 +583,14 @@ def rf_slearner_bootstrap(final_data, Test_rf_slearner):
         df = datasetOfZippedFiles
         fs = df.filesystem() # This is the FileSystem object.
         
-        with fs.open(f'{filename}.pickle', mode='rb') as f:
-            model = pickle.load(f)
-        return model
+        try:
+            with fs.open(f"{filename[0]}.pickle", mode="rb") as f:
+                model = pickle.load(f)
+                return model
+        except Exception as e:
+            with fs.open(f"{filename[1]}.pickle", mode="rb") as f:
+                model = pickle.load(f)
+                return model
 
     def temp(X_test, y_test, t_test, class_weight_dict, clf_learner):
         ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
@@ -609,7 +630,10 @@ def rf_slearner_bootstrap(final_data, Test_rf_slearner):
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
         
-        clf_learner = sample(Test_rf_slearner, f'{combination[0]}_{combination[1]}')
+        clf_learner = sample(Test_rf_slearner, [
+                f"{combination[0]}_{combination[1]}",
+                f"{combination[1]}_{combination[0]}",
+            ])
         ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
 
         # results_df.loc[-1] = [ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR']
@@ -651,9 +675,14 @@ def rf_tlearner_bootstrap(final_data, Test_rf_tlearner):
         df = datasetOfZippedFiles
         fs = df.filesystem() # This is the FileSystem object.
         
-        with fs.open(f'{filename}.pickle', mode='rb') as f:
-            model = pickle.load(f)
-        return model
+        try:
+            with fs.open(f"{filename[0]}.pickle", mode="rb") as f:
+                model = pickle.load(f)
+                return model
+        except Exception as e:
+            with fs.open(f"{filename[1]}.pickle", mode="rb") as f:
+                model = pickle.load(f)
+                return model
 
     def temp(X_test, y_test, t_test, class_weight_dict, clf_learner):
         ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
@@ -693,7 +722,10 @@ def rf_tlearner_bootstrap(final_data, Test_rf_tlearner):
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
         
-        clf_learner = sample(Test_rf_tlearner, f'{combination[0]}_{combination[1]}')
+        clf_learner = sample(Test_rf_tlearner, [
+                f"{combination[0]}_{combination[1]}",
+                f"{combination[1]}_{combination[0]}",
+            ])
         ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
 
         # results_df.loc[-1] = [ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR']
