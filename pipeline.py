@@ -486,8 +486,8 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         
         with fs.open('40234834_710062.pickle', mode='rb') as f:
             model = pickle.load(f)
-        # print(model)
-        # print(str(model))
+        print(model)
+        print(str(model))
         return model
 
     def temp(X_test, y_test, t_test, class_weight_dict):
@@ -509,12 +509,11 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
     results_df = pd.DataFrame()
-    ingredient_list = main_df.ingredient_concept_id.unique()
-    ingredient_pairs = list(combinations(ingredient_list, 2))[:2]
+    # ingredient_list = main_df.ingredient_concept_id.unique()
+    # ingredient_pairs = list(combinations(ingredient_list, 2))[:2]
     initial_time = datetime.now()
     print('done')
-    # ingredient_pairs = [(716968, 19080226), (739138, 703547)]
-    # threshold = 0.4
+    ingredient_pairs = [(40234834, 710062)]
 
     for idx, combination in enumerate(ingredient_pairs):
         start_time = datetime.now()
