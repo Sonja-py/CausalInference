@@ -1244,7 +1244,7 @@ def unnamed_3(Test_lr_slearner):
         # MyRow = Row("id", "name")
         def process_file(file_status):
             with fs.open(file_status.path, 'rb') as f:
-                print(3)
+                print(4)
                 data = pickle.load(f)
                 print('Data Loaded')
                 print(data)
@@ -1260,8 +1260,10 @@ def unnamed_3(Test_lr_slearner):
         #                         tw.readline() # Skip the first line of each CSV
         #                         for line in tw:
         #                             yield MyRow(*line.split(","))
-        rdd = fs.files().rdd
-        rdd = rdd.flatMap(process_file)
+        rdd = fs.files()
+        print(3)
+        rdd(process_file)
+        # rdd = rdd.flatMap(process_file)
         print(rdd)
         # df = rdd.toDF()
         # return df
