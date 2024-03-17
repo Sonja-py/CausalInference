@@ -624,6 +624,90 @@ def rf_slearner_bootstrap(final_data, Test_rf_slearner):
     return results_df
 
 @transform_pandas(
+    Output(rid="ri.vector.main.execute.26f8137b-be28-4f94-a0c3-18e75a2d8ec5"),
+    Test_lr_tlearner=Input(rid="ri.foundry.main.dataset.720ebfa7-629e-4ae2-9d4d-e23ab6099284"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+def rf_tlearner_bootstrap(final_data, Test_lr_tlearner):
+    def metrics(y, t, ite, yhat_cs, yhat_ts):
+        yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
+        preds = (1. - t) * yhat_cs + t * yhat_ts
+        roc = roc_auc_score(y, preds)
+        ate = ite.mean()
+        return roc, ate
+
+    def create_best_params_df(ate, ate_lower, ate_upper, variance, combination, model):
+        best_params = {}
+        best_params['ate'] = ate
+        best_params['ate_lower'] = ate_lower
+        best_params['ate_upper'] = ate_upper
+        best_params['variance'] = variance
+        best_params['drug_0'] = combination[0]
+        best_params['drug_1'] = combination[1]
+        best_params['model'] = model
+        return pd.DataFrame(best_params, index=[0])
+
+    def sample(datasetOfZippedFiles, filename):
+        df = datasetOfZippedFiles
+        fs = df.filesystem() # This is the FileSystem object.
+        
+        with fs.open(f'{filename}.pickle', mode='rb') as f:
+            model = pickle.load(f)
+        return model
+
+    def temp(X_test, y_test, t_test, class_weight_dict, clf_learner):
+        ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
+                                                            treatment=t_test,
+                                                            y=y_test,
+                                                            # return_ci=True,
+                                                            bootstrap_ci=True,
+                                                            n_bootstraps=100,
+                                                            bootstrap_size=10000,
+                                                            # pretrain=True,
+                                                            )
+
+        print(f'ATE: {ate}, lower: {ate_lower}, upper: {ate_upper}')
+        return ate[0], ate_lower[0], ate_upper[0]
+
+    # Create and get the data for pair of different antidepressants
+    main_df = final_data.toPandas()
+    results_df = pd.DataFrame(columns=['ate', 'ate_lower', 'ate_upper', 'variance', 'drug_0', 'drug_1', 'model'])
+    ingredient_list = main_df.ingredient_concept_id.unique()
+    ingredient_pairs = list(combinations(ingredient_list, 2))
+    initial_time = datetime.now()
+    # ingredient_pairs = [(40234834, 710062)]
+
+    for idx, combination in enumerate(ingredient_pairs):
+        start_time = datetime.now()
+        print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
+        df = main_df.copy()
+        df = df[df.ingredient_concept_id.isin(list(combination))]
+        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
+
+        X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
+        y = df['severity_final']
+        t = df['treatment']
+
+        np.random.seed(0)
+        X_train_val, X_test, y_train_val, y_test, t_train_val, t_test = train_test_split(X, y, t, test_size=0.2, random_state=42, stratify=y)
+        class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
+        class_weight_dict = dict(enumerate(class_weights))
+        
+        clf_learner = sample(Test_lr_tlearner, f'{combination[0]}_{combination[1]}')
+        ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
+
+        # results_df.loc[-1] = [ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR']
+        params_df = create_best_params_df(ate, ate_l, ate_u, ate_u - ate_l, combination, 'T_LR')
+        results_df = pd.concat([results_df, params_df], ignore_index=True)
+
+        print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
+
+    #     to_pickle(best_model, f'{combination[0]}_{combination[1]}')
+    print('Total time taken:',datetime.now() - initial_time)
+
+    return results_df
+
+@transform_pandas(
     Output(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
@@ -1369,11 +1453,4 @@ def unnamed_3(Test_lr_slearner):
 #     print(data.keys())
 
 #     return data
-
-@transform_pandas(
-    Output(rid="ri.vector.main.execute.26f8137b-be28-4f94-a0c3-18e75a2d8ec5"),
-    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
-)
-def unnamed_4(final_data):
-    
 
