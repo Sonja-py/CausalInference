@@ -1261,10 +1261,10 @@ def unnamed_3(Test_lr_slearner):
         #                         for line in tw:
         #                             yield MyRow(*line.split(","))
         rdd = fs.files()
+        print(rdd)
         print(3)
         rdd(process_file)
         # rdd = rdd.flatMap(process_file)
-        print(rdd)
         # df = rdd.toDF()
         # return df
         return rdd
