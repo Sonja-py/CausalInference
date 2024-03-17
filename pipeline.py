@@ -460,7 +460,7 @@ def lr_slearner(final_data):
     return results_df
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.33b8cdaa-f7c7-40b2-8ab6-6aeecc98245b"),
+    Output(rid="ri.foundry.main.dataset.2c30c167-7995-4e2a-849d-9fb7c5a109d2"),
     Test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
