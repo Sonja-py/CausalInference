@@ -489,7 +489,6 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         
         with fs.open(f'{filename}.pickle', mode='rb') as f:
             model = pickle.load(f)
-        print(model)
         return model
 
     def temp(X_test, y_test, t_test, class_weight_dict, clf_learner):
@@ -534,7 +533,7 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
 
         # results_df.loc[-1] = [ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR']
-        params_df = create_best_params_df(ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR')
+        params_df = create_best_params_df(ate, ate_l, ate_u, ate_u - ate_l, combination, 'S_LR')
         results_df = pd.concat([results_df, params_df], ignore_index=True)
 
     #     print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
