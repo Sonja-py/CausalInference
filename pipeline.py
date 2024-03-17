@@ -481,14 +481,14 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         return pd.DataFrame(best_params, index=[0])
 
     def sample(datasetOfZippedFiles):
-            df = datasetOfZippedFiles
-            fs = df.filesystem() # This is the FileSystem object.
-            
-            with fs.open('40234834_710062.pickle', mode='rb') as f:
-                model = pickle.load(f)
-            # print(model)
-            # print(str(model))
-            return model
+        df = datasetOfZippedFiles
+        fs = df.filesystem() # This is the FileSystem object.
+        
+        with fs.open('40234834_710062.pickle', mode='rb') as f:
+            model = pickle.load(f)
+        # print(model)
+        # print(str(model))
+        return model
 
     def temp(X_test, y_test, t_test, class_weight_dict):
         # X_test, y_test, t_test = X_test.to_numpy(), y_test.to_numpy(), t_test.to_numpy()
