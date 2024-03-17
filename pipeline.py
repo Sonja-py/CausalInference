@@ -1238,40 +1238,14 @@ def unnamed_3(Test_lr_slearner):
     # datasetOfZippedFiles is a dataset with a single zipped file that contains 3 CSVs with the same schema: ["id", name"].
     def sample(datasetOfZippedFiles):
         df = datasetOfZippedFiles
-        print(df)
-        print(1)
         fs = df.filesystem() # This is the FileSystem object.
-        print(fs)
-        print(2)
-        # MyRow = Row("id", "name")
-        def process_file(file_status):
-            with fs.open(file_status.path, 'rb') as f:
-                print(4)
-                data = pickle.load(f)
-                print('Data Loaded')
-                print(data)
-                return data
-        #         with tempfile.NamedTemporaryFile() as tmp:
-        #             shutil.copyfileobj(f, tmp)
-        #             tmp.flush()
-        #             with zipfile.ZipFile(tmp) as archive:
-        #                 for filename in archive.namelist():
-        #                     with archive.open(filename) as f2:
-        #                         br = io.BufferedReader(f2)
-        #                         tw = io.TextIOWrapper(br)
-        #                         tw.readline() # Skip the first line of each CSV
-        #                         for line in tw:
-        #                             yield MyRow(*line.split(","))
+        
         with fs.open('40234834_710062.pickle', mode='rb') as f:
             data = pickle.load(f)
-        # print(pickle.load(rdd))
         print(data)
-        print(3)
-        # rdd(process_file)
-        # rdd = rdd.flatMap(process_file)
-        # df = rdd.toDF()
-        # return df
-        return rdd
+        print(data.keys())
+        print(data.best_params_)
+        # return rdd
 
     sample(Test_lr_slearner)
 
