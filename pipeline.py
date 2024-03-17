@@ -461,9 +461,10 @@ def lr_slearner(final_data):
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.33b8cdaa-f7c7-40b2-8ab6-6aeecc98245b"),
+    Test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
-def lr_slearner_bootstrap(final_data):
+def lr_slearner_bootstrap(final_data, Test_lr_slearner):
     def metrics(y, t, ite, yhat_cs, yhat_ts):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
         preds = (1. - t) * yhat_cs + t * yhat_ts
@@ -525,6 +526,17 @@ def lr_slearner_bootstrap(final_data):
 
     def temp(X_test, y_test, t_test, class_weight_dict):
         X_test, y_test, t_test = X_test.to_numpy(), y_test.to_numpy(), t_test.to_numpy()
+
+        def sample(datasetOfZippedFiles):
+            df = datasetOfZippedFiles
+            fs = df.filesystem() # This is the FileSystem object.
+            
+            with fs.open('40234834_710062.pickle', mode='rb') as f:
+                model = pickle.load(f)
+            # print(model)
+            # print(str(model))
+            return model
+
         # for idx, (train_index, val_index) in enumerate(skf.split(X_train_val, y_train_val)):
             # Generate training and validation sets for the fold
             # X_train, X_val = X_train_val.iloc[train_index].to_numpy(), X_train_val.iloc[val_index].to_numpy()
@@ -537,8 +549,9 @@ def lr_slearner_bootstrap(final_data):
             # X_b = X_train[idxs]
             # print(X_b)
             
-            clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
-            clf_learner = BaseSClassifier(learner = clf)
+            # clf = LogisticRegression(penalty='elasticnet', l1_ratio=0, max_iter=100, C=1, solver='saga', class_weight=class_weight_dict)
+            # clf_learner = BaseSClassifier(learner = clf)
+            clf_learner = sample(Test_lr_slearner)
             ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
                                                                 treatment=t_test,
                                                                 y=y_test,
@@ -547,7 +560,7 @@ def lr_slearner_bootstrap(final_data):
                                                                 bootstrap_ci=True,
                                                                 n_bootstraps=50,
                                                                 bootstrap_size=1000,
-                                                                pretrain=False,)
+                                                                pretrain=True,)
                     
             # # Unpack ite, yhat_cs, yhat_ts
             # ite, yhat_cs, yhat_ts = te[0], te[1], te[2]
@@ -1241,11 +1254,18 @@ def unnamed_3(Test_lr_slearner):
         fs = df.filesystem() # This is the FileSystem object.
         
         with fs.open('40234834_710062.pickle', mode='rb') as f:
-            data = pickle.load(f)
-        print(data)
-        print(str(data))
-        # print(data.keys())
-        print(data.best_params_)
+            model = pickle.load(f)
+        print(model)
+        print(str(model))
+
+        ate, ate_lower, ate_upper = model.estimate_ate(X=X_test,
+                                                    treatment=t_test,
+                                                    y=y_test,
+                                                    return_ci=True,
+                                                    bootstrap_ci=True,
+                                                    n_bootstraps=50,
+                                                    bootstrap_size=1000,
+                                                    pretrain=True,)
         # return rdd
 
     sample(Test_lr_slearner)
