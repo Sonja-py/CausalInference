@@ -472,9 +472,12 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         ate = ite.mean()
         return roc, ate
 
-    def create_best_params_df(best_params, best_roc, best_ate, combination, model):
-        best_params['val_roc'] = best_roc
-        best_params['val_ate'] = best_ate
+    def create_best_params_df(ate, ate_lower, ate_upper, variance, combination, model):
+        best_params = {}
+        best_params['ate'] = ate
+        best_params['ate_lower'] = ate_lower
+        best_params['ate_upper'] = ate_upper
+        best_params['variance'] = variance
         best_params['drug_0'] = combination[0]
         best_params['drug_1'] = combination[1]
         best_params['model'] = model
@@ -505,7 +508,7 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
-    results_df = pd.DataFrame(columns=['ate', 'ate_lower', 'ate_upper', 'drug_0', 'drug_1', 'model'])
+    results_df = pd.DataFrame(columns=['ate', 'ate_lower', 'ate_upper', 'variance', 'drug_0', 'drug_1', 'model'])
     ingredient_list = main_df.ingredient_concept_id.unique()
     ingredient_pairs = list(combinations(ingredient_list, 2))[:2]
     initial_time = datetime.now()
@@ -530,7 +533,9 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         clf_learner = sample(Test_lr_slearner, f'{combination[0]}_{combination[1]}')
         ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
 
-        results_df.loc[-1] = [ate, ate_l, ate_u, combination[0], combination[1], 'S_LR']
+        # results_df.loc[-1] = [ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR']
+        params_df = create_best_params_df(ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR')
+        results_df = pd.concat([results_df, params_df], ignore_index=True)
 
     #     print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
