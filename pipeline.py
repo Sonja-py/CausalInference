@@ -43,6 +43,8 @@ def to_pickle(data, filename):
     with output_fs.open(f'{filename}.pickle', 'wb') as f:
         pickle.dump(data, f)
 
+        
+
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.aa8fcdda-8570-4c04-b0d5-3b1afa7d04e6"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
@@ -275,14 +277,14 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
                 model = pickle.load(f)
                 return model
 
-    def temp(X_test, y_test, t_test, class_weight_dict, clf_learner):
-        ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
-                                                            treatment=t_test,
-                                                            y=y_test,
+    def temp(X_train_val, y_train_val, t_train_val, class_weight_dict, clf_learner):
+        ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_train_val,
+                                                            treatment=t_train_val,
+                                                            y=y_train_val,
                                                             return_ci=True,
                                                             bootstrap_ci=True,
-                                                            n_bootstraps=100,
-                                                            bootstrap_size=10000,
+                                                            n_bootstraps=50,
+                                                            bootstrap_size=X_train_val.shape[0],
                                                             # pretrain=True,
                                                             )
 
@@ -317,7 +319,7 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
                 f"{combination[0]}_{combination[1]}",
                 f"{combination[1]}_{combination[0]}",
             ])
-        ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
+        ate, ate_l, ate_u = temp(X_train_val, y_train_val, t_train_val, class_weight_dict, clf_learner)
 
         # results_df.loc[-1] = [ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR']
         params_df = create_best_params_df(ate, ate_l, ate_u, ate_u - ate_l, combination, 'S_LR')
@@ -367,14 +369,14 @@ def lr_tlearner_bootstrap(final_data, Test_lr_tlearner):
                 model = pickle.load(f)
                 return model
 
-    def temp(X_test, y_test, t_test, class_weight_dict, clf_learner):
-        ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
-                                                            treatment=t_test,
-                                                            y=y_test,
+    def temp(X_train_val, y_train_val, t_train_val, class_weight_dict, clf_learner):
+        ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_train_val,
+                                                            treatment=t_train_val,
+                                                            y=y_train_val,
                                                             # return_ci=True,
                                                             bootstrap_ci=True,
-                                                            n_bootstraps=100,
-                                                            bootstrap_size=10000,
+                                                            n_bootstraps=50,
+                                                            bootstrap_size=X_train_val.shape[0],
                                                             # pretrain=True,
                                                             )
 
@@ -409,7 +411,7 @@ def lr_tlearner_bootstrap(final_data, Test_lr_tlearner):
                 f"{combination[0]}_{combination[1]}",
                 f"{combination[1]}_{combination[0]}",
             ])
-        ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
+        ate, ate_l, ate_u = temp(X_train_val, y_train_val, t_train_val, class_weight_dict, clf_learner)
 
         # results_df.loc[-1] = [ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR']
         params_df = create_best_params_df(ate, ate_l, ate_u, ate_u - ate_l, combination, 'T_LR')
@@ -592,14 +594,14 @@ def rf_slearner_bootstrap(final_data, Test_rf_slearner):
                 model = pickle.load(f)
                 return model
 
-    def temp(X_test, y_test, t_test, class_weight_dict, clf_learner):
-        ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
-                                                            treatment=t_test,
-                                                            y=y_test,
+    def temp(X_train_val, y_train_val, t_train_val, class_weight_dict, clf_learner):
+        ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_train_val,
+                                                            treatment=t_train_val,
+                                                            y=y_train_val,
                                                             return_ci=True,
                                                             bootstrap_ci=True,
-                                                            n_bootstraps=100,
-                                                            bootstrap_size=10000,
+                                                            n_bootstraps=50,
+                                                            bootstrap_size=X_train_val.shape[0],
                                                             # pretrain=True,
                                                             )
 
@@ -634,7 +636,7 @@ def rf_slearner_bootstrap(final_data, Test_rf_slearner):
                 f"{combination[0]}_{combination[1]}",
                 f"{combination[1]}_{combination[0]}",
             ])
-        ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
+        ate, ate_l, ate_u = temp(X_train_val, y_train_val, t_train_val, class_weight_dict, clf_learner)
 
         # results_df.loc[-1] = [ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR']
         params_df = create_best_params_df(ate, ate_l, ate_u, ate_u - ate_l, combination, 'S_RF')
@@ -684,14 +686,14 @@ def rf_tlearner_bootstrap(final_data, Test_rf_tlearner):
                 model = pickle.load(f)
                 return model
 
-    def temp(X_test, y_test, t_test, class_weight_dict, clf_learner):
-        ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_test,
-                                                            treatment=t_test,
-                                                            y=y_test,
+    def temp(X_train_val, y_train_val, t_train_val, class_weight_dict, clf_learner):
+        ate, ate_lower, ate_upper = clf_learner.estimate_ate(X=X_train_val,
+                                                            treatment=t_train_val,
+                                                            y=y_train_val,
                                                             # return_ci=True,
                                                             bootstrap_ci=True,
-                                                            n_bootstraps=100,
-                                                            bootstrap_size=10000,
+                                                            n_bootstraps=50,
+                                                            bootstrap_size=X_train_val.shape[0],
                                                             # pretrain=True,
                                                             )
 
@@ -726,7 +728,7 @@ def rf_tlearner_bootstrap(final_data, Test_rf_tlearner):
                 f"{combination[0]}_{combination[1]}",
                 f"{combination[1]}_{combination[0]}",
             ])
-        ate, ate_l, ate_u = temp(X_test, y_test, t_test, class_weight_dict, clf_learner)
+        ate, ate_l, ate_u = temp(X_train_val, y_train_val, t_train_val, class_weight_dict, clf_learner)
 
         # results_df.loc[-1] = [ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR']
         params_df = create_best_params_df(ate, ate_l, ate_u, ate_u - ate_l, combination, 'T_RF')
