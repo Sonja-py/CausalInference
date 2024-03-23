@@ -692,7 +692,7 @@ def rf_tlearner_bootstrap(final_data, Test_rf_tlearner):
                                                             y=y_test,
                                                             # return_ci=True,
                                                             bootstrap_ci=True,
-                                                            n_bootstraps=50,
+                                                            n_bootstraps=100,
                                                             bootstrap_size=bs_size,
                                                             # pretrain=True,
                                                             )
