@@ -5,6 +5,8 @@ from datetime import datetime
 from itertools import combinations
 from copy import deepcopy
 import pickle
+from pyspark.sql import DataFrame
+from functools import reduce
 # from statistics import median, mean
 
 from causalml.inference.meta import BaseSClassifier, BaseTClassifier
@@ -1664,8 +1666,11 @@ def unnamed_4(final_data):
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.5771e137-9c50-4eee-9a74-1f2410e7b28b"),
-    combined_hyperparams=Input(rid="ri.foundry.main.dataset.0d645ea3-8041-482e-a548-ea708421e06b")
+    combined_hyperparams=Input(rid="ri.foundry.main.dataset.0d645ea3-8041-482e-a548-ea708421e06b"),
+    ds16=Input(rid="ri.foundry.main.dataset.02565d66-6582-40ef-b528-c2f3d2f4925f")
 )
-def unnamed_5(combined_hyperparams):
-    
+def unnamed_5(combined_hyperparams, ds16):
+    dfs = [combined_hyperparams, ds16]
+    df = reduce(DataFrame.unionAll, dfs)
+    return df
 
