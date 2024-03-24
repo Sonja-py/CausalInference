@@ -1495,7 +1495,7 @@ def unnamed_4(final_data):
     source_df = final_data.toPandas()
     ingredient_list = source_df.ingredient_concept_id.unique()
     ingredient_pairs = sorted(list(combinations(ingredient_list, 2)), reverse=False)
-    print(ingredient_pairs)
+    print(set(ingredient_pairs))
 
     list_combs = [(703547, 725131),
     (703547, 738156),
@@ -1656,5 +1656,5 @@ def unnamed_4(final_data):
 
     print(set(ingredient_pairs) - set(list_combs))
     
-    print(lst)
+    # print(lst)
 
