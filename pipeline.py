@@ -1647,7 +1647,10 @@ def unnamed_4(final_data):
     (44507700, 721724),
     (44507700, 722031)]
 
+    lst = []
     for val in list_combs:
         if val not in ingredient_pairs:
-            print(ingredient_pairs)
+           lst.append(val) 
+    
+    print(lst)
 
