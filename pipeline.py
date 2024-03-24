@@ -1496,5 +1496,5 @@ def unnamed_4(final_data):
     ingredient_list = source_df.ingredient_concept_id.unique()
     ingredient_pairs = sorted(list(combinations(ingredient_list, 2)), reverse=False)
 
-    return ingredient_pairs
+    print(ingredient_pairs)
 
