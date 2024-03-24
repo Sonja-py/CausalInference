@@ -1492,5 +1492,8 @@ def unnamed_3():
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
 def unnamed_4(final_data):
-    
+    ingredient_list = final_data.ingredient_concept_id.unique()
+    ingredient_pairs = sorted(list(combinations(ingredient_list, 2)), reverse=False)
+
+    return ingredient_pairs
 
