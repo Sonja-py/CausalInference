@@ -135,6 +135,16 @@ def cevae(final_data):
         
 
 @transform_pandas(
+    Output(rid="ri.foundry.main.dataset.275b5e62-ddd3-435c-a92f-4fe2a9da8c33"),
+    combined_hyperparams=Input(rid="ri.foundry.main.dataset.0d645ea3-8041-482e-a548-ea708421e06b"),
+    ds16=Input(rid="ri.foundry.main.dataset.02565d66-6582-40ef-b528-c2f3d2f4925f")
+)
+def combined_hyperparameters(combined_hyperparams, ds16):
+    dfs = [combined_hyperparams, ds16]
+    df = reduce(DataFrame.unionAll, dfs)
+    return df
+
+@transform_pandas(
     Output(rid="ri.foundry.main.dataset.39b1c667-50bf-4352-adb1-b33a3ba8ac47"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
@@ -1663,14 +1673,4 @@ def unnamed_4(final_data):
     print(set_list - set_ing)
     
     # print(lst)
-
-@transform_pandas(
-    Output(rid="ri.vector.main.execute.5771e137-9c50-4eee-9a74-1f2410e7b28b"),
-    combined_hyperparams=Input(rid="ri.foundry.main.dataset.0d645ea3-8041-482e-a548-ea708421e06b"),
-    ds16=Input(rid="ri.foundry.main.dataset.02565d66-6582-40ef-b528-c2f3d2f4925f")
-)
-def unnamed_5(combined_hyperparams, ds16):
-    dfs = [combined_hyperparams, ds16]
-    df = reduce(DataFrame.unionAll, dfs)
-    return df
 
