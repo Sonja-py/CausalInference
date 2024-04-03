@@ -1754,6 +1754,7 @@ def unnamed_5(final_data, Test_lr_slearner):
                 f"{combination[0]}_{combination[1]}",
                 f"{combination[1]}_{combination[0]}",
             ])
+        print('No issues yet')
         ate, ate_l, ate_u = temp(X_test, y_test, t_test, X_train_val.shape[0], class_weight_dict, clf_learner)
 
         # results_df.loc[-1] = [ate, ate_l, ate_u, ate_u - ate_l, combination[0], combination[1], 'S_LR']
