@@ -1317,10 +1317,38 @@ def testing(final_data):
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.358a4ee9-2f0f-4be6-bec9-b5d34727750f"),
-    Test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405")
+    Test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
-def unnamed(Test_lr_slearner):
+def unnamed(Test_lr_slearner, final_data):
+    def sample(datasetOfZippedFiles, filename):
+        df = datasetOfZippedFiles
+        fs = df.filesystem() # This is the FileSystem object.
+        
+        try:
+            with fs.open(f"{filename[0]}.pickle", mode="rb") as f:
+                model = pickle.load(f)
+                return model
+        except Exception as e:
+            with fs.open(f"{filename[1]}.pickle", mode="rb") as f:
+                model = pickle.load(f)
+                return model
+
     
+    main_df = final_data.toPandas()
+    # results_df = pd.DataFrame(columns=['ate', 'ate_lower', 'ate_upper', 'variance', 'drug_0', 'drug_1', 'model'])
+    # ingredient_list = main_df.ingredient_concept_id.unique()
+    # ingredient_pairs = list(combinations(ingredient_list, 2))
+    ingredient_pairs = [(40234834, 710062)]
+    for idx, combination in enumerate(ingredient_pairs):
+        model = sample(Test_lr_slearner, [
+                    f"{combination[0]}_{combination[1]}",
+                    f"{combination[1]}_{combination[0]}",
+                ])
+
+        break
+    print(model)
+    return model
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.89021ed6-53c2-4027-8855-4b7e05f30b16"),
