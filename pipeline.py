@@ -1,49 +1,49 @@
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from datetime import datetime
-from itertools import combinations
-from copy import deepcopy
-import pickle
-from pyspark.sql import DataFrame
-from functools import reduce
-# from statistics import median, mean
+# import numpy as np
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# from datetime import datetime
+# from itertools import combinations
+# from copy import deepcopy
+# import pickle
+# from pyspark.sql import DataFrame
+# from functools import reduce
+# # from statistics import median, mean
 
-from causalml.inference.meta import BaseSClassifier, BaseTClassifier
-# from causalml.inference.nn import CEVAE
-# from pyro.contrib.cevae import CEVAE
+# from causalml.inference.meta import BaseSClassifier, BaseTClassifier
+# # from causalml.inference.nn import CEVAE
+# # from pyro.contrib.cevae import CEVAE
 
-from sklearn.utils import class_weight
-from sklearn.metrics import roc_auc_score, make_scorer
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split, StratifiedKFold
+# from sklearn.utils import class_weight
+# from sklearn.metrics import roc_auc_score, make_scorer
+# from sklearn.ensemble import RandomForestClassifier
+# from sklearn.linear_model import LogisticRegression
+# from sklearn.model_selection import train_test_split, StratifiedKFold
 
-# Save error metrics
-def write_text_file(data, metric):
-    output = Transforms.get_output()
-    output_fs = output.filesystem()
-    metric, learner = metric.split('_')
+# # Save error metrics
+# def write_text_file(data, metric):
+#     output = Transforms.get_output()
+#     output_fs = output.filesystem()
+#     metric, learner = metric.split('_')
     
-    if metric == 'rocs' and learner == 'r':
-        filename = 'roc_r.txt'
-    elif metric == 'rocs' and learner == 'l':
-        filename = 'roc_l.txt'
-    elif metric == 'ates' and learner == 'r':
-        filename = 'ate_r.txt'
-    else:
-        filename = 'ate_l.txt'
-    with output_fs.open(filename, 'w') as f: 
-        f.write(str(data))
+#     if metric == 'rocs' and learner == 'r':
+#         filename = 'roc_r.txt'
+#     elif metric == 'rocs' and learner == 'l':
+#         filename = 'roc_l.txt'
+#     elif metric == 'ates' and learner == 'r':
+#         filename = 'ate_r.txt'
+#     else:
+#         filename = 'ate_l.txt'
+#     with output_fs.open(filename, 'w') as f: 
+#         f.write(str(data))
    
 
-# Save GS model
-def to_pickle(data, filename):
-    output = Transforms.get_output()
-    output_fs = output.filesystem()
+# # Save GS model
+# def to_pickle(data, filename):
+#     output = Transforms.get_output()
+#     output_fs = output.filesystem()
     
-    with output_fs.open(f'{filename}.pickle', 'wb') as f:
-        pickle.dump(data, f)
+#     with output_fs.open(f'{filename}.pickle', 'wb') as f:
+#         pickle.dump(data, f)
 
         
 
