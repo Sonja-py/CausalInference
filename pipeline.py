@@ -170,6 +170,8 @@ def lr_slearner(final_data):
     def grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, model):
         best_roc = 0.0
         best_ate = 0.0
+        best_yhat = 0.0
+        best_that = 0.0
         l1_ratio = None
         roc_auc_scorer = make_scorer(roc_auc_score, greater_is_better=True, needs_threshold=True)
         # estim_1 = ['elasticnet'] # penalty
@@ -189,6 +191,8 @@ def lr_slearner(final_data):
                 if roc > best_roc:
                     best_ate = ate
                     best_roc = roc
+                    best_yhat = yhat_cs
+                    best_that = yhat_ts
                     # best_params = {'parameters': [('n_estimators', estimator), ('criterion', criterion), ('max_depth', depth)]}
                     best_params = {'n_estimators': np.nan, 
                                     'criterion': np.nan,
@@ -200,7 +204,7 @@ def lr_slearner(final_data):
                                     }
                 # print(f'l1_ratio {crit_2}, C {crit_4}, roc {roc}')
                 # print(f'Done - penalty: {crit_1}, C: {crit_2}, max_iter: {crit_3}, solver: {crit_4}')
-        return best_roc, best_ate, best_params
+        return best_roc, best_ate, best_params, best_yhat, best_that
 
     # Create and get the data for pair of different antidepressants
     main_df = final_data.toPandas()
