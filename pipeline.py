@@ -213,7 +213,7 @@ def lr_slearner(final_data):
     results_df = pd.DataFrame()
     ingredient_list = main_df.ingredient_concept_id.unique()
     ingredient_pairs = list(combinations(ingredient_list, 2))
-    initial_time = datetime.now()
+    # initial_time = datetime.now()
     # ingredient_pairs = [(716968, 19080226), (739138, 703547)]
     # threshold = 0.4
     rocs_l = []
@@ -222,7 +222,7 @@ def lr_slearner(final_data):
     ates_l = []
 
     for idx, combination in enumerate(ingredient_pairs):
-        start_time = datetime.now()
+        # start_time = datetime.now()
         print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
         df = main_df.copy()
         df = df[df.ingredient_concept_id.isin(list(combination))]
@@ -252,9 +252,9 @@ def lr_slearner(final_data):
         best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, best_yhat, best_that, 'LR')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
 
-        print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
+        # print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
-    print('Total time taken:',datetime.now() - initial_time)
+    # print('Total time taken:',datetime.now() - initial_time)
 
     return results_df
 
