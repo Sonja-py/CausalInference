@@ -159,9 +159,11 @@ def lr_slearner(final_data):
         ate = ite.mean()
         return roc, ate
 
-    def create_best_params_df(best_params, best_roc, best_ate, combination, model):
+    def create_best_params_df(best_params, best_roc, best_ate, combination, best_yhat, best_that, model):
         best_params['roc'] = best_roc
         best_params['ate'] = best_ate
+        best_params['y_hat'] = best_yhat
+        best_params['t_hat'] = best_that
         best_params['drug_0'] = combination[0]
         best_params['drug_1'] = combination[1]
         best_params['model'] = model
@@ -245,9 +247,9 @@ def lr_slearner(final_data):
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
     
-        best_roc, best_ate, best_params = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'LR')
+        best_roc, best_ate, best_params, best_yhat, best_that = grid_search(X_train, y_train, t_train, X_valid, y_valid, t_valid, class_weight_dict, 'LR')
         print(f'ROC: {best_roc}, {best_params}')
-        best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, 'LR')
+        best_params_df = create_best_params_df(best_params, best_roc, best_ate, combination, best_yhat, best_that, 'LR')
         results_df = pd.concat([results_df, best_params_df], ignore_index=True)
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
