@@ -264,6 +264,7 @@ def lr_slearner(final_data):
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
 from datetime import datetime
+from sklearn.model_selection import train_test_split
 
 def lr_slearner_bootstrap(final_data, Test_lr_slearner):
     def metrics(y, t, ite, yhat_cs, yhat_ts):
