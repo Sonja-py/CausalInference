@@ -265,6 +265,7 @@ def lr_slearner(final_data):
 )
 from datetime import datetime
 from sklearn.model_selection import train_test_split
+from sklearn.utils import compute_class_weight
 
 def lr_slearner_bootstrap(final_data, Test_lr_slearner):
     def metrics(y, t, ite, yhat_cs, yhat_ts):
