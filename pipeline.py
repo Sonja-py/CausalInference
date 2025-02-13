@@ -792,6 +792,15 @@ def rf_tlearner_bootstrap(final_data, Test_rf_tlearner):
     Output(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
+from sklearn.utils import class_weight
+from itertools import combinations
+from sklearn.base import BaseEstimator
+from causalml.inference.meta import BaseSClassifier
 def test_lr_slearner(final_data):
     import warnings
     warnings.filterwarnings('ignore')
