@@ -500,6 +500,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.utils import class_weight
 from itertools import combinations
 from sklearn.base import BaseEstimator
+from causalml.inference.meta import BaseSClassifier
 
 def rf_slearner(final_data):
 
