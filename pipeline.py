@@ -492,6 +492,15 @@ def meta_learners_bootstrapped(final_data):
     Output(rid="ri.foundry.main.dataset.c55c9d7f-ff97-450b-8d2c-fabecfaaa8ab"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
+from sklearn.utils import class_weight
+from itertools import combinations
+from sklearn.base import BaseEstimator
+
 def rf_slearner(final_data):
 
     def metrics(y_valid, t_valid, ite, yhat_cs, yhat_ts):
