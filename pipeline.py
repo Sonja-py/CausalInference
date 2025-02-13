@@ -1371,6 +1371,14 @@ def unnamed(Test_lr_slearner, final_data):
     return model
 
 @transform_pandas(
+    Output(rid="ri.vector.main.execute.7fbdc1e1-5256-4228-a479-d060987c67c6")
+)
+from pyspark.sql.types import *
+def unnamed_1():
+    schema = StructType([])
+    return spark.createDataFrame([[]], schema=schema)
+
+@transform_pandas(
     Output(rid="ri.vector.main.execute.89021ed6-53c2-4027-8855-4b7e05f30b16"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
