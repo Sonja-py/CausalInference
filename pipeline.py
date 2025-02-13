@@ -263,9 +263,15 @@ def lr_slearner(final_data):
     Test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
-from datetime import datetime
+import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
 from sklearn.utils import class_weight
+from itertools import combinations
+from sklearn.base import BaseEstimator
+from causalml.inference.meta import BaseSClassifier
 
 def lr_slearner_bootstrap(final_data, Test_lr_slearner):
     def metrics(y, t, ite, yhat_cs, yhat_ts):
@@ -686,6 +692,15 @@ def rf_slearner_bootstrap(final_data, Test_rf_slearner):
     Test_rf_tlearner=Input(rid="ri.foundry.main.dataset.3cbc3c8c-65b6-4f67-8c4e-40bc4da8bbe8"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
+from sklearn.utils import class_weight
+from itertools import combinations
+from sklearn.base import BaseEstimator
+from causalml.inference.meta import BaseSClassifier
 def rf_tlearner_bootstrap(final_data, Test_rf_tlearner):
     def metrics(y, t, ite, yhat_cs, yhat_ts):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
