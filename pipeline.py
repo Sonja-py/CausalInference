@@ -803,9 +803,15 @@ from itertools import combinations
 from sklearn.base import BaseEstimator
 from causalml.inference.meta import BaseSClassifier
 from datetime import datetime
+import pickle
+
 def test_lr_slearner(final_data):
     import warnings
     warnings.filterwarnings('ignore')
+
+    def save_model_to_pickle(model, file_name):
+        with open(file_name + '.pkl', 'wb') as f:
+            pickle.dump(model, f)
 
     def metrics(y, t, ite, yhat_cs, yhat_ts):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
@@ -903,7 +909,7 @@ def test_lr_slearner(final_data):
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
-        to_pickle(best_model, f'{combination[0]}_{combination[1]}')
+        save_model_to_pickle(best_model, f'{combination[0]}_{combination[1]}')
     print('Total time taken:',datetime.now() - initial_time)
 
     return results_df
