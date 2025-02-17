@@ -298,11 +298,11 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         fs = df.filesystem() # This is the FileSystem object.
         
         try:
-            with fs.open(f"{filename[0]}.pickle", mode="rb") as f:
+            with fs.open(f"{filename[0]}.pkl", mode="rb") as f:
                 model = pickle.load(f)
                 return model
         except Exception as e:
-            with fs.open(f"{filename[1]}.pickle", mode="rb") as f:
+            with fs.open(f"{filename[1]}.pkl", mode="rb") as f:
                 model = pickle.load(f)
                 return model
 
