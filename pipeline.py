@@ -8,7 +8,7 @@ import pickle
 from pyspark.sql import DataFrame
 from functools import reduce
 from statistics import median, mean
-import causalml.inference.nn
+
 from causalml.inference.meta import BaseSClassifier, BaseTClassifier
 
 from pyro.contrib.cevae import CEVAE
