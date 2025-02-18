@@ -10,9 +10,9 @@ from functools import reduce
 from statistics import median, mean
 
 from causalml.inference.meta import BaseSClassifier, BaseTClassifier
-from causalml.inference.nn import CEVAE
+from causalml.inference.nn import cevae
+import causalml.inference.nn
 from pyro.contrib.cevae import CEVAE
-from causalml.inference.nn
 from sklearn.utils import class_weight
 from sklearn.metrics import roc_auc_score, make_scorer
 from sklearn.ensemble import RandomForestClassifier
