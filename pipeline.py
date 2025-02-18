@@ -8,10 +8,9 @@ import pickle
 from pyspark.sql import DataFrame
 from functools import reduce
 from statistics import median, mean
-
-from causalml.inference.meta import BaseSClassifier, BaseTClassifier
-from causalml.inference.nn import cevae
 import causalml.inference.nn
+from causalml.inference.meta import BaseSClassifier, BaseTClassifier
+
 from pyro.contrib.cevae import CEVAE
 from sklearn.utils import class_weight
 from sklearn.metrics import roc_auc_score, make_scorer
@@ -44,8 +43,6 @@ def to_pickle(data, filename):
     
     with output_fs.open(f'{filename}.pickle', 'wb') as f:
         pickle.dump(data, f)
-
-        
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.aa8fcdda-8570-4c04-b0d5-3b1afa7d04e6"),
