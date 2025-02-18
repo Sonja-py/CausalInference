@@ -296,7 +296,7 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
     def sample(datasetOfZippedFiles, filename):
         df = datasetOfZippedFiles
         fs = df.filesystem() # This is the FileSystem object.
-        
+        print(df.filesystem().ls())
         try:
             with fs.open(f"{filename[0]}.pkl", mode="rb") as f:
                 model = pickle.load(f)
@@ -1408,6 +1408,14 @@ def unnamed(Test_lr_slearner, final_data):
 )
 from pyspark.sql.types import *
 def unnamed_1():
+    schema = StructType([])
+    return spark.createDataFrame([[]], schema=schema)
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.d8bccc7a-6fb3-4024-a64e-dcd15a852ce9")
+)
+from pyspark.sql.types import *
+def unnamed_2():
     schema = StructType([])
     return spark.createDataFrame([[]], schema=schema)
 
