@@ -1,49 +1,49 @@
 import numpy as np
 import pandas as pd
-# import matplotlib.pyplot as plt
-# from datetime import datetime
+import matplotlib.pyplot as plt
+from datetime import datetime
 from itertools import combinations
-# from copy import deepcopy
+from copy import deepcopy
 import pickle
 from pyspark.sql import DataFrame
-# from functools import reduce
-# # from statistics import median, mean
+from functools import reduce
+from statistics import median, mean
 
-# from causalml.inference.meta import BaseSClassifier, BaseTClassifier
-# # from causalml.inference.nn import CEVAE
-# # from pyro.contrib.cevae import CEVAE
+from causalml.inference.meta import BaseSClassifier, BaseTClassifier
+from causalml.inference.nn import CEVAE
+from pyro.contrib.cevae import CEVAE
 
-# from sklearn.utils import class_weight
-# from sklearn.metrics import roc_auc_score, make_scorer
-# from sklearn.ensemble import RandomForestClassifier
-# from sklearn.linear_model import LogisticRegression
-# from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.utils import class_weight
+from sklearn.metrics import roc_auc_score, make_scorer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split, StratifiedKFold
 
-# # Save error metrics
-# def write_text_file(data, metric):
-#     output = Transforms.get_output()
-#     output_fs = output.filesystem()
-#     metric, learner = metric.split('_')
+# Save error metrics
+def write_text_file(data, metric):
+    output = Transforms.get_output()
+    output_fs = output.filesystem()
+    metric, learner = metric.split('_')
     
-#     if metric == 'rocs' and learner == 'r':
-#         filename = 'roc_r.txt'
-#     elif metric == 'rocs' and learner == 'l':
-#         filename = 'roc_l.txt'
-#     elif metric == 'ates' and learner == 'r':
-#         filename = 'ate_r.txt'
-#     else:
-#         filename = 'ate_l.txt'
-#     with output_fs.open(filename, 'w') as f: 
-#         f.write(str(data))
+    if metric == 'rocs' and learner == 'r':
+        filename = 'roc_r.txt'
+    elif metric == 'rocs' and learner == 'l':
+        filename = 'roc_l.txt'
+    elif metric == 'ates' and learner == 'r':
+        filename = 'ate_r.txt'
+    else:
+        filename = 'ate_l.txt'
+    with output_fs.open(filename, 'w') as f: 
+        f.write(str(data))
    
 
-# # Save GS model
-# def to_pickle(data, filename):
-#     output = Transforms.get_output()
-#     output_fs = output.filesystem()
+# Save GS model
+def to_pickle(data, filename):
+    output = Transforms.get_output()
+    output_fs = output.filesystem()
     
-#     with output_fs.open(f'{filename}.pickle', 'wb') as f:
-#         pickle.dump(data, f)
+    with output_fs.open(f'{filename}.pickle', 'wb') as f:
+        pickle.dump(data, f)
 
         
 
@@ -263,17 +263,6 @@ def lr_slearner(final_data):
     Test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import roc_auc_score
-from sklearn.utils import class_weight
-from itertools import combinations
-from sklearn.base import BaseEstimator
-from causalml.inference.meta import BaseSClassifier
-from datetime import datetime
-
 def lr_slearner_bootstrap(final_data, Test_lr_slearner):
     def metrics(y, t, ite, yhat_cs, yhat_ts):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
@@ -793,26 +782,9 @@ def rf_tlearner_bootstrap(final_data, Test_rf_tlearner):
     Output(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split, StratifiedKFold
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import roc_auc_score
-from sklearn.utils import class_weight
-from itertools import combinations
-from sklearn.base import BaseEstimator
-from causalml.inference.meta import BaseSClassifier
-from datetime import datetime
-import pickle
-
 def test_lr_slearner(final_data):
     import warnings
     warnings.filterwarnings('ignore')
-
-    def save_model_to_pickle(model, file_name):
-        with open(file_name + '.pkl', 'wb') as f:
-            pickle.dump(model, f)
 
     def metrics(y, t, ite, yhat_cs, yhat_ts):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
@@ -910,7 +882,7 @@ def test_lr_slearner(final_data):
 
         print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
 
-        save_model_to_pickle(best_model, f'{combination[0]}_{combination[1]}')
+        to_pickle(best_model, f'{combination[0]}_{combination[1]}')
     print('Total time taken:',datetime.now() - initial_time)
 
     return results_df
