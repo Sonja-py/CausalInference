@@ -903,7 +903,7 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
             # 'drug_1': [str(len(list([combination[1] for x in yhat_ts.values()])))],
             # 'treatment': [str(len(t_test.values))],
             'yhat_ts': yhat_ts.values(),
-            'yhat_cs': yhat_cs.values()
+            # 'yhat_cs': yhat_cs.values()
         })
         results_df = pd.concat([results_df, temp_df], ignore_index=True)
         return results_df
