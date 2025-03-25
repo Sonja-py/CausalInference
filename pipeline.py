@@ -896,14 +896,16 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
         
         # Get predictions
         ite, yhat_cs, yhat_ts = model.predict(X_test, return_components=True)
-        
+        yhat_cs = list(yhat_cs.values())[0]
+        yhat_ts = list(yhat_ts.values())[0]
+
         # Store results
         temp_df = pd.DataFrame({
-            # 'drug_0': [str(len(list([combination[0] for x in yhat_ts.values()])))],
-            # 'drug_1': [str(len(list([combination[1] for x in yhat_ts.values()])))],
-            # 'treatment': [str(len(t_test.values))],
-            'yhat_ts': list(yhat_ts.values())[0],
-            # 'yhat_cs': yhat_cs.values()
+            'drug_0': [combination[0] for x in yhat_cs],
+            'drug_1': [combination[1] for x in yhat_cs],
+            'treatment': t_test.values,
+            'yhat_cs': yhat_cs,
+            'yhat_ts': yhat_ts
         })
         results_df = pd.concat([results_df, temp_df])
         # spark_df = spark.createDataFrame(results_df.astype({'yhat_ts': 'int'}))
