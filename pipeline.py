@@ -852,9 +852,21 @@ from datetime import datetime
 from sklearn.model_selection import train_test_split
 
 def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
+
+    def get_model(dataset, combination):
+        fs = dataset.filesystem()
+        try:
+            comb = f"{combination[0]}_{combination[1]}.pickle"
+            with fs.open(comb, mode="rb") as f:
+                model = pickle.load(f)
+                return model
+        except Exception as e:
+            comb = f"{combination[1]}_{combination[0]}.pickle"
+            with fs.open(f"comb", mode="rb") as f:
+                model = pickle.load(f)
+                return model
     # Convert PySpark DataFrame to Pandas
     main_df = final_data.toPandas()
-    
     # Create result storage
     results_df = pd.DataFrame(columns=['drug_0', 'drug_1', 'treatment', 'yhat_ts', 'yhat_cs'])
     
@@ -880,11 +892,7 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
         _, X_test, _, t_test = train_test_split(X, t, test_size=0.2, random_state=42, stratify=t)
         
         # Load pre-trained model for this drug combination
-        model_key = f"{combination[0]}_{combination[1]}"
-        if model_key not in Test_rf_tlearner:
-            model_key = f"{combination[1]}_{combination[0]}"
-        
-        clf_learner = Test_rf_tlearner[model_key]
+        model = get_model(Test_rf_tlearner, combination)
         
         # Get predictions
         yhat_cs, yhat_ts = clf_learner.predict(X_test, return_components=True)
