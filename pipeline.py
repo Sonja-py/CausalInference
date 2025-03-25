@@ -899,8 +899,8 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
         
         # Store results
         temp_df = pd.DataFrame({
-            'drug_0': combination[0],
-            'drug_1': combination[1],
+            'drug_0': [combination[0] for x in yhat_ts] ,
+            'drug_1': [combination[1] for x in yhat_ts],
             'treatment': t_test.values,
             'yhat_ts': yhat_ts,
             'yhat_cs': yhat_cs
