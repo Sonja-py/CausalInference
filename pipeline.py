@@ -910,7 +910,6 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
         results_df = pd.concat([results_df, temp_df])
         # spark_df = spark.createDataFrame(results_df.astype({'yhat_ts': 'int'}))
 
-        return results_df
         print(f'Time taken for combination {idx+1}: {datetime.now() - start_time}')
     
     print('Total time taken:', datetime.now() - initial_time)
