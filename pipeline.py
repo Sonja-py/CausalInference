@@ -506,7 +506,7 @@ def lr_tlearner_bootstrap(final_data, Test_lr_tlearner):
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.e03dbd49-c66c-4ae2-ab4a-b024ffa5c2ac"),
-    Test_rf_tlearner=Input(rid="ri.foundry.main.dataset.3cbc3c8c-65b6-4f67-8c4e-40bc4da8bbe8"),
+    Test_lr_tlearner=Input(rid="ri.foundry.main.dataset.720ebfa7-629e-4ae2-9d4d-e23ab6099284"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
 import pandas as pd
@@ -515,7 +515,7 @@ from itertools import combinations
 from datetime import datetime
 from sklearn.model_selection import train_test_split
 
-def lr_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
+def lr_tlearner_predictions_y0y1(final_data, Test_lr_tlearner):
 
     def get_model(dataset, combination):
         fs = dataset.filesystem()
@@ -560,7 +560,7 @@ def lr_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
         )
         
         # Load pre-trained model for this drug combination
-        model = get_model(Test_rf_tlearner, combination)
+        model = get_model(Test_lr_tlearner, combination)
         
         # Get predictions
         ite, yhat_cs, yhat_ts = model.predict(X_test, return_components=True)
@@ -570,12 +570,12 @@ def lr_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
         # Store results
         temp_df = pd.DataFrame({
             'person': person_test.values,
-            'Y1': yhat_ts
+            'Y1': yhat_ts,
             'Y0': yhat_cs,
             'treatment_drug': t_test.values,
             'drug_0': [combination[0] for x in yhat_cs],
             'drug_1': [combination[1] for x in yhat_cs],
-            'model': ["T_RF" for x in yhat_cs]
+            'model': ["T_LR" for x in yhat_cs]
         })
         results_df = pd.concat([results_df, temp_df])
         # spark_df = spark.createDataFrame(results_df.astype({'yhat_ts': 'int'}))
