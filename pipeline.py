@@ -895,7 +895,7 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
         model = get_model(Test_rf_tlearner, combination)
         
         # Get predictions
-        yhat_cs, yhat_ts = model.predict(X_test, return_components=True)
+        ite, yhat_cs, yhat_ts = model.predict(X_test, return_components=True)
         
         # Store results
         temp_df = pd.DataFrame({
