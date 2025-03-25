@@ -905,7 +905,7 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
             'yhat_ts': yhat_ts.values.astype(int),
             # 'yhat_cs': yhat_cs.values()
         })
-        # results_df = pd.concat([results_df, temp_df], ignore_index=True)
+        results_df = pd.concat([results_df, temp_df], ignore_index=True)
         spark_df = spark.createDataFrame(results_df.astype({'yhat_ts': 'int'}))
 
         return spark_df
