@@ -876,7 +876,7 @@ def rf_slearner_predictions_y0y1(final_data, Test_rf_slearner):
         )
         
         # Load pre-trained model for this drug combination
-        model = get_model(Test_rf_tlearner, combination)
+        model = get_model(Test_rf_slearner, combination)
         
         # Get predictions
         ite, yhat_cs, yhat_ts = model.predict(X_test, return_components=True)
