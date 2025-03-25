@@ -905,7 +905,7 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
             'yhat_ts': [str(yhat_ts)],
             # 'yhat_cs': [yhat_cs]
         })
-        return pd.DataFrame(temp_df)
+        return pd.DataFrame(yhat_ts)
         results_df = pd.concat([results_df, temp_df], ignore_index=True)
         return results_df
         print(f'Time taken for combination {idx+1}: {datetime.now() - start_time}')
