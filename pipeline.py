@@ -877,7 +877,7 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
         t = df['treatment']
         
         # Train-test split
-        _, X_test, _, _, _, t_test = train_test_split(X, t, test_size=0.2, random_state=42, stratify=t)
+        _, X_test, _, t_test = train_test_split(X, t, test_size=0.2, random_state=42, stratify=t)
         
         # Load pre-trained model for this drug combination
         model_key = f"{combination[0]}_{combination[1]}"
