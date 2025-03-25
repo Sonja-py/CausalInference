@@ -875,8 +875,9 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
     ingredient_pairs = list(combinations(ingredient_list, 2))
     
     initial_time = datetime.now()
-    
+    count = 0
     for idx, combination in enumerate(ingredient_pairs):
+        count+=1
         start_time = datetime.now()
         print(f'Running inference for drug pair: {combination} ({idx+1} of {len(ingredient_pairs)})')
         
@@ -909,7 +910,8 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
         })
         results_df = pd.concat([results_df, temp_df])
         # spark_df = spark.createDataFrame(results_df.astype({'yhat_ts': 'int'}))
-
+        if count == 5:
+            return results_df
         print(f'Time taken for combination {idx+1}: {datetime.now() - start_time}')
     
     print('Total time taken:', datetime.now() - initial_time)
