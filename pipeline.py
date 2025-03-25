@@ -902,10 +902,10 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
             # 'drug_0': [str(len(list([combination[0] for x in yhat_ts.values()])))],
             # 'drug_1': [str(len(list([combination[1] for x in yhat_ts.values()])))],
             # 'treatment': [str(len(t_test.values))],
-            'yhat_ts': [type(yhat_ts)],
+            'yhat_ts': [str(type(yhat_ts))],
             # 'yhat_cs': yhat_cs.values()
         })
-        results_df = pd.concat([results_df, temp_df], ignore_index=True)
+        # results_df = pd.concat([results_df, temp_df], ignore_index=True)
         spark_df = spark.createDataFrame(results_df.astype({'yhat_ts': 'int'}))
 
         return spark_df
