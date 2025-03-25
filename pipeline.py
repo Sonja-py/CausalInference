@@ -881,10 +881,10 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
         
         # Load pre-trained model for this drug combination
         model_key = f"{combination[0]}_{combination[1]}"
-        if model_key not in Test_lr_slearner:
+        if model_key not in Test_rf_tlearner:
             model_key = f"{combination[1]}_{combination[0]}"
         
-        clf_learner = Test_lr_slearner[model_key]
+        clf_learner = Test_rf_tlearner[model_key]
         
         # Get predictions
         yhat_cs, yhat_ts = clf_learner.predict(X_test, return_components=True)
