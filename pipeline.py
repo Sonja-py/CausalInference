@@ -899,11 +899,11 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
         
         # Store results
         temp_df = pd.DataFrame({
-            'drug_0': [combination[0] for x in yhat_ts.values()],
-            'drug_1': [combination[1] for x in yhat_ts.values()],
-            'treatment': t_test.values,
-            'yhat_ts': yhat_ts.values(),
-            'yhat_cs': yhat_cs.values()
+            'drug_0': [str(len(list([combination[0] for x in yhat_ts.values()])))],
+            'drug_1': [str(len(list([combination[1] for x in yhat_ts.values()])))],
+            'treatment': [str(len(t_test.values()))],
+            'yhat_ts': [str(len(yhat_ts.values()))],
+            'yhat_cs': [str(len(yhat_cs.values()))]
         })
         results_df = pd.concat([results_df, temp_df], ignore_index=True)
         return results_df
