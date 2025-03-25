@@ -852,6 +852,7 @@ from datetime import datetime
 from sklearn.model_selection import train_test_split
 
 def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
+    return True
     # Convert PySpark DataFrame to Pandas
     main_df = final_data.toPandas()
     
