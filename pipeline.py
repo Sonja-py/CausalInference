@@ -853,58 +853,58 @@ from sklearn.model_selection import train_test_split
 
 def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
     return True
-    # Convert PySpark DataFrame to Pandas
-    main_df = final_data.toPandas()
+    # # Convert PySpark DataFrame to Pandas
+    # main_df = final_data.toPandas()
     
-    # Create result storage
-    results_df = pd.DataFrame(columns=['drug_0', 'drug_1', 'treatment', 'yhat_ts', 'yhat_cs'])
+    # # Create result storage
+    # results_df = pd.DataFrame(columns=['drug_0', 'drug_1', 'treatment', 'yhat_ts', 'yhat_cs'])
     
-    # Get unique drug combinations
-    ingredient_list = main_df.ingredient_concept_id.unique()
-    ingredient_pairs = list(combinations(ingredient_list, 2))
+    # # Get unique drug combinations
+    # ingredient_list = main_df.ingredient_concept_id.unique()
+    # ingredient_pairs = list(combinations(ingredient_list, 2))
     
-    initial_time = datetime.now()
+    # initial_time = datetime.now()
     
-    for idx, combination in enumerate(ingredient_pairs):
-        start_time = datetime.now()
-        print(f'Running inference for drug pair: {combination} ({idx+1} of {len(ingredient_pairs)})')
+    # for idx, combination in enumerate(ingredient_pairs):
+    #     start_time = datetime.now()
+    #     print(f'Running inference for drug pair: {combination} ({idx+1} of {len(ingredient_pairs)})')
         
-        # Filter data for current drug pair
-        df = main_df[main_df.ingredient_concept_id.isin(combination)].copy()
-        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
+    #     # Filter data for current drug pair
+    #     df = main_df[main_df.ingredient_concept_id.isin(combination)].copy()
+    #     df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
         
-        # Define features and labels
-        X = df.drop(columns=['person_id', 'severity_final', 'ingredient_concept_id', 'treatment'])
-        t = df['treatment']
+    #     # Define features and labels
+    #     X = df.drop(columns=['person_id', 'severity_final', 'ingredient_concept_id', 'treatment'])
+    #     t = df['treatment']
         
-        # Train-test split
-        _, X_test, _, _, _, t_test = train_test_split(X, t, test_size=0.2, random_state=42, stratify=t)
+    #     # Train-test split
+    #     _, X_test, _, _, _, t_test = train_test_split(X, t, test_size=0.2, random_state=42, stratify=t)
         
-        # Load pre-trained model for this drug combination
-        model_key = f"{combination[0]}_{combination[1]}"
-        if model_key not in Test_lr_slearner:
-            model_key = f"{combination[1]}_{combination[0]}"
+    #     # Load pre-trained model for this drug combination
+    #     model_key = f"{combination[0]}_{combination[1]}"
+    #     if model_key not in Test_lr_slearner:
+    #         model_key = f"{combination[1]}_{combination[0]}"
         
-        clf_learner = Test_lr_slearner[model_key]
+    #     clf_learner = Test_lr_slearner[model_key]
         
-        # Get predictions
-        yhat_cs, yhat_ts = clf_learner.predict(X_test, return_components=True)
+    #     # Get predictions
+    #     yhat_cs, yhat_ts = clf_learner.predict(X_test, return_components=True)
         
-        # Store results
-        temp_df = pd.DataFrame({
-            'drug_0': combination[0],
-            'drug_1': combination[1],
-            'treatment': t_test.values,
-            'yhat_ts': yhat_ts,
-            'yhat_cs': yhat_cs
-        })
-        results_df = pd.concat([results_df, temp_df], ignore_index=True)
+    #     # Store results
+    #     temp_df = pd.DataFrame({
+    #         'drug_0': combination[0],
+    #         'drug_1': combination[1],
+    #         'treatment': t_test.values,
+    #         'yhat_ts': yhat_ts,
+    #         'yhat_cs': yhat_cs
+    #     })
+    #     results_df = pd.concat([results_df, temp_df], ignore_index=True)
         
-        print(f'Time taken for combination {idx+1}: {datetime.now() - start_time}')
+    #     print(f'Time taken for combination {idx+1}: {datetime.now() - start_time}')
     
-    print('Total time taken:', datetime.now() - initial_time)
+    # print('Total time taken:', datetime.now() - initial_time)
     
-    return results_df
+    # return results_df
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
