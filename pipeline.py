@@ -1038,8 +1038,12 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
         X = df.drop(columns=['person_id', 'severity_final', 'ingredient_concept_id', 'treatment'])
         t = df['treatment']
         
-        # Train-test split
-        _, X_test, _, t_test = train_test_split(X, t, test_size=0.2, random_state=42, stratify=t)
+        person_ids = df['person_id']  # Store person_id before split
+
+        # Train-test split (also split person_ids accordingly)
+        X_train, X_test, t_train, t_test, person_train, person_test = train_test_split(
+            X, t, person_ids, test_size=0.2, random_state=42, stratify=t
+        )
         
         # Load pre-trained model for this drug combination
         model = get_model(Test_rf_tlearner, combination)
@@ -1051,11 +1055,13 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
 
         # Store results
         temp_df = pd.DataFrame({
+            'person': person_test.values,
+            'Y1': yhat_ts
+            'Y0': yhat_cs,
+            'treatment_drug': t_test.values,
             'drug_0': [combination[0] for x in yhat_cs],
             'drug_1': [combination[1] for x in yhat_cs],
-            'treatment': t_test.values,
-            'yhat_cs': yhat_cs,
-            'yhat_ts': yhat_ts
+            'model': ["T_RF" for x in yhat_cs]
         })
         results_df = pd.concat([results_df, temp_df])
         # spark_df = spark.createDataFrame(results_df.astype({'yhat_ts': 'int'}))
