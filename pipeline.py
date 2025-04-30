@@ -349,8 +349,8 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.c8e53f01-c7d2-4965-b42e-92d48eeb9197"),
-    Test_rf_slearner=Input(rid="ri.foundry.main.dataset.d8a3ce5b-5472-4704-9d3a-205920048c80"),
-    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498"),
+    test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405")
 )
 import pandas as pd
 import numpy as np
@@ -358,7 +358,7 @@ from itertools import combinations
 from datetime import datetime
 from sklearn.model_selection import train_test_split
 
-def lr_slearner_predictions_y0y1(final_data, Test_rf_slearner):
+def lr_slearner_predictions_y0y1(final_data, test_lr_slearner):
 
     def get_model(dataset, combination):
         fs = dataset.filesystem()
