@@ -45,71 +45,6 @@ def to_pickle(data, filename):
         pickle.dump(data, f)
 
 @transform_pandas(
-    Output(rid="ri.foundry.main.dataset.c8e53f01-c7d2-4965-b42e-92d48eeb9197"),
-    Test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
-    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
-)
-import pandas as pd
-import numpy as np
-from itertools import combinations
-from datetime import datetime
-from sklearn.model_selection import train_test_split
-
-def Lr_slearner_predictions_y0y1(final_data, Test_lr_slearner):
-    # Convert PySpark DataFrame to Pandas
-    main_df = final_data.toPandas()
-    
-    # Create result storage
-    results_df = pd.DataFrame(columns=['drug_0', 'drug_1', 'treatment', 'yhat_ts', 'yhat_cs'])
-    
-    # Get unique drug combinations
-    ingredient_list = main_df.ingredient_concept_id.unique()
-    ingredient_pairs = list(combinations(ingredient_list, 2))
-    
-    initial_time = datetime.now()
-    
-    for idx, combination in enumerate(ingredient_pairs):
-        start_time = datetime.now()
-        print(f'Running inference for drug pair: {combination} ({idx+1} of {len(ingredient_pairs)})')
-        
-        # Filter data for current drug pair
-        df = main_df[main_df.ingredient_concept_id.isin(combination)].copy()
-        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
-        
-        # Define features and labels
-        X = df.drop(columns=['person_id', 'severity_final', 'ingredient_concept_id', 'treatment'])
-        t = df['treatment']
-        
-        # Train-test split
-        _, X_test, _, _, _, t_test = train_test_split(X, t, test_size=0.2, random_state=42, stratify=t)
-        
-        # Load pre-trained model for this drug combination
-        model_key = f"{combination[0]}_{combination[1]}"
-        if model_key not in Test_lr_slearner:
-            model_key = f"{combination[1]}_{combination[0]}"
-        
-        clf_learner = Test_lr_slearner[model_key]
-        
-        # Get predictions
-        yhat_cs, yhat_ts = clf_learner.predict(X_test, return_components=True)
-        
-        # Store results
-        temp_df = pd.DataFrame({
-            'drug_0': combination[0],
-            'drug_1': combination[1],
-            'treatment': t_test.values,
-            'yhat_ts': yhat_ts,
-            'yhat_cs': yhat_cs
-        })
-        results_df = pd.concat([results_df, temp_df], ignore_index=True)
-        
-        print(f'Time taken for combination {idx+1}: {datetime.now() - start_time}')
-    
-    print('Total time taken:', datetime.now() - initial_time)
-    
-    return results_df
-
-@transform_pandas(
     Output(rid="ri.foundry.main.dataset.aa8fcdda-8570-4c04-b0d5-3b1afa7d04e6"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
@@ -410,6 +345,87 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
     #     to_pickle(best_model, f'{combination[0]}_{combination[1]}')
     print('Total time taken:',datetime.now() - initial_time)
 
+    return results_df
+
+@transform_pandas(
+    Output(rid="ri.foundry.main.dataset.c8e53f01-c7d2-4965-b42e-92d48eeb9197"),
+    Test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+)
+import pandas as pd
+import numpy as np
+from itertools import combinations
+from datetime import datetime
+from sklearn.model_selection import train_test_split
+
+def lr_slearner_predictions_y0y1(final_data, Test_lr_slearner):
+
+    def get_model(dataset, combination):
+        fs = dataset.filesystem()
+        try:
+            comb = f"{combination[0]}_{combination[1]}.pickle"
+            with fs.open(comb, mode="rb") as f:
+                model = pickle.load(f)
+                return model
+        except Exception as e:
+            comb = f"{combination[1]}_{combination[0]}.pickle"
+            with fs.open(f"comb", mode="rb") as f:
+                model = pickle.load(f)
+                return model
+    # Convert PySpark DataFrame to Pandas
+    main_df = final_data.toPandas()
+    # Create result storage
+    results_df = pd.DataFrame()
+    
+    # Get unique drug combinations
+    ingredient_list = main_df.ingredient_concept_id.unique()
+    ingredient_pairs = list(combinations(ingredient_list, 2))
+    
+    initial_time = datetime.now()
+    count = 0
+    for idx, combination in enumerate(ingredient_pairs):
+        start_time = datetime.now()
+        print(f'Running inference for drug pair: {combination} ({idx+1} of {len(ingredient_pairs)})')
+        
+        # Filter data for current drug pair
+        df = main_df[main_df.ingredient_concept_id.isin(combination)].copy()
+        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
+        
+        # Define features and labels
+        X = df.drop(columns=['person_id', 'severity_final', 'ingredient_concept_id', 'treatment'])
+        t = df['treatment']
+        
+        person_ids = df['person_id']  # Store person_id before split
+
+        # Train-test split (also split person_ids accordingly)
+        X_train, X_test, t_train, t_test, person_train, person_test = train_test_split(
+            X, t, person_ids, test_size=0.2, random_state=42, stratify=t
+        )
+        
+        # Load pre-trained model for this drug combination
+        model = get_model(Test_lr_slearner, combination)
+        
+        # Get predictions
+        ite, yhat_cs, yhat_ts = model.predict(X_test, return_components=True)
+        yhat_cs = list(yhat_cs.values())[0]
+        yhat_ts = list(yhat_ts.values())[0]
+
+        # Store results
+        temp_df = pd.DataFrame({
+            'person': person_test.values,
+            'Y1': yhat_ts,
+            'Y0': yhat_cs,
+            'treatment_drug': t_test.values,
+            'drug_0': [combination[0] for x in yhat_cs],
+            'drug_1': [combination[1] for x in yhat_cs],
+            'model': ["S_RF" for x in yhat_cs]
+        })
+        results_df = pd.concat([results_df, temp_df])
+        # spark_df = spark.createDataFrame(results_df.astype({'yhat_ts': 'int'}))
+        print(f'Time taken for combination {idx+1}: {datetime.now() - start_time}')
+    
+    print('Total time taken:', datetime.now() - initial_time)
+    
     return results_df
 
 @transform_pandas(
