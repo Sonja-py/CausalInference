@@ -403,7 +403,7 @@ def lr_slearner_predictions_y0y1(final_data, test_lr_slearner):
         )
         
         # Load pre-trained model for this drug combination
-        model = get_model(Test_lr_slearner, combination)
+        model = get_model(test_lr_slearner, combination)
         
         # Get predictions
         ite, yhat_cs, yhat_ts = model.predict(X_test, return_components=True)
