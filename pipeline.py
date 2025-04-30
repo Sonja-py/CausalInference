@@ -257,10 +257,10 @@ def lr_slearner(final_data):
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.2c30c167-7995-4e2a-849d-9fb7c5a109d2"),
-    Test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
-    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498"),
+    test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405")
 )
-def lr_slearner_bootstrap(final_data, Test_lr_slearner):
+def lr_slearner_bootstrap(final_data, test_lr_slearner):
     def metrics(y, t, ite, yhat_cs, yhat_ts):
         yhat_cs, yhat_ts = np.array(list(yhat_cs.values())[0]), np.array(list(yhat_ts.values())[0])
         preds = (1. - t) * yhat_cs + t * yhat_ts
@@ -284,11 +284,11 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         fs = df.filesystem() # This is the FileSystem object.
         print(df.filesystem().ls())
         try:
-            with fs.open(f"{filename[0]}.pkl", mode="rb") as f:
+            with fs.open(f"{filename[0]}.pickle", mode="rb") as f:
                 model = pickle.load(f)
                 return model
         except Exception as e:
-            with fs.open(f"{filename[1]}.pkl", mode="rb") as f:
+            with fs.open(f"{filename[1]}.pickle", mode="rb") as f:
                 model = pickle.load(f)
                 return model
 
@@ -330,7 +330,7 @@ def lr_slearner_bootstrap(final_data, Test_lr_slearner):
         class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
         class_weight_dict = dict(enumerate(class_weights))
         
-        clf_learner = sample(Test_lr_slearner, [
+        clf_learner = sample(test_lr_slearner, [
                 f"{combination[0]}_{combination[1]}",
                 f"{combination[1]}_{combination[0]}",
             ])
