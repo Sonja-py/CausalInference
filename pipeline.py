@@ -11,7 +11,6 @@ from statistics import median, mean
 
 from causalml.inference.meta import BaseSClassifier, BaseTClassifier
 
-from pyro.contrib.cevae import CEVAE
 from sklearn.utils import class_weight
 from sklearn.metrics import roc_auc_score, make_scorer
 from sklearn.ensemble import RandomForestClassifier
@@ -43,93 +42,6 @@ def to_pickle(data, filename):
     
     with output_fs.open(f'{filename}.pickle', 'wb') as f:
         pickle.dump(data, f)
-
-@transform_pandas(
-    Output(rid="ri.foundry.main.dataset.aa8fcdda-8570-4c04-b0d5-3b1afa7d04e6"),
-    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
-)
-def cevae(final_data):
-
-    # Create and get the data for pair of different antidepressants
-    main_df = final_data.toPandas()
-    ingredient_list = main_df.ingredient_concept_id.unique()[:2]
-    ingredient_pairs = list(combinations(ingredient_list, 2))
-    # rocs = []
-    ates = []
-
-    for idx, combination in enumerate(ingredient_pairs):
-        start_time = datetime.now()
-        print(f'-----------Running CEVAE for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
-        df = main_df[main_df.ingredient_concept_id.isin(list(combination))]
-        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
-
-        X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
-        y = df['severity_final']
-        t = df['treatment']
-
-        # np.random.seed(3)
-
-        X_train_val, X_test, y_train_val, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-        X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test, test_size = 0.2, random_state = 42, stratify = y_test)
-
-        # Cross-validation setup
-        kf = KFold(n_splits=5, shuffle=True, random_state=42)
-
-        # Parameter grid (you should customize this)
-        param_grid = [
-            {'dim_hidden': 20, 'dim_latent': 5, 'num_layers': 2},
-            {'dim_hidden': 20, 'dim_latent': 5, 'num_layers': 3},
-            # Add more parameter combinations as needed
-        ]
-
-        # Best model score and parameters
-        best_score = 0
-        best_params = None
-
-        # Loop over each fold
-        for train_index, test_index in kf.split(X):
-            X_train, X_test = X[train_index], X[test_index]
-            t_train, t_test = t[train_index], t[test_index]
-            y_train, y_test = y[train_index], y[test_index]
-            
-            # Inner loop: iterate over all possible combinations of parameters
-            for params in param_grid:
-                # Initialize and fit the CEVAE model with current set of parameters
-                cevae = CEVAE(outcome_dist="binary", **params)
-                cevae.fit(X=X_train, treatment=t_train, y=y_train)
-                
-                # Predict the causal effect on the validation data
-                y_pred = cevae.predict(X_test)
-                
-                # Calculate ROC AUC score
-                score = roc_auc_score(y_test, y_pred)
-                
-                # Update best score and parameters if current model is better
-                if score > best_score:
-                    best_score = score
-                    best_params = params
-
-        # Print out the best parameter set and its performance
-        print(f'Best parameters: {best_params}')
-        print(f'Best ROC AUC score: {best_score}')
-        t_train = t[X_train.index]
-        t_test = t[X_test.index]
-        t_valid = t[X_valid.index]
-
-        class_weights = class_weight.compute_class_weight(class_weight = 'balanced', classes = np.unique(y), y = y)
-        class_weight_dict = dict(enumerate(class_weights))
-        print('Class weights dict', class_weight_dict)
-
-        cevae_model = CEVAE(num_epochs = 10, batch_size = 128, learning_rate = 1e-2, num_samples = 100)
-        cevae_model.fit(X=X_train, treatment=t_train, y=y_train)
-        
-        ite = cevae_model.predict(X_valid.to_numpy())
-        ate = ite.mean()
-        print('ATE:',ate)
-        ates.append(ate)
-        # save_model(cevae_model, str(combination[0]) + '_' + str(combination[1]))
-        print(f'Time taken for combination {idx+1} is {datetime.now() - start_time}')
-        
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.275b5e62-ddd3-435c-a92f-4fe2a9da8c33"),
