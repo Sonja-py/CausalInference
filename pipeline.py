@@ -887,6 +887,7 @@ def rf_slearner_predictions_y0y1(final_data, Test_rf_slearner):
         person_ids = df['person_id']  # Store person_id before split
 
         # Train-test split (also split person_ids accordingly)
+        np.random.seed(0)
         X_train, X_test, t_train, t_test, person_train, person_test = train_test_split(
             X, t, person_ids, test_size=0.2, random_state=42, stratify=t
         )
