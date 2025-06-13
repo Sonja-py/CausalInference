@@ -271,7 +271,7 @@ from datetime import datetime
 from sklearn.model_selection import train_test_split
 
 def lr_slearner_predictions_y0y1(final_data, test_lr_slearner):
-
+    np.random.seed(0)
     def get_model(dataset, combination):
         fs = dataset.filesystem()
         try:
@@ -310,6 +310,7 @@ def lr_slearner_predictions_y0y1(final_data, test_lr_slearner):
         person_ids = df['person_id']  # Store person_id before split
 
         # Train-test split (also split person_ids accordingly)
+        np.random.seed(0)
         X_train, X_test, t_train, t_test, person_train, person_test = train_test_split(
             X, t, person_ids, test_size=0.2, random_state=42, stratify=t
         )
