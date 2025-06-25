@@ -335,7 +335,7 @@ def lr_slearner_predictions_y0y1(final_data, test_lr_slearner):
             'treatment_drug': t_test.values,
             'drug_0': [combination[0] for x in yhat_cs],
             'drug_1': [combination[1] for x in yhat_cs],
-            'model': ["S_RF" for x in yhat_cs]
+            'model': ["S_LR" for x in yhat_cs]
         })
         results_df = pd.concat([results_df, temp_df])
         # spark_df = spark.createDataFrame(results_df.astype({'yhat_ts': 'int'}))
