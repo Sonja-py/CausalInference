@@ -231,7 +231,10 @@ def lr_slearner_bootstrap(final_data, test_lr_slearner):
         print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
         df = main_df.copy()
         df = df[df.ingredient_concept_id.isin(list(combination))]
-        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
+        drug_0 = min(combination)
+        drug_1 = max(combination)
+
+        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == drug_0 else 1)
 
         X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
         y = df['severity_final']
@@ -301,7 +304,12 @@ def lr_slearner_predictions_y0y1(final_data, test_lr_slearner):
         
         # Filter data for current drug pair
         df = main_df[main_df.ingredient_concept_id.isin(combination)].copy()
-        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == combination[0] else 1)
+        # Canonicalize
+        drug_0 = min(combination)
+        drug_1 = max(combination)
+
+        # Standardized treatment direction
+        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == drug_0 else 1)
         
         # Define features and labels
         X = df.drop(columns=['person_id', 'severity_final', 'ingredient_concept_id', 'treatment'])
@@ -333,8 +341,8 @@ def lr_slearner_predictions_y0y1(final_data, test_lr_slearner):
             'Y1': yhat_ts,
             'Y0': yhat_cs,
             'treatment_drug': t_test.values,
-            'drug_0': [combination[0] for x in yhat_cs],
-            'drug_1': [combination[1] for x in yhat_cs],
+            'drug_0': [drug_0 for _ in yhat_cs],
+            'drug_1': [drug_1 for _ in yhat_cs],
             'model': ["S_LR" for x in yhat_cs]
         })
         results_df = pd.concat([results_df, temp_df])
