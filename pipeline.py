@@ -306,15 +306,19 @@ def lr_slearner_predictions_y0y1(final_data, test_lr_slearner):
         # Define features and labels
         X = df.drop(columns=['person_id', 'severity_final', 'ingredient_concept_id', 'treatment'])
         t = df['treatment']
-        
+        y = df['severity_final']
         person_ids = df['person_id']  # Store person_id before split
 
         # Train-test split (also split person_ids accordingly)
         np.random.seed(0)
-        X_train, X_test, t_train, t_test, person_train, person_test = train_test_split(
-            X, t, person_ids, test_size=0.2, random_state=42, stratify=t
+       X_train, X_test, t_train, t_test, y_train, y_test = train_test_split(
+            X, t, y,
+            test_size=0.2,
+            random_state=42,
+            stratify=y
         )
         
+        person_test = person_ids.loc[X_test.index]
         # Load pre-trained model for this drug combination
         model = get_model(test_lr_slearner, combination)
         
