@@ -311,7 +311,7 @@ def lr_slearner_predictions_y0y1(final_data, test_lr_slearner):
 
         # Train-test split (also split person_ids accordingly)
         np.random.seed(0)
-       X_train, X_test, t_train, t_test, y_train, y_test = train_test_split(
+        X_train, X_test, t_train, t_test, y_train, y_test = train_test_split(
             X, t, y,
             test_size=0.2,
             random_state=42,
