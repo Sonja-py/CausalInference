@@ -1026,6 +1026,132 @@ def rf_tlearner_predictions_y0y1(final_data, Test_rf_tlearner):
     return results_df
 
 @transform_pandas(
+    Output(rid="ri.foundry.main.dataset.6a7749e5-b652-4218-858a-455b4f5fbabc")
+)
+import pandas as pd
+import numpy as np
+from itertools import combinations
+from datetime import datetime
+from sklearn.model_selection import train_test_split
+
+def splittest(f,t):
+    np.random.seed(0)
+    # Convert PySpark DataFrame to Pandas
+    main_df = f.toPandas()
+    # Create result storage
+    results_df = pd.DataFrame()
+    
+    # Get unique drug combinations
+    ingredient_pairs = [(40234834, 710062)]
+    
+    initial_time = datetime.now()
+    count = 0
+    for idx, combination in enumerate(ingredient_pairs):
+        start_time = datetime.now()
+        print(f'Running inference for drug pair: {combination} ({idx+1} of {len(ingredient_pairs)})')
+        
+        # Filter data for current drug pair
+        df = main_df[main_df.ingredient_concept_id.isin(combination)].copy()
+        # Canonicalize
+        drug_0 = min(combination)
+        drug_1 = max(combination)
+
+        # Standardized treatment direction
+        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == drug_0 else 1)
+        
+        # Define features and labels
+        X = df.drop(columns=['person_id', 'severity_final', 'ingredient_concept_id', 'treatment'])
+        t = df['treatment']
+        y = df['severity_final']
+        person_ids = df['person_id']
+
+        np.random.seed(0)
+        X_train, X_test, t_train, t_test, y_train, y_test = train_test_split(
+            X, t, y,
+            test_size=0.2,
+            random_state=42,
+            stratify=y
+        )
+
+        return X_train, X_test, t_train, t_test, y_train, y_test
+
+def bootstrap(f,t):
+    # Create and get the data for pair of different antidepressants
+    main_df = f.toPandas()
+    results_df = pd.DataFrame(columns=['ate', 'ate_lower', 'ate_upper', 'variance', 'drug_0', 'drug_1', 'model'])
+    ingredient_pairs = [(40234834, 710062)]
+    initial_time = datetime.now()
+    # ingredient_pairs = [(40234834, 710062)]
+
+    for idx, combination in enumerate(ingredient_pairs):
+        start_time = datetime.now()
+        print(f'-----------Running Meta-Learners for drug pair: {combination}. It is number {idx+1} of {len(ingredient_pairs)} -----------')
+        df = main_df.copy()
+        df = df[df.ingredient_concept_id.isin(list(combination))]
+        drug_0 = min(combination)
+        drug_1 = max(combination)
+
+        df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == drug_0 else 1)
+
+        X = df.drop(['person_id','severity_final', 'ingredient_concept_id', 'treatment'], axis=1)
+        y = df['severity_final']
+        t = df['treatment']
+
+        np.random.seed(0)
+        X_train_val, X_test, t_train_val, t_test, y_train_val, y_test = train_test_split(X, t, y, test_size=0.2, random_state=42, stratify=y)
+    return X_train_val, X_test, t_train_val, t_test, y_train_val, y_test
+
+def splittest(final_data, test_lr_slearner):
+    from sklearn.utils import check_random_state
+    
+    # --- Pick a fixed drug pair to test ---
+    main_df = final_data.toPandas()
+    ingredient_pairs = list(combinations(main_df.ingredient_concept_id.unique(), 2))
+    test_pair = ingredient_pairs[0]
+    print(f"\n🔬 Using drug pair: {test_pair}")
+    
+    # --- Canonicalize treatment ---
+    drug_0, drug_1 = sorted(test_pair)
+    df = main_df[main_df.ingredient_concept_id.isin(test_pair)].copy()
+    df['treatment'] = df['ingredient_concept_id'].apply(lambda x: 0 if x == drug_0 else 1)
+
+    # --- Define consistent features and labels ---
+    X_all = df.drop(columns=['person_id', 'severity_final', 'ingredient_concept_id', 'treatment'])
+    t_all = df['treatment'].values
+    y_all = df['severity_final'].values
+
+    # --- Ensure consistent RNG ---
+    rng = check_random_state(42)
+    
+    # --- splittest split ---
+    X_train_1, X_test_1, t_train_1, t_test_1, y_train_1, y_test_1 = train_test_split(
+        X_all, t_all, y_all, test_size=0.2, random_state=rng, stratify=y_all
+    )
+    
+    # --- bootstrap split ---
+    X_train_2, X_test_2, t_train_2, t_test_2, y_train_2, y_test_2 = train_test_split(
+        X_all, t_all, y_all, test_size=0.2, random_state=rng, stratify=y_all
+    )
+    
+    # --- Compare results: ---
+    print(f"X_train equal: {np.allclose(X_train_1.values, X_train_2.values)}")
+    print(f"t_train equal: {np.array_equal(t_train_1, t_train_2)}")
+    print(f"y_train equal: {np.array_equal(y_train_1, y_train_2)}")
+
+    print(f"X_train shapes: {X_train_1.shape} vs {X_train_2.shape}")
+    print(f"t_train shapes: {t_train_1.shape} vs {t_train_2.shape}")
+    print(f"y_train shapes: {y_train_1.shape} vs {y_train_2.shape}")
+
+    print("splittest treatment train dist:", np.bincount(t_train_1))
+    print("bootstrap treatment train dist:", np.bincount(t_train_2))
+
+    return {
+        "splittest": (X_train_1, X_test_1, t_train_1, t_test_1, y_train_1, y_test_1),
+        "bootstrap": (X_train_2, X_test_2, t_train_2, t_test_2, y_train_2, y_test_2)
+    }
+    
+
+@transform_pandas(
     Output(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
@@ -1637,12 +1763,6 @@ from pyspark.sql.types import *
 def unnamed_2():
     schema = StructType([])
     return spark.createDataFrame([[]], schema=schema)
-
-@transform_pandas(
-    Output(rid="ri.vector.main.execute.f1922823-f07a-4746-9bdf-27fec3e677f5")
-)
-def unnamed_3():
-    
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.89021ed6-53c2-4027-8855-4b7e05f30b16"),
