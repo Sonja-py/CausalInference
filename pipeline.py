@@ -1054,7 +1054,7 @@ def splittest(final_data, test_lr_slearner):
     print(f"X_test equal: {X_test_equal}")
     print(f"t_test equal: {t_test_equal}")
     print(f"y_test equal: {y_test_equal}")
-    }
+    
 
 def y0y1(f,t):
     np.random.seed(0)
