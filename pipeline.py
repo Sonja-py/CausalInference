@@ -10,7 +10,6 @@ from functools import reduce
 from statistics import median, mean
 
 from causalml.inference.meta import BaseSClassifier, BaseTClassifier
-from causalml.inference.tree import predict as causal_predict
 
 from sklearn.utils import class_weight
 from sklearn.metrics import roc_auc_score, make_scorer
