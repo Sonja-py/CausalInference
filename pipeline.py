@@ -10,6 +10,7 @@ from functools import reduce
 from statistics import median, mean
 
 from causalml.inference.meta import BaseSClassifier, BaseTClassifier
+from causalml.inference.tree import predict as causal_predict
 
 from sklearn.utils import class_weight
 from sklearn.metrics import roc_auc_score, make_scorer
@@ -212,7 +213,7 @@ def lr_slearner_bootstrap(final_data, test_lr_slearner):
                                                             bootstrap_ci=True,
                                                             n_bootstraps=100,
                                                             bootstrap_size=bs_size,
-                                                            # pretrain=True,
+                                                            pretrain=True,
                                                             )
 
         print(f'ATE: {ate}, lower: {ate_lower}, upper: {ate_upper}')
@@ -261,6 +262,25 @@ def lr_slearner_bootstrap(final_data, test_lr_slearner):
     print('Total time taken:',datetime.now() - initial_time)
 
     return results_df
+
+def estimate_ate_pretrained(model, X, treatment):
+    X1 = X.copy()
+    X1['treatment'] = 1
+    X0 = X.copy()
+    X0['treatment'] = 0
+
+    y1_pred = model.causal_predict(X1)
+    y0_pred = model.causal_predict(X0)
+    
+    ite = y1_pred - y0_pred
+    ate = ite.mean()
+    se = ite.std() / np.sqrt(len(ite))
+
+    z = norm.ppf(0.975)  # for 95% CI
+    ate_lb = ate - z * se
+    ate_ub = ate + z * se
+
+    return ate, ate_lb, ate_ub
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.c8e53f01-c7d2-4965-b42e-92d48eeb9197"),
