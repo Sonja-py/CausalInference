@@ -148,7 +148,7 @@ from sklearn.model_selection import train_test_split
 from datetime import datetime
 from itertools import combinations
 
-def Rerun_best_for_auc_rfs(final_data, , , test_rf_slearner):
+def Rerun_best_for_auc_rfs(final_data, test_rf_slearner):
     def load_model(fs, names):
         for name in names:
             try:
