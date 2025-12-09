@@ -588,6 +588,98 @@ def meta_learners_bootstrapped(final_data):
     
 
 @transform_pandas(
+    Output(rid="ri.foundry.main.dataset.3e7802eb-6010-47c3-8547-95935e15fac8"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498"),
+    test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405")
+)
+import pickle
+import numpy as np
+import pandas as pd
+from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import train_test_split
+from datetime import datetime
+from itertools import combinations
+
+def rerun_best_for_auc(final_data, test_lr_slearner):
+    def load_model(fs, names):
+        for name in names:
+            try:
+                with fs.open(f"{name}.pickle", "rb") as f:
+                    return pickle.load(f)
+            except Exception:
+                continue
+        raise FileNotFoundError(f"No model found for {names}")
+
+    main_df = final_data.toPandas()
+    ingredient_list = main_df.ingredient_concept_id.unique()
+    ingredient_pairs = list(combinations(ingredient_list, 2))
+
+    fs = test_lr_slearner.filesystem()
+    results = []
+
+    start_all = datetime.now()
+
+    for idx, combination in enumerate(ingredient_pairs, 1):
+        start = datetime.now()
+        print(
+            f"[{idx}/{len(ingredient_pairs)}] "
+            f"Evaluating model for drug pair {combination}..."
+        )
+
+        df = main_df[main_df.ingredient_concept_id.isin(combination)].copy()
+
+        drug_0, drug_1 = combination
+        df["treatment"] = (df.ingredient_concept_id == drug_1).astype(int)
+
+        X = df.drop(
+            ["person_id", "severity_final", "ingredient_concept_id", "treatment"],
+            axis=1
+        )
+        y = df["severity_final"]
+        t = df["treatment"]
+
+        # IMPORTANT: same split as training code
+        X_train_val, X_test, y_train_val, y_test, t_train_val, t_test = (
+            train_test_split(
+                X, y, t,
+                test_size=0.2,
+                random_state=42,
+                stratify=y
+            )
+        )
+
+        clf = load_model(
+            fs,
+            [f"{drug_0}_{drug_1}", f"{drug_1}_{drug_0}"]
+        )
+
+        ite, yhat_cs, yhat_ts = clf.predict(
+            X=X_test,
+            treatment=t_test,
+            return_components=True
+        )
+
+        yhat_cs = np.array(list(yhat_cs.values())[0])
+        yhat_ts = np.array(list(yhat_ts.values())[0])
+
+        preds = (1 - t_test.values) * yhat_cs + t_test.values * yhat_ts
+        auc = roc_auc_score(y_test, preds)
+
+        results.append({
+            "drug_0": drug_0,
+            "drug_1": drug_1,
+            "auc": auc,
+        })
+
+        print(
+            f"    AUC: {auc:.4f} | "
+            f"Time: {datetime.now() - start}"
+        )
+
+    print("Total time:", datetime.now() - start_all)
+    return pd.DataFrame(results)
+
+@transform_pandas(
     Output(rid="ri.foundry.main.dataset.c55c9d7f-ff97-450b-8d2c-fabecfaaa8ab"),
     final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
@@ -1756,13 +1848,6 @@ from pyspark.sql.types import *
 def unnamed_2():
     schema = StructType([])
     return spark.createDataFrame([[]], schema=schema)
-
-@transform_pandas(
-    Output(rid="ri.vector.main.execute.76b60846-ab40-4ea5-9178-1e641abe699c"),
-    test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405")
-)
-def unnamed_3(test_lr_slearner):
-    
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.89021ed6-53c2-4027-8855-4b7e05f30b16"),
