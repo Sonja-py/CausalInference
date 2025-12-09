@@ -137,8 +137,8 @@ def Rerun_best_for_auc_lrs(final_data, test_lr_slearner):
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.7ae3b5f1-cea5-4c3a-a789-9c0b4612bfc0"),
-    Test_rf_slearner=Input(rid="ri.foundry.main.dataset.d8a3ce5b-5472-4704-9d3a-205920048c80"),
-    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498"),
+    test_rf_slearner=Input(rid="ri.foundry.main.dataset.d8a3ce5b-5472-4704-9d3a-205920048c80")
 )
 import pickle
 import numpy as np
@@ -148,7 +148,7 @@ from sklearn.model_selection import train_test_split
 from datetime import datetime
 from itertools import combinations
 
-def Rerun_best_for_auc_rfs(final_data, , Test_rf_slearner):
+def Rerun_best_for_auc_rfs(final_data, , , test_rf_slearner):
     def load_model(fs, names):
         for name in names:
             try:
