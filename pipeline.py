@@ -600,7 +600,7 @@ from sklearn.model_selection import train_test_split
 from datetime import datetime
 from itertools import combinations
 
-def rerun_best_for_auc(final_data, test_lr_slearner):
+def rerun_best_for_auc_lrs(final_data, test_lr_slearner):
     def load_model(fs, names):
         for name in names:
             try:
