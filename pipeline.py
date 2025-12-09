@@ -137,8 +137,8 @@ def Rerun_best_for_auc_lrs(final_data, test_lr_slearner):
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.7ae3b5f1-cea5-4c3a-a789-9c0b4612bfc0"),
-    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498"),
-    test_lr_slearner=Input(rid="ri.foundry.main.dataset.67236741-6d93-418d-83c3-91a2b3ea8405")
+    Test_rf_slearner=Input(rid="ri.foundry.main.dataset.d8a3ce5b-5472-4704-9d3a-205920048c80"),
+    final_data=Input(rid="ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498")
 )
 import pickle
 import numpy as np
@@ -148,7 +148,7 @@ from sklearn.model_selection import train_test_split
 from datetime import datetime
 from itertools import combinations
 
-def Rerun_best_for_auc_rfs(final_data, test_lr_slearner):
+def Rerun_best_for_auc_rfs(final_data, Test_rf_slearner):
     def load_model(fs, names):
         for name in names:
             try:
@@ -162,7 +162,7 @@ def Rerun_best_for_auc_rfs(final_data, test_lr_slearner):
     ingredient_list = main_df.ingredient_concept_id.unique()
     ingredient_pairs = list(combinations(ingredient_list, 2))
 
-    fs = test_lr_slearner.filesystem()
+    fs = Test_rf_slearner.filesystem()
     results = []
 
     start_all = datetime.now()
