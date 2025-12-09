@@ -162,7 +162,7 @@ def Rerun_best_for_auc_rfs(final_data, test_rf_slearner):
     ingredient_list = main_df.ingredient_concept_id.unique()
     ingredient_pairs = list(combinations(ingredient_list, 2))
 
-    fs = Test_rf_slearner.filesystem()
+    fs = test_rf_slearner.filesystem()
     results = []
 
     start_all = datetime.now()
