@@ -1,0 +1,56 @@
+from myproject.TARNet.tarnet import bootstrap_func
+from pyspark.sql import SparkSession
+from transforms.api import transform, Input, Output, configure
+
+from itertools import combinations
+import logging
+import pandas as pd
+
+logger = logging.getLogger()
+
+
+@configure(["DRIVER_GPU_ENABLED", "DRIVER_MEMORY_LARGE", "DRIVER_CORES_LARGE"])
+@configure(
+    [
+        "EXECUTOR_GPU_ENABLED",
+        "EXECUTOR_MEMORY_MEDIUM",
+        "EXECUTOR_CORES_LARGE",
+        "NUM_EXECUTORS_8",
+    ]
+)
+@transform(
+    output_df=Output("ri.foundry.main.dataset.be5b7ed3-4548-4f1d-90ab-71896decc58c"),
+    source_df=Input("ri.foundry.main.dataset.189cbacb-e1b1-4ba8-8bee-9d6ee805f498"),
+    hyperparams_df=Input(
+        "ri.foundry.main.dataset.0d645ea3-8041-482e-a548-ea708421e06b"
+    ),
+)
+def compute(output_df, source_df, hyperparams_df):
+    source_df = source_df.dataframe()
+    hyperparams_df = hyperparams_df.dataframe()
+
+    source_df = source_df.toPandas()
+    hyperparams_df = hyperparams_df.toPandas()
+
+    results_df = pd.DataFrame()
+    # ingredient_pairs = [(40234834, 710062)]
+    ingredient_list = source_df.ingredient_concept_id.unique()
+    ingredient_pairs = sorted(list(combinations(ingredient_list, 2)), reverse=False)
+
+    mini_batch_size = 10
+    mini_batches = []
+
+    for idx in range(0, len(ingredient_pairs), mini_batch_size):
+        mini_batches.append(ingredient_pairs[idx : idx + mini_batch_size])
+
+    results_df = bootstrap_func(source_df, hyperparams_df, mini_batches[11])
+
+    logger.info(type(results_df))
+
+    # Create a SparkSession object
+    spark = SparkSession.builder.getOrCreate()
+
+    # Convert the Pandas DataFrame to a PySpark DataFrame
+    df_pyspark = spark.createDataFrame(results_df)
+
+    return output_df.write_dataframe(df_pyspark)
